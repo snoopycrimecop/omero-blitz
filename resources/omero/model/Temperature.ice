@@ -18,8 +18,8 @@
  */
 
 
-#ifndef CLASS_TIME
-#define CLASS_TIME
+#ifndef CLASS_TEMPERATURE
+#define CLASS_TEMPERATURE
 
 #include <omero/model/Units.ice>
 
@@ -28,14 +28,14 @@ module omero {
     module model {
 
       /**
-       * Unit of Time which is used through the model. This is not
+       * Unit of Temperature which is used through the model. This is not
        * an [omero::model::IObject] implementation and as such does
        * not have an ID value. Instead, the entire object is embedded
        * into the containing class, so that the value and unit rows
-       * can be found on the table itself (e.g. planeInfo.exposureTime
-       * and planeInfo.exposureTimeUnit).
+       * can be found on the table itself (e.g. imagingEnvironment.temperature
+       * and imagingEnvironment.temperatureUnit).
        **/
-    ["protected"] class Time
+    ["protected"] class Temperature
     {
 
       /**
@@ -43,11 +43,11 @@ module omero {
        */
       double value;
 
-      omero::model::enums::UnitsTime unit;
+      omero::model::enums::UnitsTemperature unit;
 
       /**
        * Actual value for this unit-based field. The interpretation of
-       * the value is only possible along with the [omero::model::enums::UnitsTime]
+       * the value is only possible along with the [omero::model::enums::UnitsTemperature]
        * enum.
        **/
       double getValue();
@@ -55,14 +55,14 @@ module omero {
       void setValue(double value);
 
       /**
-       * [omero::model::enums::UnitsTime] instance which is an [omero::model::IObject]
+       * [omero::model::enums::UnitsTemperature] instance which is an [omero::model::IObject]
        * meaning that its ID is sufficient for identifying equality.
        **/
-      omero::model::enums::UnitsTime getUnit();
+      omero::model::enums::UnitsTemperature getUnit();
 
-      void setUnit(omero::model::enums::UnitsTime unit);
+      void setUnit(omero::model::enums::UnitsTemperature unit);
 
-      Time copy();
+      Temperature copy();
 
     };
   };

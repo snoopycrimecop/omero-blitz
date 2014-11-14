@@ -26,17 +26,17 @@ import ome.util.ModelMapper;
 import ome.util.ReverseModelMapper;
 import ome.xml.model.enums.EnumerationException;
 
-import omero.model.enums.UnitsTime;
+import omero.model.enums.UnitsFrequency;
 
 /**
- * Blitz wrapper around the {@link ome.model.units.Time} class.
+ * Blitz wrapper around the {@link ome.model.units.Frequency} class.
  * Like {@link Details} and {@link Permissions}, this object
  * is embedded into other objects and does not have a full life
  * cycle of its own.
  *
  * @author Josh Moore, josh at glencoesoftware.com
  */
-public class TimeI extends Time implements ModelBased {
+public class FrequencyI extends Frequency implements ModelBased {
 
     private static final long serialVersionUID = 1L;
 
@@ -45,7 +45,7 @@ public class TimeI extends Time implements ModelBased {
         return new Ice.ObjectFactory() {
 
             public Ice.Object create(String arg0) {
-                return new TimeI();
+                return new FrequencyI();
             }
 
             public void destroy() {
@@ -59,20 +59,20 @@ public class TimeI extends Time implements ModelBased {
     // CONVERSIONS
     //
 
-    public static ome.xml.model.enums.UnitsTime makeXMLUnit(String unit) {
+    public static ome.xml.model.enums.UnitsFrequency makeXMLUnit(String unit) {
         try {
-            return ome.xml.model.enums.UnitsTime
+            return ome.xml.model.enums.UnitsFrequency
                     .fromString((String) unit);
         } catch (EnumerationException e) {
-            throw new RuntimeException("Bad Time unit: " + unit, e);
+            throw new RuntimeException("Bad Frequency unit: " + unit, e);
         }
     }
 
-    public static ome.units.quantity.Time makeXMLQuantity(double d, String unit) {
-        ome.units.unit.Unit<ome.units.quantity.Time> units =
-                ome.xml.model.enums.handlers.UnitsTimeEnumHandler
+    public static ome.units.quantity.Frequency makeXMLQuantity(double d, String unit) {
+        ome.units.unit.Unit<ome.units.quantity.Frequency> units =
+                ome.xml.model.enums.handlers.UnitsFrequencyEnumHandler
                         .getBaseUnit(makeXMLUnit(unit));
-        return new ome.units.quantity.Time(d, units);
+        return new ome.units.quantity.Frequency(d, units);
     }
 
    /**
@@ -84,7 +84,7 @@ public class TimeI extends Time implements ModelBased {
     *
     * or similar.
     */
-   public static ome.units.quantity.Time convert(Time t) {
+   public static ome.units.quantity.Frequency convert(Frequency t) {
        if (t == null) {
            return null;
        }
@@ -92,14 +92,14 @@ public class TimeI extends Time implements ModelBased {
        Double v = t.getValue();
        // Use the code/symbol-mapping in the ome.model.enums files
        // to convert to the specification value.
-       String u = ome.model.enums.UnitsTime.valueOf(
+       String u = ome.model.enums.UnitsFrequency.valueOf(
                t.getUnit().toString()).getSymbol();
-       ome.xml.model.enums.UnitsTime units = makeXMLUnit(u);
-       ome.units.unit.Unit<ome.units.quantity.Time> units2 =
-               ome.xml.model.enums.handlers.UnitsTimeEnumHandler
+       ome.xml.model.enums.UnitsFrequency units = makeXMLUnit(u);
+       ome.units.unit.Unit<ome.units.quantity.Frequency> units2 =
+               ome.xml.model.enums.handlers.UnitsFrequencyEnumHandler
                        .getBaseUnit(units);
 
-       return new ome.units.quantity.Time(v, units2);
+       return new ome.units.quantity.Frequency(v, units2);
    }
 
 
@@ -109,41 +109,41 @@ public class TimeI extends Time implements ModelBased {
 
     public final static Ice.ObjectFactory Factory = makeFactory(null);
 
-    public TimeI() {
+    public FrequencyI() {
         super();
     }
 
-    public TimeI(double d, UnitsTime unit) {
+    public FrequencyI(double d, UnitsFrequency unit) {
         super();
         this.setUnit(unit);
         this.setValue(d);
     }
 
-    public TimeI(double d,
-            Unit<ome.units.quantity.Time> unit) {
-        this(d, ome.model.enums.UnitsTime.bySymbol(unit.getSymbol()));
+    public FrequencyI(double d,
+            Unit<ome.units.quantity.Frequency> unit) {
+        this(d, ome.model.enums.UnitsFrequency.bySymbol(unit.getSymbol()));
     }
 
    /**
-    * Copy constructor that converts the given {@link omero.model.Time}
+    * Copy constructor that converts the given {@link omero.model.Frequency}
     * based on the given ome-xml enum
     */
-   public TimeI(Time value, Unit<ome.units.quantity.Time> ul) {
+   public FrequencyI(Frequency value, Unit<ome.units.quantity.Frequency> ul) {
        this(value,
-            ome.model.enums.UnitsTime.bySymbol(ul.getSymbol()).toString());
+            ome.model.enums.UnitsFrequency.bySymbol(ul.getSymbol()).toString());
    }
 
-   public TimeI(double d, ome.model.enums.UnitsTime ul) {
-        this(d, UnitsTime.valueOf(ul.toString()));
+   public FrequencyI(double d, ome.model.enums.UnitsFrequency ul) {
+        this(d, UnitsFrequency.valueOf(ul.toString()));
     }
 
    /**
-    * Copy constructor that converts the given {@link omero.model.Time}
+    * Copy constructor that converts the given {@link omero.model.Frequency}
     * based on the given enum string.
     *
     * @param target String representation of the CODE enum
     */
-    public TimeI(Time value, String target) {
+    public FrequencyI(Frequency value, String target) {
        String source = value.getUnit().toString();
        if (!target.equals(source)) {
             throw new RuntimeException(String.format(
@@ -159,17 +159,17 @@ public class TimeI extends Time implements ModelBased {
     *
     * @param target unit that is desired. non-null.
     */
-    public TimeI(Time value, UnitsTime target) {
+    public FrequencyI(Frequency value, UnitsFrequency target) {
         this(value, target.toString());
     }
 
     /**
-     * Convert a Bio-Formats {@link Time} to an OMERO Time.
+     * Convert a Bio-Formats {@link Frequency} to an OMERO Frequency.
      */
-    public TimeI(ome.units.quantity.Time value) {
-        ome.model.enums.UnitsTime internal =
-            ome.model.enums.UnitsTime.bySymbol(value.unit().getSymbol());
-        UnitsTime ul = UnitsTime.valueOf(internal.toString());
+    public FrequencyI(ome.units.quantity.Frequency value) {
+        ome.model.enums.UnitsFrequency internal =
+            ome.model.enums.UnitsFrequency.bySymbol(value.unit().getSymbol());
+        UnitsFrequency ul = UnitsFrequency.valueOf(internal.toString());
         setValue(value.value().doubleValue());
         setUnit(ul);
     }
@@ -182,16 +182,16 @@ public class TimeI extends Time implements ModelBased {
         this.value = value;
     }
 
-    public UnitsTime getUnit(Ice.Current current) {
+    public UnitsFrequency getUnit(Ice.Current current) {
         return this.unit;
     }
 
-    public void setUnit(UnitsTime unit, Ice.Current current) {
+    public void setUnit(UnitsFrequency unit, Ice.Current current) {
         this.unit = unit;
     }
 
-    public Time copy(Ice.Current ignore) {
-        TimeI copy = new TimeI();
+    public Frequency copy(Ice.Current ignore) {
+        FrequencyI copy = new FrequencyI();
         copy.setValue(getValue());
         copy.setUnit(getUnit());
         return copy;
@@ -199,21 +199,21 @@ public class TimeI extends Time implements ModelBased {
 
     @Override
     public void copyObject(Filterable model, ModelMapper mapper) {
-        if (model instanceof ome.model.units.Time) {
-            ome.model.units.Time t = (ome.model.units.Time) model;
+        if (model instanceof ome.model.units.Frequency) {
+            ome.model.units.Frequency t = (ome.model.units.Frequency) model;
             this.value = t.getValue();
-            this.unit = UnitsTime.valueOf(t.getUnit().toString());
+            this.unit = UnitsFrequency.valueOf(t.getUnit().toString());
         } else {
             throw new IllegalArgumentException(
-              "Time cannot copy from " +
+              "Frequency cannot copy from " +
               (model==null ? "null" : model.getClass().getName()));
         }
     }
 
     @Override
     public Filterable fillObject(ReverseModelMapper mapper) {
-        ome.model.enums.UnitsTime ut = ome.model.enums.UnitsTime.valueOf(getUnit().toString());
-        ome.model.units.Time t = new ome.model.units.Time(getValue(), ut);
+        ome.model.enums.UnitsFrequency ut = ome.model.enums.UnitsFrequency.valueOf(getUnit().toString());
+        ome.model.units.Frequency t = new ome.model.units.Frequency(getValue(), ut);
         return t;
     }
 
@@ -233,7 +233,7 @@ public class TimeI extends Time implements ModelBased {
 
     @Override
     public String toString() {
-        return "Time(" + value + " " + unit + ")";
+        return "Frequency(" + value + " " + unit + ")";
     }
 
     @Override
@@ -244,7 +244,7 @@ public class TimeI extends Time implements ModelBased {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        Time other = (Time) obj;
+        Frequency other = (Frequency) obj;
         if (unit != other.unit)
             return false;
         if (Double.doubleToLongBits(value) != Double

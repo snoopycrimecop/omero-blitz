@@ -26,17 +26,17 @@ import ome.util.ModelMapper;
 import ome.util.ReverseModelMapper;
 import ome.xml.model.enums.EnumerationException;
 
-import omero.model.enums.UnitsTime;
+import omero.model.enums.UnitsTemperature;
 
 /**
- * Blitz wrapper around the {@link ome.model.units.Time} class.
+ * Blitz wrapper around the {@link ome.model.units.Temperature} class.
  * Like {@link Details} and {@link Permissions}, this object
  * is embedded into other objects and does not have a full life
  * cycle of its own.
  *
  * @author Josh Moore, josh at glencoesoftware.com
  */
-public class TimeI extends Time implements ModelBased {
+public class TemperatureI extends Temperature implements ModelBased {
 
     private static final long serialVersionUID = 1L;
 
@@ -45,7 +45,7 @@ public class TimeI extends Time implements ModelBased {
         return new Ice.ObjectFactory() {
 
             public Ice.Object create(String arg0) {
-                return new TimeI();
+                return new TemperatureI();
             }
 
             public void destroy() {
@@ -59,20 +59,20 @@ public class TimeI extends Time implements ModelBased {
     // CONVERSIONS
     //
 
-    public static ome.xml.model.enums.UnitsTime makeXMLUnit(String unit) {
+    public static ome.xml.model.enums.UnitsTemperature makeXMLUnit(String unit) {
         try {
-            return ome.xml.model.enums.UnitsTime
+            return ome.xml.model.enums.UnitsTemperature
                     .fromString((String) unit);
         } catch (EnumerationException e) {
-            throw new RuntimeException("Bad Time unit: " + unit, e);
+            throw new RuntimeException("Bad Temperature unit: " + unit, e);
         }
     }
 
-    public static ome.units.quantity.Time makeXMLQuantity(double d, String unit) {
-        ome.units.unit.Unit<ome.units.quantity.Time> units =
-                ome.xml.model.enums.handlers.UnitsTimeEnumHandler
+    public static ome.units.quantity.Temperature makeXMLQuantity(double d, String unit) {
+        ome.units.unit.Unit<ome.units.quantity.Temperature> units =
+                ome.xml.model.enums.handlers.UnitsTemperatureEnumHandler
                         .getBaseUnit(makeXMLUnit(unit));
-        return new ome.units.quantity.Time(d, units);
+        return new ome.units.quantity.Temperature(d, units);
     }
 
    /**
@@ -84,7 +84,7 @@ public class TimeI extends Time implements ModelBased {
     *
     * or similar.
     */
-   public static ome.units.quantity.Time convert(Time t) {
+   public static ome.units.quantity.Temperature convert(Temperature t) {
        if (t == null) {
            return null;
        }
@@ -92,14 +92,14 @@ public class TimeI extends Time implements ModelBased {
        Double v = t.getValue();
        // Use the code/symbol-mapping in the ome.model.enums files
        // to convert to the specification value.
-       String u = ome.model.enums.UnitsTime.valueOf(
+       String u = ome.model.enums.UnitsTemperature.valueOf(
                t.getUnit().toString()).getSymbol();
-       ome.xml.model.enums.UnitsTime units = makeXMLUnit(u);
-       ome.units.unit.Unit<ome.units.quantity.Time> units2 =
-               ome.xml.model.enums.handlers.UnitsTimeEnumHandler
+       ome.xml.model.enums.UnitsTemperature units = makeXMLUnit(u);
+       ome.units.unit.Unit<ome.units.quantity.Temperature> units2 =
+               ome.xml.model.enums.handlers.UnitsTemperatureEnumHandler
                        .getBaseUnit(units);
 
-       return new ome.units.quantity.Time(v, units2);
+       return new ome.units.quantity.Temperature(v, units2);
    }
 
 
@@ -109,41 +109,41 @@ public class TimeI extends Time implements ModelBased {
 
     public final static Ice.ObjectFactory Factory = makeFactory(null);
 
-    public TimeI() {
+    public TemperatureI() {
         super();
     }
 
-    public TimeI(double d, UnitsTime unit) {
+    public TemperatureI(double d, UnitsTemperature unit) {
         super();
         this.setUnit(unit);
         this.setValue(d);
     }
 
-    public TimeI(double d,
-            Unit<ome.units.quantity.Time> unit) {
-        this(d, ome.model.enums.UnitsTime.bySymbol(unit.getSymbol()));
+    public TemperatureI(double d,
+            Unit<ome.units.quantity.Temperature> unit) {
+        this(d, ome.model.enums.UnitsTemperature.bySymbol(unit.getSymbol()));
     }
 
    /**
-    * Copy constructor that converts the given {@link omero.model.Time}
+    * Copy constructor that converts the given {@link omero.model.Temperature}
     * based on the given ome-xml enum
     */
-   public TimeI(Time value, Unit<ome.units.quantity.Time> ul) {
+   public TemperatureI(Temperature value, Unit<ome.units.quantity.Temperature> ul) {
        this(value,
-            ome.model.enums.UnitsTime.bySymbol(ul.getSymbol()).toString());
+            ome.model.enums.UnitsTemperature.bySymbol(ul.getSymbol()).toString());
    }
 
-   public TimeI(double d, ome.model.enums.UnitsTime ul) {
-        this(d, UnitsTime.valueOf(ul.toString()));
+   public TemperatureI(double d, ome.model.enums.UnitsTemperature ul) {
+        this(d, UnitsTemperature.valueOf(ul.toString()));
     }
 
    /**
-    * Copy constructor that converts the given {@link omero.model.Time}
+    * Copy constructor that converts the given {@link omero.model.Temperature}
     * based on the given enum string.
     *
     * @param target String representation of the CODE enum
     */
-    public TimeI(Time value, String target) {
+    public TemperatureI(Temperature value, String target) {
        String source = value.getUnit().toString();
        if (!target.equals(source)) {
             throw new RuntimeException(String.format(
@@ -159,17 +159,17 @@ public class TimeI extends Time implements ModelBased {
     *
     * @param target unit that is desired. non-null.
     */
-    public TimeI(Time value, UnitsTime target) {
+    public TemperatureI(Temperature value, UnitsTemperature target) {
         this(value, target.toString());
     }
 
     /**
-     * Convert a Bio-Formats {@link Time} to an OMERO Time.
+     * Convert a Bio-Formats {@link Temperature} to an OMERO Temperature.
      */
-    public TimeI(ome.units.quantity.Time value) {
-        ome.model.enums.UnitsTime internal =
-            ome.model.enums.UnitsTime.bySymbol(value.unit().getSymbol());
-        UnitsTime ul = UnitsTime.valueOf(internal.toString());
+    public TemperatureI(ome.units.quantity.Temperature value) {
+        ome.model.enums.UnitsTemperature internal =
+            ome.model.enums.UnitsTemperature.bySymbol(value.unit().getSymbol());
+        UnitsTemperature ul = UnitsTemperature.valueOf(internal.toString());
         setValue(value.value().doubleValue());
         setUnit(ul);
     }
@@ -182,16 +182,16 @@ public class TimeI extends Time implements ModelBased {
         this.value = value;
     }
 
-    public UnitsTime getUnit(Ice.Current current) {
+    public UnitsTemperature getUnit(Ice.Current current) {
         return this.unit;
     }
 
-    public void setUnit(UnitsTime unit, Ice.Current current) {
+    public void setUnit(UnitsTemperature unit, Ice.Current current) {
         this.unit = unit;
     }
 
-    public Time copy(Ice.Current ignore) {
-        TimeI copy = new TimeI();
+    public Temperature copy(Ice.Current ignore) {
+        TemperatureI copy = new TemperatureI();
         copy.setValue(getValue());
         copy.setUnit(getUnit());
         return copy;
@@ -199,21 +199,21 @@ public class TimeI extends Time implements ModelBased {
 
     @Override
     public void copyObject(Filterable model, ModelMapper mapper) {
-        if (model instanceof ome.model.units.Time) {
-            ome.model.units.Time t = (ome.model.units.Time) model;
+        if (model instanceof ome.model.units.Temperature) {
+            ome.model.units.Temperature t = (ome.model.units.Temperature) model;
             this.value = t.getValue();
-            this.unit = UnitsTime.valueOf(t.getUnit().toString());
+            this.unit = UnitsTemperature.valueOf(t.getUnit().toString());
         } else {
             throw new IllegalArgumentException(
-              "Time cannot copy from " +
+              "Temperature cannot copy from " +
               (model==null ? "null" : model.getClass().getName()));
         }
     }
 
     @Override
     public Filterable fillObject(ReverseModelMapper mapper) {
-        ome.model.enums.UnitsTime ut = ome.model.enums.UnitsTime.valueOf(getUnit().toString());
-        ome.model.units.Time t = new ome.model.units.Time(getValue(), ut);
+        ome.model.enums.UnitsTemperature ut = ome.model.enums.UnitsTemperature.valueOf(getUnit().toString());
+        ome.model.units.Temperature t = new ome.model.units.Temperature(getValue(), ut);
         return t;
     }
 
@@ -233,7 +233,7 @@ public class TimeI extends Time implements ModelBased {
 
     @Override
     public String toString() {
-        return "Time(" + value + " " + unit + ")";
+        return "Temperature(" + value + " " + unit + ")";
     }
 
     @Override
@@ -244,7 +244,7 @@ public class TimeI extends Time implements ModelBased {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        Time other = (Time) obj;
+        Temperature other = (Temperature) obj;
         if (unit != other.unit)
             return false;
         if (Double.doubleToLongBits(value) != Double
