@@ -18,8 +18,8 @@
  */
 
 
-#ifndef CLASS_TIME
-#define CLASS_TIME
+#ifndef CLASS_ELECTRICPOTENTIAL
+#define CLASS_ELECTRICPOTENTIAL
 
 #include <omero/model/Units.ice>
 
@@ -28,14 +28,14 @@ module omero {
     module model {
 
       /**
-       * Unit of Time which is used through the model. This is not
+       * Unit of ElectricPotential which is used through the model. This is not
        * an [omero::model::IObject] implementation and as such does
        * not have an ID value. Instead, the entire object is embedded
        * into the containing class, so that the value and unit rows
-       * can be found on the table itself (e.g. planeInfo.exposureTime
-       * and planeInfo.exposureTimeUnit).
+       * can be found on the table itself (e.g. detectorSettings.volatage
+       * and detectorSettings.volatageUnit).
        **/
-    ["protected"] class Time
+    ["protected"] class ElectricPotential
     {
 
       /**
@@ -43,11 +43,11 @@ module omero {
        */
       double value;
 
-      omero::model::enums::UnitsTime unit;
+      omero::model::enums::UnitsElectricPotential unit;
 
       /**
        * Actual value for this unit-based field. The interpretation of
-       * the value is only possible along with the [omero::model::enums::UnitsTime]
+       * the value is only possible along with the [omero::model::enums::UnitsElectricPotential]
        * enum.
        **/
       double getValue();
@@ -55,14 +55,14 @@ module omero {
       void setValue(double value);
 
       /**
-       * [omero::model::enums::UnitsTime] instance which is an [omero::model::IObject]
+       * [omero::model::enums::UnitsElectricPotential] instance which is an [omero::model::IObject]
        * meaning that its ID is sufficient for identifying equality.
        **/
-      omero::model::enums::UnitsTime getUnit();
+      omero::model::enums::UnitsElectricPotential getUnit();
 
-      void setUnit(omero::model::enums::UnitsTime unit);
+      void setUnit(omero::model::enums::UnitsElectricPotential unit);
 
-      Time copy();
+      ElectricPotential copy();
 
     };
   };

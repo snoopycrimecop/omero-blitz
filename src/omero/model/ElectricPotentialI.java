@@ -26,17 +26,17 @@ import ome.util.ModelMapper;
 import ome.util.ReverseModelMapper;
 import ome.xml.model.enums.EnumerationException;
 
-import omero.model.enums.UnitsTime;
+import omero.model.enums.UnitsElectricPotential;
 
 /**
- * Blitz wrapper around the {@link ome.model.units.Time} class.
+ * Blitz wrapper around the {@link ome.model.units.ElectricPotential} class.
  * Like {@link Details} and {@link Permissions}, this object
  * is embedded into other objects and does not have a full life
  * cycle of its own.
  *
  * @author Josh Moore, josh at glencoesoftware.com
  */
-public class TimeI extends Time implements ModelBased {
+public class ElectricPotentialI extends ElectricPotential implements ModelBased {
 
     private static final long serialVersionUID = 1L;
 
@@ -45,7 +45,7 @@ public class TimeI extends Time implements ModelBased {
         return new Ice.ObjectFactory() {
 
             public Ice.Object create(String arg0) {
-                return new TimeI();
+                return new ElectricPotentialI();
             }
 
             public void destroy() {
@@ -59,20 +59,20 @@ public class TimeI extends Time implements ModelBased {
     // CONVERSIONS
     //
 
-    public static ome.xml.model.enums.UnitsTime makeXMLUnit(String unit) {
+    public static ome.xml.model.enums.UnitsElectricPotential makeXMLUnit(String unit) {
         try {
-            return ome.xml.model.enums.UnitsTime
+            return ome.xml.model.enums.UnitsElectricPotential
                     .fromString((String) unit);
         } catch (EnumerationException e) {
-            throw new RuntimeException("Bad Time unit: " + unit, e);
+            throw new RuntimeException("Bad ElectricPotential unit: " + unit, e);
         }
     }
 
-    public static ome.units.quantity.Time makeXMLQuantity(double d, String unit) {
-        ome.units.unit.Unit<ome.units.quantity.Time> units =
-                ome.xml.model.enums.handlers.UnitsTimeEnumHandler
+    public static ome.units.quantity.ElectricPotential makeXMLQuantity(double d, String unit) {
+        ome.units.unit.Unit<ome.units.quantity.ElectricPotential> units =
+                ome.xml.model.enums.handlers.UnitsElectricPotentialEnumHandler
                         .getBaseUnit(makeXMLUnit(unit));
-        return new ome.units.quantity.Time(d, units);
+        return new ome.units.quantity.ElectricPotential(d, units);
     }
 
    /**
@@ -84,7 +84,7 @@ public class TimeI extends Time implements ModelBased {
     *
     * or similar.
     */
-   public static ome.units.quantity.Time convert(Time t) {
+   public static ome.units.quantity.ElectricPotential convert(ElectricPotential t) {
        if (t == null) {
            return null;
        }
@@ -92,14 +92,14 @@ public class TimeI extends Time implements ModelBased {
        Double v = t.getValue();
        // Use the code/symbol-mapping in the ome.model.enums files
        // to convert to the specification value.
-       String u = ome.model.enums.UnitsTime.valueOf(
+       String u = ome.model.enums.UnitsElectricPotential.valueOf(
                t.getUnit().toString()).getSymbol();
-       ome.xml.model.enums.UnitsTime units = makeXMLUnit(u);
-       ome.units.unit.Unit<ome.units.quantity.Time> units2 =
-               ome.xml.model.enums.handlers.UnitsTimeEnumHandler
+       ome.xml.model.enums.UnitsElectricPotential units = makeXMLUnit(u);
+       ome.units.unit.Unit<ome.units.quantity.ElectricPotential> units2 =
+               ome.xml.model.enums.handlers.UnitsElectricPotentialEnumHandler
                        .getBaseUnit(units);
 
-       return new ome.units.quantity.Time(v, units2);
+       return new ome.units.quantity.ElectricPotential(v, units2);
    }
 
 
@@ -109,41 +109,41 @@ public class TimeI extends Time implements ModelBased {
 
     public final static Ice.ObjectFactory Factory = makeFactory(null);
 
-    public TimeI() {
+    public ElectricPotentialI() {
         super();
     }
 
-    public TimeI(double d, UnitsTime unit) {
+    public ElectricPotentialI(double d, UnitsElectricPotential unit) {
         super();
         this.setUnit(unit);
         this.setValue(d);
     }
 
-    public TimeI(double d,
-            Unit<ome.units.quantity.Time> unit) {
-        this(d, ome.model.enums.UnitsTime.bySymbol(unit.getSymbol()));
+    public ElectricPotentialI(double d,
+            Unit<ome.units.quantity.ElectricPotential> unit) {
+        this(d, ome.model.enums.UnitsElectricPotential.bySymbol(unit.getSymbol()));
     }
 
    /**
-    * Copy constructor that converts the given {@link omero.model.Time}
+    * Copy constructor that converts the given {@link omero.model.ElectricPotential}
     * based on the given ome-xml enum
     */
-   public TimeI(Time value, Unit<ome.units.quantity.Time> ul) {
+   public ElectricPotentialI(ElectricPotential value, Unit<ome.units.quantity.ElectricPotential> ul) {
        this(value,
-            ome.model.enums.UnitsTime.bySymbol(ul.getSymbol()).toString());
+            ome.model.enums.UnitsElectricPotential.bySymbol(ul.getSymbol()).toString());
    }
 
-   public TimeI(double d, ome.model.enums.UnitsTime ul) {
-        this(d, UnitsTime.valueOf(ul.toString()));
+   public ElectricPotentialI(double d, ome.model.enums.UnitsElectricPotential ul) {
+        this(d, UnitsElectricPotential.valueOf(ul.toString()));
     }
 
    /**
-    * Copy constructor that converts the given {@link omero.model.Time}
+    * Copy constructor that converts the given {@link omero.model.ElectricPotential}
     * based on the given enum string.
     *
     * @param target String representation of the CODE enum
     */
-    public TimeI(Time value, String target) {
+    public ElectricPotentialI(ElectricPotential value, String target) {
        String source = value.getUnit().toString();
        if (!target.equals(source)) {
             throw new RuntimeException(String.format(
@@ -159,17 +159,17 @@ public class TimeI extends Time implements ModelBased {
     *
     * @param target unit that is desired. non-null.
     */
-    public TimeI(Time value, UnitsTime target) {
+    public ElectricPotentialI(ElectricPotential value, UnitsElectricPotential target) {
         this(value, target.toString());
     }
 
     /**
-     * Convert a Bio-Formats {@link Time} to an OMERO Time.
+     * Convert a Bio-Formats {@link ElectricPotential} to an OMERO ElectricPotential.
      */
-    public TimeI(ome.units.quantity.Time value) {
-        ome.model.enums.UnitsTime internal =
-            ome.model.enums.UnitsTime.bySymbol(value.unit().getSymbol());
-        UnitsTime ul = UnitsTime.valueOf(internal.toString());
+    public ElectricPotentialI(ome.units.quantity.ElectricPotential value) {
+        ome.model.enums.UnitsElectricPotential internal =
+            ome.model.enums.UnitsElectricPotential.bySymbol(value.unit().getSymbol());
+        UnitsElectricPotential ul = UnitsElectricPotential.valueOf(internal.toString());
         setValue(value.value().doubleValue());
         setUnit(ul);
     }
@@ -182,16 +182,16 @@ public class TimeI extends Time implements ModelBased {
         this.value = value;
     }
 
-    public UnitsTime getUnit(Ice.Current current) {
+    public UnitsElectricPotential getUnit(Ice.Current current) {
         return this.unit;
     }
 
-    public void setUnit(UnitsTime unit, Ice.Current current) {
+    public void setUnit(UnitsElectricPotential unit, Ice.Current current) {
         this.unit = unit;
     }
 
-    public Time copy(Ice.Current ignore) {
-        TimeI copy = new TimeI();
+    public ElectricPotential copy(Ice.Current ignore) {
+        ElectricPotentialI copy = new ElectricPotentialI();
         copy.setValue(getValue());
         copy.setUnit(getUnit());
         return copy;
@@ -199,21 +199,21 @@ public class TimeI extends Time implements ModelBased {
 
     @Override
     public void copyObject(Filterable model, ModelMapper mapper) {
-        if (model instanceof ome.model.units.Time) {
-            ome.model.units.Time t = (ome.model.units.Time) model;
+        if (model instanceof ome.model.units.ElectricPotential) {
+            ome.model.units.ElectricPotential t = (ome.model.units.ElectricPotential) model;
             this.value = t.getValue();
-            this.unit = UnitsTime.valueOf(t.getUnit().toString());
+            this.unit = UnitsElectricPotential.valueOf(t.getUnit().toString());
         } else {
             throw new IllegalArgumentException(
-              "Time cannot copy from " +
+              "ElectricPotential cannot copy from " +
               (model==null ? "null" : model.getClass().getName()));
         }
     }
 
     @Override
     public Filterable fillObject(ReverseModelMapper mapper) {
-        ome.model.enums.UnitsTime ut = ome.model.enums.UnitsTime.valueOf(getUnit().toString());
-        ome.model.units.Time t = new ome.model.units.Time(getValue(), ut);
+        ome.model.enums.UnitsElectricPotential ut = ome.model.enums.UnitsElectricPotential.valueOf(getUnit().toString());
+        ome.model.units.ElectricPotential t = new ome.model.units.ElectricPotential(getValue(), ut);
         return t;
     }
 
@@ -233,7 +233,7 @@ public class TimeI extends Time implements ModelBased {
 
     @Override
     public String toString() {
-        return "Time(" + value + " " + unit + ")";
+        return "ElectricPotential(" + value + " " + unit + ")";
     }
 
     @Override
@@ -244,7 +244,7 @@ public class TimeI extends Time implements ModelBased {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        Time other = (Time) obj;
+        ElectricPotential other = (ElectricPotential) obj;
         if (unit != other.unit)
             return false;
         if (Double.doubleToLongBits(value) != Double
