@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2014 Glencoe Software, Inc. All rights reserved.
+ * Copyright (C) 2014 University of Dundee & Open Microscopy Environment.
+ * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,35 +17,24 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package ome.formats.utests;
+#ifndef CLASS_NAMEDVALUE
+#define CLASS_NAMEDVALUE
 
-import ome.units.UNITS;
-import omero.model.LengthI;
 
-import org.testng.annotations.Test;
+module omero {
 
-public class UnitsTest {
+  module model {
 
-    protected omero.model.Length mm(double d) {
-        omero.model.Length l = new omero.model.LengthI();
-        l.setUnit(omero.model.enums.UnitsLength.MM);
-        l.setValue(d);
-        return l;
-    }
+    /**
+     * Simple Pair-like container which is
+     * used in a sequence to support ordered maps.
+     **/
+    class NamedValue {
+        string name;
+        string value;
+    };
 
-    @Test
-    public void testLengthConversion() {
-        LengthI.convert(mm(1));
-    }
+  };
 
-    @Test
-    public void testLengthMapping() {
-        new LengthI(mm(1), UNITS.M);
-    }
-
-    @Test
-    public void testLengthNoOpMapping() {
-        new LengthI(mm(1), UNITS.MM);
-    }
-
-}
+};
+#endif
