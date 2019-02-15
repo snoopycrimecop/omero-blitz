@@ -1,28 +1,28 @@
 plugins {
     id "java-library"
     id 'maven-publish'
-    id 'org.openmicroscopy.blitz' version '5.5.0-m3'
-    id 'com.zeroc.gradle.ice-builder.slice' version '1.5.0-m1'
+    id "com.jfrog.artifactory" version "4.9.1"
+    id 'org.openmicroscopy.api' version '5.5.0-SNAPSHOT'
+    id 'org.openmicroscopy.dsl' version '5.5.0-SNAPSHOT'
+    id 'org.openmicroscopy.blitz' version '5.5.0-SNAPSHOT'
+    id 'com.zeroc.gradle.ice-builder.slice' version '1.5.0-SNAPSHOT'
 }
 
 group = 'org.openmicroscopy'
-version = '5.5.0-m3'
+version = '5.5.0-SNAPSHOT'
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 repositories {
-    mavenCentral()
     mavenLocal()
+    jcenter()
     maven { url 'https://artifacts.openmicroscopy.org/artifactory/maven/' }
-    maven {
-        url "https://artifacts.unidata.ucar.edu/repository/unidata-all/"
-    }
 }
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 
-    api 'org.openmicroscopy:omero-server:5.5.0-m3'
+    api 'org.openmicroscopy:omero-server:5.5.0-SNAPSHOT'
 
     implementation 'com.sun.activation:javax.activation:1.2.0'
 
@@ -61,39 +61,14 @@ ext {
     pythonOutputDir = "$buildDir/toArchive/python"
 }
 
-/**
- * Creates .combined files that can then be split into sources.
- * In this instance, we're splitting out .java and .ice files
- * from .combined files.
- **/
-blitz {
-    template = "src/main/resources/templates/combined.vm"
-    databaseType = "psql"
-
-    api {
-        java {
-            language "java"
-            outputDir "java/omero/model"
-        }
-
-        ice {
-            language "ice"
-            outputDir "slice/omero/model"
-            outputName "\$1"
-        }
-
-        python {
-            language "python"
-            outputDir pythonOutputDir
-            outputName "omero_model_\$1I"
-        }
-    }
+clean {
+    delete blitz.outputDir
 }
 
 dsl {
-    databaseType "psql"
-    outputDir blitz.outputDir
-    resource {
+    database "psql"
+
+    singleFile {
         iceMap {
             template "java_ice_map.vm"
             outputFile "java/omero/util/IceMap.java"
@@ -111,21 +86,39 @@ dsl {
     }
 }
 
-clean {
-    delete blitz.outputDir
+api {
+    language {
+        java {
+            language "java"
+            outputDir "java/omero/model"
+        }
+
+        ice {
+            language "ice"
+            outputDir "slice/omero/model"
+            rename "\$1"
+        }
+
+        python {
+            language "python"
+            outputDir pythonOutputDir
+            rename "omero_model_\$1I"
+        }
+    }
 }
+
 
 slice {
     java {
-        include = [file("src/generated/slice")]
-        files = fileTree(dir: file("src/generated/slice"), include: '**/*.ice')
+        include = [file("src/psql/slice")]
+        files = fileTree(dir: file("src/psql/slice"), include: '**/*.ice')
         args = "--tie"
     }
 }
 
-task copySliceFiles(type: Copy, dependsOn: "splitIce") {
+task copySliceFiles(type: Copy, dependsOn: "generateIce") {
     from "src/main/slice"
-    into "src/generated/slice"
+    into "src/psql/slice"
 }
 
 tasks.addRule('Pattern: pythonTask<ID>') { String taskName ->
@@ -136,8 +129,8 @@ tasks.addRule('Pattern: pythonTask<ID>') { String taskName ->
         def dirAsPrefix = dir.replace("/", "_") + "_"
 
         task(taskName, type: com.zeroc.gradle.icebuilder.slice.PythonTask, dependsOn: "copySliceFiles") {
-            includeDirs = "src/generated/slice"
-            inputFiles = fileTree(dir: "src/generated/slice/${dir}", include: '**.ice')
+            includeDirs = "src/psql/slice"
+            inputFiles = fileTree(dir: "src/psql/slice/${dir}", include: '**.ice')
             outputDir = file("$pythonOutputDir")
             prefix = dirAsPrefix
         }
@@ -147,8 +140,8 @@ tasks.addRule('Pattern: pythonTask<ID>') { String taskName ->
 task pythonTaskGroup {
     description "Runs all python tasks"
     dependsOn = [
-            "generateObjectFactoryRegistrar",
-            "splitPython",
+            // "generateObjectFactoryRegistrar",
+            "generatePython",
             pythonTaskOmero,
             pythonTaskOmeroModel,
             pythonTaskOmeroCmd,
@@ -160,20 +153,7 @@ task pythonTaskGroup {
 compileSlice.dependsOn "copySliceFiles"
 
 // Set compileJava to additionally depend on "splitJava"
-compileJava.dependsOn "splitJava"
-
-jar {
-    manifest {
-        attributes(
-                'Build-Timestamp': new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").format(new Date()),
-                'Created-By': "Gradle ${gradle.gradleVersion}",
-                'Build-Jdk': "${System.properties['java.version']} (${System.properties['java.vendor']} ${System.properties['java.vm.version']})",
-                'Main-Class': 'ome.services.blitz.Entry',
-                "Class-Path": configurations.runtimeClasspath.collect { it.getName() }.join(' ')
-        )
-    }
-}
+compileJava.dependsOn "generateJava"
 
 // Add publish functionality
 apply from: 'publish.gradle'
-

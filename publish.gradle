@@ -1,15 +1,15 @@
-task sourceJar(type: Jar) {
-    classifier "sources"
-    from sourceSets.main.allSource
+task sourcesJar(type: Jar) {
+    archiveClassifier.set('sources')
+    from sourceSets.main.allJava
 }
 
 task javadocJar(type: Jar) {
-    classifier "javadoc"
+    archiveClassifier.set('javadoc')
     from javadoc
 }
 
 task pythonZip(type: Zip, dependsOn: "pythonTaskGroup") {
-    classifier 'python'
+    archiveClassifier.set('python')
     from pythonOutputDir
 }
 
@@ -17,7 +17,7 @@ publishing {
     publications {
         bltizJava(MavenPublication) {
             from components.java
-            artifact sourceJar
+            artifact sourcesJar
             artifact javadocJar
         }
 
@@ -44,5 +44,16 @@ javadoc {
     options.addStringOption('Xdoclint:none', '-quiet')
     if (JavaVersion.current().isJava9Compatible()) {
         options.addBooleanOption('html5', true)
+    }
+}
+
+artifactory {
+    contextUrl = "http://artifacts.openmicroscopy.org/artifactory"
+    publish {
+        repository {
+            repoKey = 'integration-libs' // The Artifactory repository key to publish to
+            username = System.getenv('ARTIFACTORY_USER') ?: "${findProperty('artifactorUser')}"
+            password = System.getenv('ARTIFACTORY_PASSWORD') ?: "${findProperty('artifactorPassword')}"
+        }
     }
 }
