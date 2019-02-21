@@ -1,0 +1,31 @@
+language: java
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+before_install:
+  - sudo apt-key adv --keyserver keyserver.ubuntu.com --recv 5E6DA83306132997
+  - sudo apt-add-repository "deb http://zeroc.com/download/apt/ubuntu14.04 stable main"
+  - sudo apt-get update -q
+  - sudo apt-get install libzeroc-ice-java -y
+  - git clone git://github.com/ome/omero-dsl-plugin
+  - cd omero-dsl-plugin && ./gradlew publishToMavenLocal
+  - cd ..
+  - git clone git://github.com/ome/omero-blitz-plugin
+  - cd omero-blitz-plugin && ./gradlew publishToMavenLocal
+  - cd ..
+  - git clone git://github.com/ome/ice-builder-gradle
+  - cd ice-builder-gradle && ./gradlew publishToMavenLocal
+  - cd ..
+script:
+  - ./gradlew publishToMavenLocal
+
+deploy:
+  provider: script
+  script: ./gradlew publish
+  skip_cleanup: true
+  on:
+    branch: deploy
