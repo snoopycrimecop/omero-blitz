@@ -10,7 +10,6 @@
 
 # generated files
 /build
-/src/generated/*
 
 # Local configuration file (sdk path, etc)
 local.properties
@@ -34,3 +33,8 @@ gradle-local.properties
 
 # Gradle cache
 .gradle
+
+# Only include main and test from src dir (for now)
+src/*
+!src/main/*
+!src/test/*

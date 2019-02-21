@@ -1,68 +1,69 @@
 plugins {
     id "java-library"
-    id 'maven-publish'
-    id "com.jfrog.artifactory" version "4.9.1"
-    id 'org.openmicroscopy.api' version '5.5.0-SNAPSHOT'
-    id 'org.openmicroscopy.dsl' version '5.5.0-SNAPSHOT'
-    id 'org.openmicroscopy.blitz' version '5.5.0-SNAPSHOT'
-    id 'com.zeroc.gradle.ice-builder.slice' version '1.5.0-SNAPSHOT'
+    id "org.openmicroscopy.api" version "5.5.0-SNAPSHOT"
+    id "org.openmicroscopy.dsl" version "5.5.0-SNAPSHOT"
+    id "org.openmicroscopy.blitz" version "5.5.0-SNAPSHOT"
+    id "org.openmicroscopy.project" version "5.5.0-SNAPSHOT"
+    id "com.zeroc.gradle.ice-builder.slice" version "1.5.0-SNAPSHOT"
 }
 
-group = 'org.openmicroscopy'
-version = '5.5.0-SNAPSHOT'
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
+group = "org.openmicroscopy"
+version = "5.5.0-SNAPSHOT"
 
 repositories {
     mavenLocal()
     jcenter()
-    maven { url 'https://artifacts.openmicroscopy.org/artifactory/maven/' }
+    maven { url "https://artifacts.openmicroscopy.org/artifactory/maven/" }
 }
 
-dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
-
-    api 'org.openmicroscopy:omero-server:5.5.0-SNAPSHOT'
-
-    implementation 'com.sun.activation:javax.activation:1.2.0'
-
-    implementation 'org.ini4j:ini4j:0.4.1'
-
-    implementation 'commons-beanutils:commons-beanutils:1.9.3'
-    implementation 'org.apache.xmlgraphics:batik-all:1.9.1'
-    implementation 'org.apache.httpcomponents:httpclient:4.5.6'
-    implementation 'org.apache.httpcomponents:httpmime:4.5.6'
-
-    implementation 'gnu.getopt:java-getopt:1.0.13'
-    implementation 'net.sf.ehcache:ehcache:2.10.6'
-}
-
-if (slice.iceVersion.contains('3.7')) {
-    slice.output = file('src/generated/ice37')
-    dependencies {
-        implementation 'com.zeroc:icegrid:3.7.2'
-        implementation 'com.zeroc:icestorm:3.7.2'
-    }
-    sourceSets.main.java {
-        srcDirs 'src/main/ice37', slice.output
-    }
-} else if (slice.iceVersion.contains('3.6')) {
-    slice.output = file('src/generated/ice36')
-    dependencies {
-        implementation 'com.zeroc:icegrid:3.6.4'
-        implementation 'com.zeroc:icestorm:3.6.4'
-    }
-    sourceSets.main.java {
-        srcDirs 'src/main/ice36', slice.output
-    }
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 }
 
 ext {
     pythonOutputDir = "$buildDir/toArchive/python"
+    generatedDir = "${blitz.outputDir.get()}"
+    generatedSliceDir = "${generatedDir}/slice"
+}
+
+dependencies {
+    testImplementation("junit:junit:4.12")
+
+    api("org.openmicroscopy:omero-server:5.5.0-SNAPSHOT")
+
+    implementation("com.sun.activation:javax.activation:1.2.0")
+    implementation("org.ini4j:ini4j:0.4.1")
+    implementation("commons-beanutils:commons-beanutils:1.9.3")
+    implementation("org.apache.xmlgraphics:batik-all:1.9.1")
+    implementation("org.apache.httpcomponents:httpclient:4.5.6")
+    implementation("org.apache.httpcomponents:httpmime:4.5.6")
+    implementation("gnu.getopt:java-getopt:1.0.13")
+    implementation("net.sf.ehcache:ehcache:2.10.6")
+}
+
+if (slice.iceVersion.contains("3.7")) {
+    slice.output = file("$generatedDir/ice37")
+    dependencies {
+        implementation "com.zeroc:icegrid:3.7.2"
+        implementation "com.zeroc:icestorm:3.7.2"
+    }
+    sourceSets.main.java {
+        srcDirs "src/main/ice37", slice.output
+    }
+} else if (slice.iceVersion.contains("3.6")) {
+    slice.output = file("${generatedDir}/ice36")
+    dependencies {
+        implementation "com.zeroc:icegrid:3.6.4"
+        implementation "com.zeroc:icestorm:3.6.4"
+    }
+    sourceSets.main.java {
+        srcDirs "src/main/ice36", slice.output
+    }
 }
 
 clean {
-    delete blitz.outputDir
+    delete generatedDir
 }
 
 dsl {
@@ -107,30 +108,29 @@ api {
     }
 }
 
+task copySliceFiles(type: Copy, dependsOn: "generateIce") {
+    from "src/main/slice"
+    into "${generatedSliceDir}"
+}
 
 slice {
     java {
-        include = [file("src/psql/slice")]
-        files = fileTree(dir: file("src/psql/slice"), include: '**/*.ice')
+        include = [file("${generatedSliceDir}")]
+        files = fileTree(dir: file("${generatedSliceDir}"), include: "**/*.ice")
         args = "--tie"
     }
 }
 
-task copySliceFiles(type: Copy, dependsOn: "generateIce") {
-    from "src/main/slice"
-    into "src/psql/slice"
-}
-
-tasks.addRule('Pattern: pythonTask<ID>') { String taskName ->
-    if (taskName.startsWith('pythonTask')) {
+tasks.addRule("Pattern: pythonTask<ID>") { String taskName ->
+    if (taskName.startsWith("pythonTask")) {
         def id = taskName.replace("pythonTask", "")
         def camel = id.substring(0, 1).toLowerCase() + id.substring(1)
         def dir = camel.replaceAll("([A-Z])", '/$1').toLowerCase()
         def dirAsPrefix = dir.replace("/", "_") + "_"
 
         task(taskName, type: com.zeroc.gradle.icebuilder.slice.PythonTask, dependsOn: "copySliceFiles") {
-            includeDirs = "src/psql/slice"
-            inputFiles = fileTree(dir: "src/psql/slice/${dir}", include: '**.ice')
+            includeDirs = "${generatedSliceDir}"
+            inputFiles = fileTree(dir: "${generatedSliceDir}/${dir}", include: "**.ice")
             outputDir = file("$pythonOutputDir")
             prefix = dirAsPrefix
         }
@@ -154,6 +154,3 @@ compileSlice.dependsOn "copySliceFiles"
 
 // Set compileJava to additionally depend on "splitJava"
 compileJava.dependsOn "generateJava"
-
-// Add publish functionality
-apply from: 'publish.gradle'
