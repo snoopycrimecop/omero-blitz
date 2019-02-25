@@ -11,15 +11,6 @@ before_install:
   - sudo apt-add-repository "deb http://zeroc.com/download/apt/ubuntu14.04 stable main"
   - sudo apt-get update -q
   - sudo apt-get install libzeroc-ice-java -y
-  - git clone git://github.com/ome/omero-dsl-plugin
-  - cd omero-dsl-plugin && ./gradlew publishToMavenLocal
-  - cd ..
-  - git clone git://github.com/ome/omero-blitz-plugin
-  - cd omero-blitz-plugin && ./gradlew publishToMavenLocal
-  - cd ..
-  - git clone git://github.com/ome/ice-builder-gradle
-  - cd ice-builder-gradle && ./gradlew publishToMavenLocal
-  - cd ..
 script:
   - ./gradlew publishToMavenLocal
 
@@ -28,4 +19,4 @@ deploy:
   script: ./gradlew publish
   skip_cleanup: true
   on:
-    branch: deploy
+    tag: true
