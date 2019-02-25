@@ -23,4 +23,4 @@ deploy:
   script: ./gradlew publish -x javadoc
   skip_cleanup: true
   on:
-    tag: true
+    tags: true
