@@ -13,7 +13,6 @@ version = "5.5.0-SNAPSHOT"
 repositories {
     mavenLocal()
     jcenter()
-    maven { url "https://artifacts.openmicroscopy.org/artifactory/maven/" }
 }
 
 java {
