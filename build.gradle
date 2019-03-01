@@ -10,7 +10,6 @@ plugins {
 group = "org.openmicroscopy"
 version = "5.5.0-SNAPSHOT"
 
-
 repositories {
     mavenLocal()
     jcenter()
@@ -140,7 +139,7 @@ tasks.addRule("Pattern: pythonTask<ID>") { String taskName ->
 task pythonTaskGroup {
     description "Runs all python tasks"
     dependsOn = [
-            // "generateObjectFactoryRegistrar",
+            "generateObjectFactoryRegistrar${dsl.database.get().capitalize()}",
             "generatePython",
             pythonTaskOmero,
             pythonTaskOmeroModel,
@@ -154,3 +153,6 @@ compileSlice.dependsOn "copySliceFiles"
 
 // Set compileJava to additionally depend on "splitJava"
 compileJava.dependsOn "generateJava"
+
+// Add publish functionality
+apply from: "publish.gradle"
