@@ -1,6 +1,4 @@
 /*
- *   $Id$
- *
  *   Copyright 2008 Glencoe Software, Inc. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  */
@@ -57,6 +55,7 @@ import omero.api.AMD_Search_resetDefaults;
 import omero.api.AMD_Search_results;
 import omero.api.AMD_Search_setAllowLeadingWildcard;
 import omero.api.AMD_Search_setBatchSize;
+import omero.api.AMD_Search_setCaseSensitive;
 import omero.api.AMD_Search_setCaseSentivice;
 import omero.api.AMD_Search_setMergedBatches;
 import omero.api.AMD_Search_setReturnUnloaded;
@@ -355,6 +354,12 @@ public class SearchI extends AbstractCloseableAmdServant implements _SearchOpera
     }
 
     public void setCaseSentivice_async(AMD_Search_setCaseSentivice __cb,
+            boolean caseSensitive, Current __current) throws ServerError {
+        callInvokerOnRawArgs(__cb, __current, caseSensitive);
+
+    }
+
+    public void setCaseSensitive_async(AMD_Search_setCaseSensitive __cb,
             boolean caseSensitive, Current __current) throws ServerError {
         callInvokerOnRawArgs(__cb, __current, caseSensitive);
 
