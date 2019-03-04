@@ -36,7 +36,6 @@ import org.springframework.context.ApplicationContext;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import com.google.common.collect.SetMultimap;
 
 import ome.model.IObject;
@@ -187,9 +186,7 @@ public class Chgrp2I extends Chgrp2 implements IRequest, ReadOnlyStatus.IsAware,
             case 0:
                 final SetMultimap<String, Long> targetMultimap = graphHelper.getTargetMultimap(targetClasses, targetObjects);
                 targetObjectCount += targetMultimap.size();
-                final Entry<SetMultimap<String, Long>, SetMultimap<String, Long>> plan =
-                        graphTraversal.planOperation(targetMultimap, true, true);
-                return Maps.immutableEntry(plan.getKey(), GraphUtil.arrangeDeletionTargets(helper.getSession(), plan.getValue()));
+                return graphTraversal.planOperation(targetMultimap, true, true);
             case 1:
                 graphTraversal.assertNoPolicyViolations();
                 return null;

@@ -153,7 +153,7 @@ public class Delete2I extends Delete2 implements IRequest, ReadOnlyStatus.IsAwar
                     final Exception e = new IllegalStateException("deletion does not do anything other than delete");
                     helper.cancel(new ERR(), e, "graph-fail");
                 }
-                return GraphUtil.arrangeDeletionTargets(helper.getSession(), plan.getValue());
+                return plan.getValue();
             case 1:
                 graphTraversal.assertNoPolicyViolations();
                 return null;

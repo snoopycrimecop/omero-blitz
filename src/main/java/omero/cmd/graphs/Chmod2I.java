@@ -37,7 +37,6 @@ import com.google.common.base.Function;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import com.google.common.collect.SetMultimap;
 
 import ome.api.IAdmin;
@@ -182,12 +181,11 @@ public class Chmod2I extends Chmod2 implements IRequest, ReadOnlyStatus.IsAware,
                 final SetMultimap<String, Long> targetMultimap = graphHelper.getTargetMultimap(targetClasses, targetObjects);
                 targetObjectCount += targetMultimap.size();
                 /* only downgrade to private requires the graph policy rules to be applied */
-                final Entry<SetMultimap<String, Long>, SetMultimap<String, Long>> plan;
                 final Permissions newPermissions = Utils.toPermissions(perm1);
                 final boolean isToGroupReadable = newPermissions.isGranted(Permissions.Role.GROUP, Permissions.Right.READ);
                 if (isToGroupReadable) {
                     /* can always skip graph policy rules as is not downgrade to private */
-                    plan = graphTraversal.planOperation(targetMultimap, true, false);
+                    return graphTraversal.planOperation(targetMultimap, true, false);
                 } else {
                     /* determine which target groups are not already private ... */
                     final String groupClass = ExperimenterGroup.class.getName();
@@ -211,9 +209,8 @@ public class Chmod2I extends Chmod2 implements IRequest, ReadOnlyStatus.IsAware,
                         }
                     }
                     /* ... and apply the graph policy rules to those */
-                    plan = graphTraversal.planOperation(targetsNotPrivate, true, true);
+                    return graphTraversal.planOperation(targetsNotPrivate, true, true);
                 }
-                return Maps.immutableEntry(plan.getKey(), GraphUtil.arrangeDeletionTargets(helper.getSession(), plan.getValue()));
             case 1:
                 graphTraversal.assertNoPolicyViolations();
                 return null;
