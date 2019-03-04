@@ -36,6 +36,7 @@ import com.google.common.collect.SetMultimap;
  * @author m.t.b.carroll@dundee.ac.uk
  * @since 5.1.0
  */
+@Deprecated
 @Test
 public class GraphUtilTest {
 

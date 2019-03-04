@@ -84,7 +84,9 @@ public class GraphUtil {
      * and the ordering of the values preserved.
      * @param entriesByFullName a multimap
      * @return a new multimap with the same contents, except for the package name having been trimmed off each key
+     * @deprecated no longer used internally
      */
+    @Deprecated
     static <X> SetMultimap<String, X> trimPackageNames(SetMultimap<String, X> entriesByFullName) {
         final SetMultimap<String, X> entriesBySimpleName = LinkedHashMultimap.create();
         for (final Map.Entry<String, Collection<X>> entriesForOneClass : entriesByFullName.asMap().entrySet()) {

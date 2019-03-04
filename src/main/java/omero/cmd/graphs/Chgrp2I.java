@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2017 University of Dundee & Open Microscopy Environment.
+ * Copyright (C) 2014-2019 University of Dundee & Open Microscopy Environment.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -89,6 +89,7 @@ public class Chgrp2I extends Chgrp2 implements IRequest, ReadOnlyStatus.IsAware,
     private Helper helper;
     private GraphHelper graphHelper;
     private GraphTraversal graphTraversal;
+    private InternalProcessor internalProcessor;
 
     private GraphTraversal.PlanExecutor unlinker;
     private GraphTraversal.PlanExecutor processor;
@@ -168,8 +169,10 @@ public class Chgrp2I extends Chgrp2 implements IRequest, ReadOnlyStatus.IsAware,
 
         graphPolicy.registerPredicate(new GroupPredicate(securityRoles));
 
+        internalProcessor = new InternalProcessor(requiredAbilities);
+
         graphTraversal = graphHelper.prepareGraphTraversal(childOptions, requiredAbilities, graphPolicy, graphPolicyAdjusters,
-                aclVoter, graphPathBean, unnullable, new InternalProcessor(requiredAbilities), dryRun);
+                aclVoter, graphPathBean, unnullable, internalProcessor, dryRun);
 
         if (isChgrpPrivilege) {
             graphTraversal.setOwnsAll();
@@ -231,7 +234,7 @@ public class Chgrp2I extends Chgrp2 implements IRequest, ReadOnlyStatus.IsAware,
                     (Entry<SetMultimap<String, Long>, SetMultimap<String, Long>>) object;
             if (!dryRun) {
                 try {
-                    deletionInstance.deleteFiles(GraphUtil.trimPackageNames(result.getValue()));
+                    internalProcessor.deleteFiles(deletionInstance);
                 } catch (Exception e) {
                     helper.cancel(new ERR(), e, "file-delete-fail");
                 }
