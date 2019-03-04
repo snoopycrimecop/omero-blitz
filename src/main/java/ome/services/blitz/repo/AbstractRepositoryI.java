@@ -172,7 +172,9 @@ public abstract class AbstractRepositoryI extends _InternalRepositoryDisp
                 }
                 try {
                     final CheckedPath checked = servant.checkPath(filename, null, null /* i.e. as admin*/);
-                    if (!checked.delete()) {
+                    if (checked.delete()) {
+                        log.debug("DELETED: {}", checked);
+                    } else {
                         Throwable t = new omero.grid.FileDeleteException(
                                 null, null, "Delete file failed: " + filename);
                         dlm.error(dl, t);
