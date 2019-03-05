@@ -397,7 +397,7 @@ module omero {
             /**
              * A request of the type being queried.
              **/
-            GraphModify2 request;
+            GraphQuery request;
         };
 
         /**
