@@ -139,14 +139,16 @@ tasks.addRule("Pattern: pythonTask<ID>") { String taskName ->
 task pythonTaskGroup {
     description "Runs all python tasks"
     dependsOn = [
-            "generateObjectFactoryRegistrar${dsl.database.get().capitalize()}",
-            "generatePython",
+            tasks."generatePython",
             pythonTaskOmero,
             pythonTaskOmeroModel,
             pythonTaskOmeroCmd,
-            pythonTaskOmeroApi
+            pythonTaskOmeroApi,
     ]
 }
+
+// Need to ensure that the pythonTaskGroup output doesn't overwrite the output of generateObjectFactoryRegistrar
+tasks."generateObjectFactoryRegistrar${dsl.database.get().capitalize()}".mustRunAfter pythonTaskGroup
 
 // Set compileSlice to depend on the generation of ice files from "splitIce"
 compileSlice.dependsOn "copySliceFiles"

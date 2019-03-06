@@ -1,4 +1,5 @@
-task pythonZip(type: Zip, dependsOn: "pythonTaskGroup") {
+task pythonZip(type: Zip) {
+    dependsOn pythonTaskGroup, "generateObjectFactoryRegistrar${dsl.database.get().capitalize()}"
     archiveClassifier.set("python")
     from pythonOutputDir
 }
