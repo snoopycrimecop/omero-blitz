@@ -38,6 +38,8 @@ import omero.model.Screen;
 import omero.model.ScreenI;
 import omero.sys.ParametersI;
 
+import org.apache.commons.lang.StringUtils;
+
 public class ServerTemplateImportTarget extends TemplateImportTarget {
 
     private final String sharedPath;
@@ -70,7 +72,7 @@ public class ServerTemplateImportTarget extends TemplateImportTarget {
         }
 
         String name = m.group("Container1");
-        if (name == null || name.trim().length() == 0) {
+        if (StringUtils.isBlank(name)) {
             log.warn("Empty name");
             return null;
         }
