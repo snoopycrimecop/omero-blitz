@@ -67,8 +67,6 @@ public class ModelImportTarget implements ImportTarget {
 
     private String discriminator;
 
-    private String template;
-
     private String name;
 
     @SuppressWarnings("unchecked")
@@ -138,7 +136,7 @@ public class ModelImportTarget implements ImportTarget {
                     objIter.remove();
                 }
             }
-            if (objs.size() == 0 || discriminator.startsWith("@")) {
+            if (objs.isEmpty() || discriminator.startsWith("@")) {
                 obj = type.newInstance();
                 Method m = type.getMethod("setName", omero.RString.class);
                 m.invoke(obj, rstring(name));

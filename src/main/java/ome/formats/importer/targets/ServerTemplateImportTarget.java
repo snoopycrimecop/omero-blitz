@@ -91,7 +91,7 @@ public class ServerTemplateImportTarget extends TemplateImportTarget {
                     screenIter.remove();
                 }
             }
-            if (screens.size() == 0 || getDiscriminator().startsWith("@")) {
+            if (screens.isEmpty() || getDiscriminator().startsWith("@")) {
                 screen = new ScreenI();
                 screen.setName(rstring(name));
                 screen = (Screen) update.saveAndReturnObject(screen);
@@ -116,7 +116,7 @@ public class ServerTemplateImportTarget extends TemplateImportTarget {
                     datasetIter.remove();
                 }
             }
-            if (datasets.size() == 0 || getDiscriminator().startsWith("@")) {
+            if (datasets.isEmpty() || getDiscriminator().startsWith("@")) {
                 dataset = new DatasetI();
                 dataset.setName(rstring(name));
                 dataset = (Dataset) update.saveAndReturnObject(dataset);
