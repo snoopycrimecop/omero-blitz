@@ -70,7 +70,9 @@ import Ice.Current;
 /**
  *
  * @since Beta4.1
+ * @deprecated may be removed in next major release
  */
+@Deprecated
 public class BfPixelsStoreI extends _RawPixelsStoreDisp {
 
     private final static Logger log = LoggerFactory.getLogger(BfPixelsStoreI.class);

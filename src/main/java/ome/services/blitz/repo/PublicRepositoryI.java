@@ -58,8 +58,6 @@ import Ice.Current;
 
 import ome.api.IQuery;
 import ome.api.RawFileStore;
-import ome.formats.importer.ImportConfig;
-import ome.formats.importer.OMEROWrapper;
 import ome.services.blitz.impl.AbstractAmdServant;
 import ome.services.blitz.impl.ServiceFactoryI;
 import ome.services.blitz.repo.path.FilePathRestrictionInstance;
@@ -89,10 +87,7 @@ import omero.ServerError;
 import omero.ValidationException;
 import omero.api.RawFileStorePrx;
 import omero.api.RawFileStorePrxHelper;
-import omero.api.RawPixelsStorePrx;
-import omero.api.RawPixelsStorePrxHelper;
 import omero.api._RawFileStoreTie;
-import omero.api._RawPixelsStoreTie;
 import omero.cmd.AMD_Session_submit;
 import omero.cmd.Delete2;
 import omero.cmd.HandlePrx;
@@ -358,47 +353,6 @@ public class PublicRepositoryI implements _RepositoryOperations, ApplicationCont
      */
     public String mimetype(String path, Current __current) throws ServerError {
         return checkPath(path, null, __current).mustExist().getMimetype();
-    }
-
-    @Deprecated
-    public RawPixelsStorePrx pixels(String path, Current __current) throws ServerError {
-        final CheckedPath checked = checkPath(path, null, __current);
-
-        // See comment below in RawFileStorePrx
-        Ice.Current adjustedCurr = makeAdjustedCurrent(__current);
-
-
-        // Check that the file is in the DB and has minimally "r" permissions
-        // Sets the ID value on the checked object.
-        findInDb(checked, "r", adjustedCurr);
-
-        BfPixelsStoreI rps;
-        try {
-            // FIXME ImportConfig should be injected
-            // Is this ever used? No Memoizer is active here!
-            // Perhaps better to use the PixelsService directly and
-            // omit OMEROWrapper.
-            rps = new BfPixelsStoreI(path,
-                    new OMEROWrapper(new ImportConfig()).getImageReader());
-        } catch (Throwable t) {
-            if (t instanceof ServerError) {
-                throw (ServerError) t;
-            } else {
-                omero.InternalException ie = new omero.InternalException();
-                IceMapper.fillServerError(ie, t);
-                throw ie;
-            }
-        }
-
-        // See comment below in RawFileStorePrx
-        _RawPixelsStoreTie tie = new _RawPixelsStoreTie(rps);
-        RegisterServantMessage msg = new RegisterServantMessage(this, tie, adjustedCurr);
-        publishMessage(msg);
-        Ice.ObjectPrx prx = msg.getProxy();
-        if (prx == null) {
-            throw new omero.InternalException(null, null, "No ServantHolder for proxy.");
-        }
-        return RawPixelsStorePrxHelper.uncheckedCast(prx);
     }
 
     public RawFileStorePrx file(String path, String mode, Current __current) throws ServerError {
