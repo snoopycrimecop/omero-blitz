@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015 University of Dundee. All rights reserved.
+ *  Copyright (C) 2015-2019 University of Dundee. All rights reserved.
  *
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -22,6 +22,7 @@ package ome.formats.importer.targets;
 
 import static omero.rtypes.rstring;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -84,6 +85,12 @@ public class ServerTemplateImportTarget extends TemplateImportTarget {
                 "select o from Screen as o where o.name = :name"
                 + " order by o.id " + order,
                 new ParametersI().add("name", rstring(name)));
+            final Iterator<IObject> screenIter = screens.iterator();
+            while (screenIter.hasNext()) {
+                if (!screenIter.next().getDetails().getPermissions().canLink()) {
+                    screenIter.remove();
+                }
+            }
             if (screens.size() == 0 || getDiscriminator().startsWith("@")) {
                 screen = new ScreenI();
                 screen.setName(rstring(name));
@@ -103,6 +110,12 @@ public class ServerTemplateImportTarget extends TemplateImportTarget {
                 "select o from Dataset as o where o.name = :name"
                 + " order by o.id " + order,
                 new ParametersI().add("name", rstring(name)));
+            final Iterator<IObject> datasetIter = datasets.iterator();
+            while (datasetIter.hasNext()) {
+                if (!datasetIter.next().getDetails().getPermissions().canLink()) {
+                    datasetIter.remove();
+                }
+            }
             if (datasets.size() == 0 || getDiscriminator().startsWith("@")) {
                 dataset = new DatasetI();
                 dataset.setName(rstring(name));

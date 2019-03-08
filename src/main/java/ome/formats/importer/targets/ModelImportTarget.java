@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 University of Dundee & Open Microscopy Environment.
+ * Copyright (C) 2015-2019 University of Dundee & Open Microscopy Environment.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -23,6 +23,7 @@ import static omero.rtypes.rstring;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import ome.formats.OMEROMetadataStoreClient;
@@ -131,6 +132,12 @@ public class ModelImportTarget implements ImportTarget {
                 "select o from "+simpleName+" as o where o.name = :name"
                 + " order by o.id " + order,
                 new ParametersI().add("name", rstring(name)));
+            final Iterator<IObject> objIter = objs.iterator();
+            while (objIter.hasNext()) {
+                if (!objIter.next().getDetails().getPermissions().canLink()) {
+                    objIter.remove();
+                }
+            }
             if (objs.size() == 0 || discriminator.startsWith("@")) {
                 obj = type.newInstance();
                 Method m = type.getMethod("setName", omero.RString.class);
