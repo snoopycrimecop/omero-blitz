@@ -23,6 +23,7 @@ import static omero.rtypes.rstring;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -126,7 +127,11 @@ public class ModelImportTarget implements ImportTarget {
             if (discriminator.startsWith("-")) {
                 order = "asc";
             }
-            List<IObject> objs = (List<IObject>) query.findAllByQuery(
+            final List<IObject> objs;
+            if (discriminator.startsWith("@")) {
+                objs = Collections.emptyList();
+            } else {
+            objs = (List<IObject>) query.findAllByQuery(
                 "select o from "+simpleName+" as o where o.name = :name"
                 + " order by o.id " + order,
                 new ParametersI().add("name", rstring(name)));
@@ -136,7 +141,8 @@ public class ModelImportTarget implements ImportTarget {
                     objIter.remove();
                 }
             }
-            if (objs.isEmpty() || discriminator.startsWith("@")) {
+            }
+            if (objs.isEmpty()) {
                 obj = type.newInstance();
                 Method m = type.getMethod("setName", omero.RString.class);
                 m.invoke(obj, rstring(name));
