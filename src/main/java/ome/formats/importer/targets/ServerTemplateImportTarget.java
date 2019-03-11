@@ -22,6 +22,7 @@ package ome.formats.importer.targets;
 
 import static omero.rtypes.rstring;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -36,6 +37,7 @@ import omero.model.DatasetI;
 import omero.model.IObject;
 import omero.model.Screen;
 import omero.model.ScreenI;
+import omero.sys.Parameters;
 import omero.sys.ParametersI;
 
 import org.apache.commons.lang.StringUtils;
@@ -54,10 +56,6 @@ public class ServerTemplateImportTarget extends TemplateImportTarget {
     }
 
     public IObject load(OMEROMetadataStoreClient client, boolean spw) throws Exception {
-
-        IQueryPrx query = client.getServiceFactory().getQueryService();
-        IUpdatePrx update = client.getServiceFactory().getUpdateService();
-
         log.info("Checking '{}' against '{}'", sharedPath, getTemplate());
         Pattern pattern = Pattern.compile(getTemplate());
         Matcher m = pattern.matcher(sharedPath);
@@ -77,60 +75,43 @@ public class ServerTemplateImportTarget extends TemplateImportTarget {
             return null;
         }
 
-        String order = "desc";
-        if (getDiscriminator().startsWith("-")) {
-            order = "asc";
-        }
-        if (spw) {
-            Screen screen;
-            List<IObject> screens = (List<IObject>) query.findAllByQuery(
-                "select o from Screen as o where o.name = :name"
-                + " order by o.id " + order,
-                new ParametersI().add("name", rstring(name)));
-            final Iterator<IObject> screenIter = screens.iterator();
-            while (screenIter.hasNext()) {
-                if (!screenIter.next().getDetails().getPermissions().canLink()) {
-                    screenIter.remove();
-                }
-            }
-            if (screens.isEmpty() || getDiscriminator().startsWith("@")) {
-                screen = new ScreenI();
-                screen.setName(rstring(name));
-                screen = (Screen) update.saveAndReturnObject(screen);
-            } else {
-                if (getDiscriminator().startsWith("%") && screens.size() > 1) {
-                    log.warn("No unique Screen called {}", name);
-                    return null;
-                } else {
-                    screen = (Screen) screens.get(0);
-                }
-            }
-            return screen;
+        final List<IObject> objs;
+        if (getDiscriminator().startsWith("@")) {
+            objs = Collections.emptyList();
         } else {
-            Dataset dataset;
-            List<IObject> datasets = (List<IObject>) query.findAllByQuery(
-                "select o from Dataset as o where o.name = :name"
-                + " order by o.id " + order,
-                new ParametersI().add("name", rstring(name)));
-            final Iterator<IObject> datasetIter = datasets.iterator();
-            while (datasetIter.hasNext()) {
-                if (!datasetIter.next().getDetails().getPermissions().canLink()) {
-                    datasetIter.remove();
+            final IQueryPrx query = client.getServiceFactory().getQueryService();
+            final StringBuilder hql = new StringBuilder();
+            hql.append("FROM ");
+            hql.append(spw ? "Screen" : "Dataset");
+            hql.append(" WHERE name = :name ORDER BY id");
+            if (!getDiscriminator().startsWith("-")) {
+                hql.append(" DESC");
+            }
+            final Parameters params = new ParametersI().add("name", rstring(name));
+            objs = query.findAllByQuery(hql.toString(), params);
+            final Iterator<IObject> objIter = objs.iterator();
+            while (objIter.hasNext()) {
+                if (!objIter.next().getDetails().getPermissions().canLink()) {
+                    objIter.remove();
                 }
             }
-            if (datasets.isEmpty() || getDiscriminator().startsWith("@")) {
-                dataset = new DatasetI();
-                dataset.setName(rstring(name));
-                dataset = (Dataset) update.saveAndReturnObject(dataset);
+        }
+        if (objs.isEmpty()) {
+            final IUpdatePrx update = client.getServiceFactory().getUpdateService();
+            if (spw) {
+                final Screen screen = new ScreenI();
+                screen.setName(rstring(name));
+                return update.saveAndReturnObject(screen);
             } else {
-                if (getDiscriminator().startsWith("%") && datasets.size() > 1) {
-                    log.warn("No unique Dataset called {}", name);
-                    return null;
-                } else {
-                    dataset = (Dataset) datasets.get(0);
-                }
+                final Dataset dataset = new DatasetI();
+                dataset.setName(rstring(name));
+                return update.saveAndReturnObject(dataset);
             }
-            return dataset;
+        } else if (getDiscriminator().startsWith("%") && objs.size() > 1) {
+            log.warn("No unique {} called {}", spw ? "screen" : "dataset", name);
+            return null;
+        } else {
+            return objs.get(0);
         }
     }
 }
