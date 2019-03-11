@@ -131,16 +131,16 @@ public class ModelImportTarget implements ImportTarget {
             if (discriminator.startsWith("@")) {
                 objs = Collections.emptyList();
             } else {
-            objs = (List<IObject>) query.findAllByQuery(
-                "select o from "+simpleName+" as o where o.name = :name"
-                + " order by o.id " + order,
-                new ParametersI().add("name", rstring(name)));
-            final Iterator<IObject> objIter = objs.iterator();
-            while (objIter.hasNext()) {
-                if (!objIter.next().getDetails().getPermissions().canLink()) {
-                    objIter.remove();
+                objs = (List<IObject>) query.findAllByQuery(
+                        "select o from " + simpleName + " as o where o.name = :name"
+                                + " order by o.id " + order,
+                                new ParametersI().add("name", rstring(name)));
+                final Iterator<IObject> objIter = objs.iterator();
+                while (objIter.hasNext()) {
+                    if (!objIter.next().getDetails().getPermissions().canLink()) {
+                        objIter.remove();
+                    }
                 }
-            }
             }
             if (objs.isEmpty()) {
                 obj = type.newInstance();
