@@ -147,6 +147,12 @@ task pythonTaskGroup {
     ]
 }
 
+jar {
+    manifest {
+        attributes("Main-Class": 'ome.services.blitz.Entry')
+    }
+}
+
 // Need to ensure that the pythonTaskGroup output doesn't overwrite the output of generateObjectFactoryRegistrar
 tasks."generateObjectFactoryRegistrar${dsl.database.get().capitalize()}".mustRunAfter pythonTaskGroup
 
