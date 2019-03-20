@@ -29,6 +29,7 @@ import ome.formats.importer.targets.TargetBuilder;
 import ome.formats.importer.util.IniFileLoader;
 import ome.system.PreferenceContext;
 import ome.system.UpgradeCheck;
+import omero.gateway.BuildConfig;
 import omero.model.Annotation;
 import omero.model.NamedValue;
 
@@ -228,9 +229,7 @@ public class ImportConfig {
         this.ini = ini;
 
         // Various startup requirements
-
-        ResourceBundle bundle = ResourceBundle.getBundle("omero");
-        omeroVersion = bundle.getString("omero.version");
+        omeroVersion = BuildConfig.getBuildVersion();
         log.info("OMERO Version: " + omeroVersion);
 
         if (ini != null) {

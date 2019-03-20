@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.MissingResourceException;
-import java.util.ResourceBundle;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
@@ -38,6 +37,7 @@ import loci.formats.in.FlexReader;
 import ome.formats.importer.ImportConfig;
 import ome.formats.importer.Version;
 
+import omero.gateway.BuildConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.ini4j.IniFile;
@@ -255,8 +255,7 @@ public class IniFileLoader {
     {
         try
         {
-            ResourceBundle bundle = ResourceBundle.getBundle("omero");
-            return bundle.getString("omero.version");
+            return BuildConfig.getBuildVersion();
         }
         catch (MissingResourceException e)
         {

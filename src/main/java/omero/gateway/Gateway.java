@@ -29,7 +29,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
@@ -1135,8 +1134,7 @@ public class Gateway implements AutoCloseable {
             ServiceFactoryPrx entryEncrypted = client.getSession();
             
             // version check
-            ResourceBundle bundle = ResourceBundle.getBundle("omero");
-            String clientVersion = bundle.getString("omero.version");
+            String clientVersion = BuildConfig.getBuildVersion();
             IConfigPrx conf = entryEncrypted.getConfigService();
             String serverVersion = conf.getVersion();
             if (StringUtils.isNotEmpty(clientVersion)
