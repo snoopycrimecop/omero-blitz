@@ -1,6 +1,4 @@
 /*
- *   $Id$
- *
  *   Copyright 2010 Glencoe Software, Inc. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  *
@@ -26,7 +24,7 @@ module omero {
          *
          * Each instance also has a number of settings which can all be
          * changed from their defaults via accessors, e.g.
-         * {@link #setBatchSize} or {@link #setCaseSentivice}.
+         * {@link #setBatchSize} or {@link #setCaseSensitive}.
          *
          * The only methods which are required for the proper functioning of a
          * {@link Search} instance are:
@@ -99,11 +97,18 @@ module omero {
                  * Sets the case sensitivity on all queries where
                  * case-sensitivity is supported.
                  */
+                ["deprecate:use setCaseSensitive instead"]
                 idempotent void setCaseSentivice(bool caseSensitive) throws ServerError;
 
                 /**
+                 * Sets the case sensitivity on all queries where
+                 * case-sensitivity is supported.
+                 */
+                idempotent void setCaseSensitive(bool caseSensitive) throws ServerError;
+
+                /**
                  * Returns the current case sensitivity setting. If
-                 * {@link #setCaseSentivice} has not been called, the
+                 * {@link #setCaseSensitive} has not been called, the
                  * default value will be in effect.
                  */
                 idempotent bool isCaseSensitive() throws ServerError;
