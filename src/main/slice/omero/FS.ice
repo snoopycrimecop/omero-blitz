@@ -1,9 +1,3 @@
-/*
- *   $Id$
- *
- *
- */
-
 #ifndef OMERO_FS
 #define OMERO_FS
 
