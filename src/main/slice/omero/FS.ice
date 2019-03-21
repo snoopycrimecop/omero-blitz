@@ -63,7 +63,6 @@ module omero {
          *
          * @param id, monitor Id from which the event was reported (string).
          * @param el, list of events (EventList).
-         * @return no explicit return value.
          **/
         void fsEventHappened(string id, EventList el) throws omero::ServerError;
 
@@ -405,7 +404,6 @@ module omero {
          * in this case the monitor's state cannot be assumed.
          *
          * @param id, monitor id (string).
-         * @return no explicit return value.
          * @throws omero::OmeroFSError
          **/
         idempotent void startMonitor(string id)
@@ -420,7 +418,6 @@ module omero {
          * in this case the monitor's state cannot be assumed.
          *
          * @param id, monitor id (string).
-         * @return no explicit return value.
          * @throws omero::OmeroFSError
          **/
         idempotent void stopMonitor(string id)
@@ -436,7 +433,6 @@ module omero {
          * for any other reason, in this case the monitor's state cannot be assumed.
          *
          * @param id, monitor id (string).
-         * @return no explicit return value.
          * @throws omero::OmeroFSError
          **/
         idempotent void destroyMonitor(string id)
