@@ -63,7 +63,7 @@ module omero {
          *
          * @param id, monitor Id from which the event was reported (string).
          * @param el, list of events (EventList).
-         * @return, no explicit return value.
+         * @return no explicit return value.
          **/
         void fsEventHappened(string id, EventList el) throws omero::ServerError;
 
@@ -171,7 +171,7 @@ module omero {
          *
          * @param absPath, an absolute path on the monitor's watch path (string).
          * @param filter, a filter to apply to the listing, cf. ls (string).
-         * @return, a directory listing (Ice::StringSeq).
+         * @return a directory listing (Ice::StringSeq).
          * @throws omero::OmeroFSError
          **/
         idempotent Ice::StringSeq getDirectory(string absPath, string filter)
@@ -188,7 +188,7 @@ module omero {
          *
          * @param absPath, an absolute path on the monitor's watch path (string).
          * @param filter, a filter to apply to the listing, cf. ls (string).
-         * @return, a directory listing (FileStatsList).
+         * @return a directory listing (FileStatsList).
          * @throws omero::OmeroFSError
          **/
         idempotent FileStatsList getBulkDirectory(string absPath, string filter)
@@ -405,7 +405,7 @@ module omero {
          * in this case the monitor's state cannot be assumed.
          *
          * @param id, monitor id (string).
-         * @return, no explicit return value.
+         * @return no explicit return value.
          * @throws omero::OmeroFSError
          **/
         idempotent void startMonitor(string id)
@@ -420,7 +420,7 @@ module omero {
          * in this case the monitor's state cannot be assumed.
          *
          * @param id, monitor id (string).
-         * @return, no explicit return value.
+         * @return no explicit return value.
          * @throws omero::OmeroFSError
          **/
         idempotent void stopMonitor(string id)
@@ -436,7 +436,7 @@ module omero {
          * for any other reason, in this case the monitor's state cannot be assumed.
          *
          * @param id, monitor id (string).
-         * @return, no explicit return value.
+         * @return no explicit return value.
          * @throws omero::OmeroFSError
          **/
         idempotent void destroyMonitor(string id)
@@ -449,7 +449,7 @@ module omero {
          * An exception will be raised if the id does not correspond to an existing monitor.
          *
          * @param id, monitor id (string).
-         * @return, the monitor state (MonitorState).
+         * @return the monitor state (MonitorState).
          * @throws omero::OmeroFSError
          **/
         idempotent MonitorState getMonitorState(string id)
