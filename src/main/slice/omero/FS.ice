@@ -61,8 +61,8 @@ module omero {
         /**
          * Callback, called by the monitor upon the proxy of the OMERO.fs client.
          *
-         * @param id, monitor Id from which the event was reported (string).
-         * @param el, list of events (EventList).
+         * @param id monitor Id from which the event was reported (string).
+         * @param el list of events (EventList).
          **/
         void fsEventHappened(string id, EventList el) throws omero::ServerError;
 
@@ -168,8 +168,8 @@ module omero {
          * OMERO.fs server. An exception will be raised if directory list cannot be
          * returned for any other reason.
          *
-         * @param absPath, an absolute path on the monitor's watch path (string).
-         * @param filter, a filter to apply to the listing, cf. ls (string).
+         * @param absPath an absolute path on the monitor's watch path (string).
+         * @param filter a filter to apply to the listing, cf. ls (string).
          * @return a directory listing (Ice::StringSeq).
          * @throws omero::OmeroFSError
          **/
@@ -185,8 +185,8 @@ module omero {
          * OMERO.fs server. An exception will be raised if directory list cannot be
          * returned for any other reason.
          *
-         * @param absPath, an absolute path on the monitor's watch path (string).
-         * @param filter, a filter to apply to the listing, cf. ls (string).
+         * @param absPath an absolute path on the monitor's watch path (string).
+         * @param filter a filter to apply to the listing, cf. ls (string).
          * @return a directory listing (FileStatsList).
          * @throws omero::OmeroFSError
          **/
@@ -204,7 +204,7 @@ module omero {
          *
          * An exception will be raised if the method fails to determine the existence.
          *
-         * @param fileId, see above.
+         * @param fileId see above.
          * @return existence of file.
          * @throws omero::OmeroFSError
          **/
@@ -217,7 +217,7 @@ module omero {
          *
          * An exception will be raised if the file no longer exists or is inaccessible.
          *
-         * @param fileId, see above.
+         * @param fileId see above.
          * @return base name.
          * @throws omero::OmeroFSError
          **/
@@ -229,7 +229,7 @@ module omero {
          *
          * An exception will be raised if the file no longer exists or is inaccessible.
          *
-         * @param fileId, see above.
+         * @param fileId see above.
          * @return file stats (FileStats).
          * @throws omero::OmeroFSError
          **/
@@ -241,7 +241,7 @@ module omero {
          *
          * An exception will be raised if the file no longer exists or is inaccessible.
          *
-         * @param fileId, see above.
+         * @param fileId see above.
          * @return byte size of file (long).
          * @throws omero::OmeroFSError
          **/
@@ -253,7 +253,7 @@ module omero {
          *
          * An exception will be raised if the file no longer exists or is inaccessible.
          *
-         * @param fileId, see above.
+         * @param fileId see above.
          * @return owner of file (string).
          * @throws omero::OmeroFSError
          **/
@@ -265,7 +265,7 @@ module omero {
          *
          * An exception will be raised if the file no longer exists or is inaccessible.
          *
-         * @param fileId, see above.
+         * @param fileId see above.
          * @return ctime of file (float).
          * @throws omero::OmeroFSError
          **/
@@ -277,7 +277,7 @@ module omero {
          *
          * An exception will be raised if the file no longer exists or is inaccessible.
          *
-         * @param fileId, see above.
+         * @param fileId see above.
          * @return mtime of file (float).
          * @throws omero::OmeroFSError
          **/
@@ -289,7 +289,7 @@ module omero {
          *
          * An exception will be raised if the file no longer exists or is inaccessible.
          *
-         * @param fileId, see above.
+         * @param fileId see above.
          * @return atime of file (float).
          * @throws omero::OmeroFSError
          **/
@@ -301,7 +301,7 @@ module omero {
          *
          * An exception will be raised if the file no longer exists or is inaccessible.
          *
-         * @param fileId, see above.
+         * @param fileId see above.
          * @return true is directory (bool).
          * @throws omero::OmeroFSError
          **/
@@ -313,7 +313,7 @@ module omero {
          *
          * An exception will be raised if the file no longer exists or is inaccessible.
          *
-         * @param fileId, see above.
+         * @param fileId see above.
          * @return true if file (bool).
          * @throws omero::OmeroFSError
          **/
@@ -326,7 +326,7 @@ module omero {
          * An exception will be raised if the file no longer exists or is inaccessible.
          * An exception will be raised if the SHA1 cannot be generated for any reason.
          *
-         * @param fileId, see above.
+         * @param fileId see above.
          * @return SHA1 hex hash digest of file (string).
          * @throws omero::OmeroFSError
          **/
@@ -340,9 +340,9 @@ module omero {
          * An exception will be raised if the file no longer exists or is inaccessible.
          * An exception will be raised if the file read fails for any other reason.
          *
-         * @param fileId, see above.
-         * @param offset, byte offset into file from where read should begin (long).
-         * @param size, number of bytes that should be read (int).
+         * @param fileId see above.
+         * @param offset byte offset into file from where read should begin (long).
+         * @param size number of bytes that should be read (int).
          * @return byte sequence of upto size bytes.
          * @throws omero::OmeroFSError
          **/
@@ -367,18 +367,18 @@ module omero {
          * path does not exist or is inaccessible to the monitor. An exception will be raised
          * if a monitor cannot be created for any other reason.
          *
-         * @param mType, type of monitor to create (MonitorType).
-         * @param eTypes, a sequence of watch event type to monitor (WatchEventTypeList).
-         * @param pathString, full path of directory of interest (string).
-         * @param whitelist, list of files or extensions of interest (Ice::StringSeq).
-         * @param blacklist, list of directories, files or extensions that are not of interest (Ice::StringSeq).
-         * @param pMode, path mode of monitor (PathMode).
-         * @param proxy, a proxy of the client to which notifications will be sent (MonitorClient*).
-         * @param timeout, time in seconds fo monitor to time out (float).
-         * @param blockSize, the number of events to pack into each notification (int).
-         * @param ignoreSysFiles, ignore system files or not (bool).
-         * @param ignoreDirEvents, ignore directory events (bool).
-         * @param platformCheck, if true strictly check platform (bool).
+         * @param mType type of monitor to create (MonitorType).
+         * @param eTypes a sequence of watch event type to monitor (WatchEventTypeList).
+         * @param pathString full path of directory of interest (string).
+         * @param whitelist list of files or extensions of interest (Ice::StringSeq).
+         * @param blacklist list of directories, files or extensions that are not of interest (Ice::StringSeq).
+         * @param pMode path mode of monitor (PathMode).
+         * @param proxy a proxy of the client to which notifications will be sent (MonitorClient*).
+         * @param timeout time in seconds fo monitor to time out (float).
+         * @param blockSize the number of events to pack into each notification (int).
+         * @param ignoreSysFiles ignore system files or not (bool).
+         * @param ignoreDirEvents ignore directory events (bool).
+         * @param platformCheck if true strictly check platform (bool).
          * @return monitorId, a uuid1 (string).
          * @throws omero::OmeroFSError
          **/
@@ -403,7 +403,7 @@ module omero {
          * An exception will be raised if a monitor cannot be started for any other reason,
          * in this case the monitor's state cannot be assumed.
          *
-         * @param id, monitor id (string).
+         * @param id monitor id (string).
          * @throws omero::OmeroFSError
          **/
         idempotent void startMonitor(string id)
@@ -417,7 +417,7 @@ module omero {
          * An exception will be raised if a monitor cannot be stopped for any other reason,
          * in this case the monitor's state cannot be assumed.
          *
-         * @param id, monitor id (string).
+         * @param id monitor id (string).
          * @throws omero::OmeroFSError
          **/
         idempotent void stopMonitor(string id)
@@ -432,7 +432,7 @@ module omero {
          * An exception will be raised if a monitor cannot be destroyed (or stopped and destroyed)
          * for any other reason, in this case the monitor's state cannot be assumed.
          *
-         * @param id, monitor id (string).
+         * @param id monitor id (string).
          * @throws omero::OmeroFSError
          **/
         idempotent void destroyMonitor(string id)
@@ -444,7 +444,7 @@ module omero {
          *
          * An exception will be raised if the id does not correspond to an existing monitor.
          *
-         * @param id, monitor id (string).
+         * @param id monitor id (string).
          * @return the monitor state (MonitorState).
          * @throws omero::OmeroFSError
          **/
