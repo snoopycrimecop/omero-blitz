@@ -76,7 +76,7 @@ module omero {
          * will be returned under normal conditions, otherwise a {@link ERR}
          * will be returned.
          **/
-        class OriginalMetadataRequest extends OK {
+        class OriginalMetadataRequest extends Request {
             long imageId;
         };
 
