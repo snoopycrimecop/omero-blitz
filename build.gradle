@@ -65,6 +65,13 @@ if (slice.iceVersion.contains("3.7")) {
     }
 }
 
+test {
+    // enable TestNG support (default is JUnit)
+    useTestNG() {
+        suites "src/test/resources/unit.testng.xml"
+    }
+}
+
 clean {
     delete generatedDir
 }
