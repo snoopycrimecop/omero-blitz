@@ -19,8 +19,6 @@ import ome.services.sessions.SessionManager;
 import ome.services.util.Executor;
 import ome.system.OmeroContext;
 import ome.system.Principal;
-import omero.api.IAdminPrxHelper;
-import omero.api._IAdminTie;
 import omero.constants.CLIENTUUID;
 
 import org.aopalliance.intercept.MethodInvocation;
@@ -113,14 +111,12 @@ public class ServiceFactoryServiceCreationDestructionTest extends
     @Test
     public void testDoStatelessAddsServantToServantListCacheAndAdapter()
             throws Exception {
-        IAdminPrxHelper admin = IAdminPrxHelperFactory.create();
 
         callsActiveServices(Collections.singletonList(adminServiceId));
-        map.put(adminServiceId, new _IAdminTie());
         mockAdapter.expects(once()).method("add").will(returnValue(null));
         mockAdapter.expects(once()).method("find").will(returnValue(null));
         mockAdapter.expects(once()).method("createDirectProxy").will(
-                returnValue(admin));
+                returnValue(null));
         sf.getAdminService(curr);
         List<String> ids = sf.activeServices(curr);
         assertTrue(ids.toString(), ids.size() == 1);

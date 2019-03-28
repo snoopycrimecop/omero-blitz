@@ -42,7 +42,7 @@ import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
 import org.quartz.JobDetail;
 import org.quartz.Trigger;
-import org.springframework.scheduling.quartz.CronTriggerBean;
+import org.springframework.scheduling.quartz.CronTriggerFactoryBean;
 import org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean;
 
 import Glacier2.AMD_Router_createSession;
@@ -182,14 +182,14 @@ public class MockFixture {
             runBeats.setTargetMethod("requestHeartBeats");
             runBeats.setTargetObject(blitz.getBlitzManager());
             runBeats.afterPropertiesSet();
-            CronTriggerBean triggerBeats = new CronTriggerBean();
+            CronTriggerFactoryBean triggerBeats = new CronTriggerFactoryBean();
             triggerBeats.setBeanName("triggerBeats");
             triggerBeats.setJobDetail((JobDetail) runBeats.getObject());
             triggerBeats.setCronExpression("0-59/5 * * * * ?");
             triggerBeats.afterPropertiesSet();
             scheduler = new SchedulerFactoryBean();
             scheduler.setApplicationContext(ctx);
-            scheduler.setTriggers(new Trigger[] { triggerBeats });
+            scheduler.setTriggers(new Trigger[] { triggerBeats.getObject() });
             scheduler.afterPropertiesSet();
             scheduler.start();
         } catch (Exception e) {

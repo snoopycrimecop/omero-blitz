@@ -1,6 +1,4 @@
 /*
- *   $Id: AbstractSecurityTest.java 2147 2008-02-07 11:21:51Z jmoore $
- *
  *   Copyright 2006 University of Dundee. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  */
@@ -18,7 +16,7 @@ import omero.api.IQueryPrx;
 import omero.api.IUpdatePrx;
 import omero.api.ServiceFactoryPrx;
 
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.testng.annotations.Test;
 
 @Test(enabled = false, groups = { "broken", "client", "integration", "security" })
@@ -32,7 +30,7 @@ public class AbstractSecurityTest extends TestCase {
 
     protected DataSource dataSource = null; // (DataSource) tmp.getContext().getBean( "omero.security.test");
 
-    protected SimpleJdbcTemplate jdbc = null; // new SimpleJdbcTemplate(dataSource);
+    protected JdbcTemplate jdbc = null; // new JdbcTemplate(dataSource);
 
     protected Login rootLogin = null; // (Login) tmp.getContext().getBean("rootLogin");
 
