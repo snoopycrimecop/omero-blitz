@@ -1,6 +1,4 @@
 /*
- *   $Id$
- *
  *   Copyright 2011 Glencoe Software, Inc. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  */
@@ -25,9 +23,9 @@ public interface TileLoopIteration
     * timepoint counters.
     * @param tileWidth Width of the tile requested. The tile request
     * itself may be smaller than the original tile width requested if
-    * <code>x + tileWidth > sizeX</code>.
+    * {@code x + tileWidth > sizeX}.
     * @param tileHeight Height of the tile requested. The tile request
-    * itself may be smaller if <code>y + tileHeight > sizeY</code>.
+    * itself may be smaller if {@code y + tileHeight > sizeY}.
     * @param tileCount Counter of the tile since the beginning of the loop.
     */
     void run(TileData data, int z, int c, int t, int x, int y,

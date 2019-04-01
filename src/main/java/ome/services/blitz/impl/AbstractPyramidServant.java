@@ -103,8 +103,8 @@ public abstract class AbstractPyramidServant extends AbstractCloseableAmdServant
     }
 
     /**
-     * This is a fairly brittle mapping from the List<List<Integer>> created by
-     * the PixelBuffers to the List<ResolutionDescription> which is remotely
+     * This is a fairly brittle mapping from the {@code List<List<Integer>>} created by
+     * the PixelBuffers to the {@code List<ResolutionDescription>} which is remotely
      * provided by Blitz. The assumption is that much of these two levels will
      * be refactored together and therefore that shouldn't be a long-term
      * problem.

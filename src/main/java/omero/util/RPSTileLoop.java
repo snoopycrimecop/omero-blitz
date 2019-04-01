@@ -1,6 +1,4 @@
 /*
- *   $Id$
- *
  *   Copyright 2011 Glencoe Software, Inc. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  */
@@ -78,9 +76,9 @@ public class RPSTileLoop extends TileLoop {
      * @param iteration Invoker to call for each tile.
      * @param tileWidth <b>Maximum</b> width of the tile requested. The tile
      * request itself will be smaller than the original tile width requested if
-     * <code>x + tileWidth > sizeX</code>.
+     * {@code x + tileWidth > sizeX}
      * @param tileHeight <b>Maximum</b> height of the tile requested. The tile
-     * request itself will be smaller if <code>y + tileHeight > sizeY</code>.
+     * request itself will be smaller if {@code y + tileHeight > sizeY}.
      * @return The total number of tiles iterated over.
      */
     public int forEachTile(int tileWidth, int tileHeight,
