@@ -1,6 +1,4 @@
 /*
- *   $Id$
- *
  *   Copyright 2010-2014 Glencoe Software, Inc. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  *
@@ -20,7 +18,7 @@ module omero {
         /**
          * Provides method to interact with acquisition metadata and
          * annotations.
-         **/
+         */
         ["ami", "amd"] interface IMetadata extends ServiceInterface
             {
                 /**
@@ -30,7 +28,7 @@ module omero {
                  * @param ids The collection of logical channel's ids.
                  * 		      Mustn't be <code>null</code>.
                  * @return The collection of loaded logical channels.
-                 **/
+                 */
                 idempotent LogicalChannelList loadChannelAcquisitionData(omero::sys::LongList ids) throws ServerError;
 
                 /**
@@ -52,7 +50,7 @@ module omero {
                  * @param rootIds
                  *      Ids of the objects of type <code>rootType</code>.
                  * 		Mustn't be <code>null</code>.
-                 * @param annotationType
+                 * @param annotationTypes
                  *      The types of annotation to retrieve. If
                  *      <code>null</code> all annotations will be loaded.
                  *      String of the type
@@ -65,7 +63,7 @@ module omero {
                  * @return A map whose key is rootId and value the
                  *         <code>Map</code> of all annotations for that node
                  *         or <code>null</code>.
-                 **/
+                 */
                 idempotent LongIObjectListMap loadAnnotations(string rootType, omero::sys::LongList rootIds,
                                                          omero::api::StringSet annotationTypes, omero::sys::LongList annotatorIds,
                                                          omero::sys::Parameters options) throws ServerError;
@@ -82,7 +80,7 @@ module omero {
                  *      Exclude the annotations with the specified name spaces.
                  * @param options   The POJO options.
                  * @return          A collection of found annotations.
-                 **/
+                 */
                 idempotent AnnotationList loadSpecifiedAnnotations(string annotationType,
                                                                    omero::api::StringSet include,
                                                                    omero::api::StringSet exclude,
@@ -98,7 +96,7 @@ module omero {
                  * @return Map whose key is a <code>Tag/TagSet</code> and the
                  *         value either a Map or a list of related
                  *         <code>DataObject</code>.
-                 **/
+                 */
                 idempotent LongIObjectListMap loadTagContent(omero::sys::LongList ids, omero::sys::Parameters options) throws ServerError;
 
                 /**
@@ -111,7 +109,7 @@ module omero {
                  *
                  * @param options The POJO options.
                  * @return See above.
-                 **/
+                 */
                 idempotent IObjectList loadTagSets(omero::sys::Parameters options) throws ServerError;
 
                 /**
@@ -121,7 +119,7 @@ module omero {
                  * @param ids The collection of ids.
                  * @param options The POJO options.
                  * @return See above.
-                 **/
+                 */
                 idempotent omero::sys::CountMap getTaggedObjectsCount(omero::sys::LongList ids, omero::sys::Parameters options) throws ServerError;
 
                 /**
@@ -134,7 +132,7 @@ module omero {
                  *                  constants defined by this class.
                  * @param options	The POJO options.
                  * @return See above.
-                 **/
+                 */
                 omero::RLong countSpecifiedAnnotations(string annotationType,
                                                        omero::api::StringSet include,
                                                        omero::api::StringSet exclude,
@@ -216,7 +214,7 @@ module omero {
                  * Finds the original file IDs for the import logs
                  * corresponding to the given Image or Fileset IDs.
                  *
-                 * @param rootNodeType
+                 * @param rootType
                  *       the root node type, may be {@link omero.model.Image}
                  *       or {@link omero.model.Fileset}
                  * @param ids

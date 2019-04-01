@@ -1,6 +1,4 @@
 /*
- *   $Id$
- *
  *   Copyright 2010 Glencoe Software, Inc. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  *
@@ -63,12 +61,12 @@ module omero {
                  *   <li><code>channelIndex</code> is out of range</li>
                  *   <li><code>start</code> is out of range</li>
                  *   <li><code>end</code> is out of range</li>
-                 *   <li><code>start > end</code></li>
+                 *   <li><code>start</code> is greater than <code>end</code></li>
                  *   <li>the Pixels set qualified by <code>pixelsId</code> is
-                 *       unlocatable.</li>
+                 *       not locatable.</li>
                  * </ul>
                  * @see #projectPixels
-                 **/
+                 */
                 Ice::ByteSeq projectStack(long pixelsId,
                                           omero::model::PixelsType pixelsType,
                                           omero::constants::projection::ProjectionType algorithm,
@@ -80,7 +78,7 @@ module omero {
                  * optical sections for a given set of time points of a Pixels
                  * set. The Image which is linked to the Pixels set will be
                  * copied using
-                 * {@link omero.api.IPixels#copyAndResizeImage}.
+                 * {@code omero.api.IPixels.copyAndResizeImage}.
                  *
                  * @param pixelsId The source Pixels set Id.
                  * @param pixelsType The destination Pixels type. If
@@ -96,7 +94,7 @@ module omero {
                  *                  Pixels type.
                  * @param tStart Timepoint to start projecting from.
                  * @param tEnd Timepoint to finish projecting.
-                 * @param channels List of the channel indexes to use while
+                 * @param channelList List of the channel indexes to use while
                  *                 calculating the projection.
                  * @param stepping Stepping value to use while calculating the
                  *                 projection. For example,
@@ -124,17 +122,17 @@ module omero {
                  *   <li><code>algorithm</code> is unknown</li>
                  *   <li><code>tStart</code> is out of range</li>
                  *   <li><code>tEnd</code> is out of range</li>
-                 *   <li><code>tStart > tEnd</code></li>
-                 *   <li><code>channels</code> is null or has indexes out of
+                 *   <li><code>tStart</code> is greater than <code>tEnd</code></li>
+                 *   <li><code>channelList</code> is null or has indexes out of
                  *       range</li>
                  *   <li><code>zStart</code> is out of range</li>
                  *   <li><code>zEnd</code> is out of range</li>
-                 *   <li><code>zStart > zEnd</code></li>
+                 *   <li><code>zStart</code> is greater than <code>zEnd</code></li>
                  *   <li>the Pixels set qualified by <code>pixelsId</code> is
-                 *       unlocatable.</li>
+                 *       not locatable.</li>
                  * </ul>
                  * @see #projectStack
-                 **/
+                 */
                 long projectPixels(long pixelsId, omero::model::PixelsType pixelsType,
                                    omero::constants::projection::ProjectionType algorithm,
                                    int tStart, int tEnd,

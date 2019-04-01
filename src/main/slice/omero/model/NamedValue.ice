@@ -28,7 +28,7 @@ module omero {
     /**
      * Simple Pair-like container which is
      * used in a sequence to support ordered maps.
-     **/
+     */
     class NamedValue {
         string name;
         string value;

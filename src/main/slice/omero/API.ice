@@ -1,6 +1,4 @@
 /*
- *   $Id$
- *
  *   Copyright 2007 Glencoe Software, Inc. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  *
@@ -101,7 +99,7 @@ module omero {
             /**
              * Provides a list of all valid security contexts for this session.
              * Each of the returned {@link omero.model.IObject} instances can
-             * be passed to {@link #setSecurityContext}.
+             * be passed to {@code setSecurityContext}.
              **/
             IObjectList getSecurityContexts() throws ServerError;
 
@@ -122,7 +120,7 @@ module omero {
              *
              * <p> Passing an unloaded version of either object type will change
              * the way the current session operates. Note: only objects which
-             * are returned by the {@link #getSecurityContexts} method are
+             * are returned by the {@code getSecurityContext} method are
              * considered valid. Any other instance will cause an exception to
              * be thrown. </p>
              *
@@ -267,9 +265,9 @@ module omero {
              * case the returned long value will be non-zero.
              *
              * Specifically, the bit representing the 0-based index will be 1:
-             *
+             * {@code
              *        if (retval & 1&lt;&lt;idx == 1&lt;&lt;idx) { // not alive }
-             *
+             * }
              * Except for fatal server or session errors, this method should never
              * throw an exception.
              **/

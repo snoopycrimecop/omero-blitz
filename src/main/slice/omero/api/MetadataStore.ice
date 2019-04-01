@@ -1,6 +1,4 @@
 /*
- *   $Id$
- *
  *   Copyright 2008 Glencoe Software, Inc. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  *
@@ -25,13 +23,13 @@ module omero {
 
     /**
      * Types used during import.
-     **/
+     */
     module metadatastore {
 
         /**
          * Container-class used by the import mechanism. Passed to
          * {@link omero.api.MetadataStore}
-         **/
+         */
         class IObjectContainer {
             string LSID;
             omero::api::StringIntMap indexes;
@@ -46,7 +44,7 @@ module omero {
 
         /**
          * Server-side interface for import.
-         **/
+         */
         ["ami","amd"] interface MetadataStore extends StatefulServiceInterface
             {
                 void createRoot() throws ServerError;

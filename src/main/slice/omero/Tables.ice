@@ -1,6 +1,4 @@
 /*
- *   $Id$
- *
  *   Copyright 2009 Glencoe Software, Inc. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  *
@@ -44,7 +42,7 @@ module omero {
         /**
          * Base type for dealing working with tabular data. For efficiency,
          * data is grouped by type, i.e. column. These value objects are passed
-         * through the {@link Table} interface.
+         * through the {@code Table} interface.
          **/
         class Column {
 
@@ -178,7 +176,7 @@ module omero {
             /**
              * Read the given rows of data.
              *
-             * {@param rowNumbers} must contain at least one element or an
+             * @param rowNumbers must contain at least one element or an
              * {@link omero.ApiUsageException} will be thrown.
              **/
             idempotent
@@ -226,8 +224,8 @@ module omero {
             /**
              * Allows the user to modify a Data instance passed back
              * from a query method and have the values modified. It
-             * is critical that the {@link Data#lastModification} and the
-             * {@link Data#rowNumbers} fields are properly set. An exception
+             * is critical that the {@code Data.lastModification} and the
+             * {@code Data.rowNumbers} fields are properly set. An exception
              * will be thrown if the data has since been modified.
              **/
             void update(Data modifiedData)

@@ -1,6 +1,4 @@
 /*
- *   $Id$
- *
  *   Copyright 2010 Glencoe Software, Inc. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  *
@@ -46,14 +44,14 @@ module omero {
                  * followed by a hyphen: ACME-0.0.1 and any build information
                  * should follow the patch number also with a hyphen:
                  * 4.0.0-RC1. These values will be removed by
-                 * {@link #getVersion}
+                 * {@code getVersion}
                  */
                 idempotent string getVersion() throws ServerError;
 
                 /**
                  * Retrieves a configuration value from the backend store.
                  * Permissions applied to the configuration value may cause a
-                 * {@link SecurityViolation} to be thrown.
+                 * {@link omero.SecurityViolation} to be thrown.
                  *
                  * @param key The non-null name of the desired configuration
                  *        value
@@ -87,7 +85,7 @@ module omero {
                 idempotent omero::api::StringStringMap getConfigDefaults() throws ServerError;
 
                 /**
-                 * Retrieves configuration values like {@link #getConfigValues}
+                 * Retrieves configuration values like {@code getConfigValues}
                  * but only those with the prefix <i>omero.client</i>.
                  *
                  * @return a map from the found keys to the linked values.
@@ -106,12 +104,12 @@ module omero {
                 /**
                  * Sets a configuration value in the backend store.
                  * Permissions applied to the configuration value may cause a
-                 * {@link SecurityViolation} to be thrown. If the value is
+                 * {@link omero.SecurityViolation} to be thrown. If the value is
                  * null or empty, then the configuration will be removed in
                  * all writable configuration sources. If the configuration is
                  * set in a non-modifiable source (e.g. in a property file on
                  * the classpath), then a subsequent call to
-                 * {@link #getConfigValue} will return that value.
+                 * {@code getConfigValue} will return that value.
                  *
                  * @param key The non-null name of the desired configuration
                  *        value
@@ -122,7 +120,7 @@ module omero {
                 idempotent void setConfigValue(string key, string value) throws ServerError;
 
                 /**
-                 * Calls {@link #setConfigValue} if and only if the
+                 * Calls {@code setConfigValue} if and only if the
                  * configuration property is currently equal to the test
                  * argument. If the test is null or empty, then the
                  * configuration property will be set only if missing.
@@ -152,7 +150,7 @@ module omero {
                 /**
                  * Checks the database for its time using a SELECT statement.
                  *
-                 * @return Non-null {@link RTime} representation of the
+                 * @return Non-null {@link omero.RTime} representation of the
                  *         database time.
                  * @throws InternalException though any call can throw an
                  *         InternalException it is more likely that this can
@@ -168,7 +166,7 @@ module omero {
                  * variant depending on whether the service is clustered or
                  * not.
                  *
-                 * @return Non-null {@link RTime} representation of the
+                 * @return Non-null {@link omero.RTime} representation of the
                  *         server's own time.
                  */
                 idempotent omero::RTime getServerTime() throws ServerError;

@@ -1,6 +1,4 @@
 /*
- *   $Id$
- *
  *   Copyright 2009 Glencoe Software, Inc. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  *
@@ -63,7 +61,7 @@ module omero {
             * stateful service and removes its name from the object adapter.
             * Any further method calls will fail with a Ice::NoSuchObjectException.
             *
-            * Note: with JavaEE, the close method was called publically,
+            * Note: with JavaEE, the close method was called publicly,
             * and internally this called destroy(). As of the OmeroBlitz
             * migration, this functionality has been combined.
             **/

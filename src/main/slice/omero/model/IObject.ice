@@ -1,6 +1,4 @@
 /*
- *   $Id$
- *
  *   Copyright 2007 Glencoe Software, Inc. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  *
@@ -20,21 +18,21 @@ module omero {
      * server, the interface ome.model.IObject
      * unifies the model. In Ice, interfaces have
      * a more remote connotation.
-     **/
+     */
     ["protected"] class IObject
     {
       /**
        * The database id for this entity. Of RLong value
        * so that transient entities can have a null id.
-       **/
-      omero::RLong          id;
+       */
+      omero::RLong id;
 
       /**
        * Internal details (permissions, owner, etc.) for
        * this entity. All entities have Details, and even
        * a newly created object will have a non-null
        * Details instance. (In the OMERO provided mapping!)
-       **/
+       */
       omero::model::Details details;
 
       /**
@@ -42,7 +40,7 @@ module omero {
        * exception will be raised if any field other than id is
        * accessed via the OMERO-generated methods. Unloaded objects
        * are useful as pointers or proxies to server-side state.
-       **/
+       */
       bool loaded;
 
       // METHODS
@@ -59,21 +57,21 @@ module omero {
       /**
        * Return another instance of the same type as this instance
        * constructed as if by: new InstanceI( this.id.val, false );
-       **/
+       */
       IObject proxy();
 
       /**
        * Return another instance of the same type as this instance
        * with all single-value entities unloaded and all members of
        * collections also unloaded.
-       **/
+       */
       IObject shallowCopy();
 
       /**
        * Sets the loaded boolean to false and empties all state
        * from this entity to make sending it over the network
        * less costly.
-       **/
+       */
       void unload();
 
       /**
@@ -88,18 +86,18 @@ module omero {
        *
        * Sending back empty collections can also save a significant
        * amount of bandwidth, when working with large data graphs.
-       **/
+       */
       void unloadCollections();
 
       /**
        * As with collections, the objects under details can link
        * to many other objects. Unloading the details can same
        * bandwidth and simplify the server logic.
-       **/
+       */
       void unloadDetails();
 
       /**
-       * Tests for unloadedness. If this value is false, then
+       * Tests if the objects are loaded or not. If this value is false, then
        * any method call on this instance other than getId
        * or setId will result in an exception.
        **/
@@ -116,7 +114,7 @@ module omero {
       /**
        * Marker interface which means that special rules apply
        * for both reading and writing these instances.
-       **/
+       */
       bool isGlobal();
 
       /**
@@ -125,7 +123,7 @@ module omero {
        *
        *   - getParent()
        *   - getChild()
-       **/
+       */
       bool isLink();
 
       /**
@@ -135,7 +133,7 @@ module omero {
        *   - getVersion()
        *   - setVersion()
        *
-       **/
+       */
       bool isMutable();
 
       /**
@@ -144,7 +142,7 @@ module omero {
        *
        *   - linkAnnotation(Annotation)
        *   -
-       **/
+       */
       bool isAnnotated();
 
 

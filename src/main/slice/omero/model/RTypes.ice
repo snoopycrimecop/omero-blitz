@@ -1,6 +1,4 @@
 /*
- *   $Id$
- *
  *   Copyright 2007 Glencoe Software, Inc. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  *
@@ -19,7 +17,7 @@ module omero {
 
   /**
    * Wrapper for an {@link omero.model.IObject} instance.
-   **/
+   */
   ["protected"] class RObject extends RType
   {
     omero::model::IObject val;

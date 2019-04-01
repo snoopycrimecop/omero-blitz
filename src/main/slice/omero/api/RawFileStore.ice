@@ -1,6 +1,4 @@
 /*
- *   $Id$
- *
  *   Copyright 2010 Glencoe Software, Inc. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  *
@@ -22,7 +20,7 @@ module omero {
          *
          * Note: methods on this service are protected by a <i>DOWNLOAD</i>
          * restriction.
-         **/
+         */
         ["ami", "amd"] interface RawFileStore extends StatefulServiceInterface
             {
 
@@ -30,7 +28,7 @@ module omero {
                  * This method manages the state of the service. This method
                  * will throw a {@link omero.SecurityViolation} if for the
                  * current user context either the file is not readable or a
-                 * {@link omero.constants.permissions#DOWNLOAD} restriction is
+                 * {@code omero.constants.permissions.BINARYACCESS} restriction is
                  * in place.
                  */
                 void setFileId(long fileId) throws ServerError;
@@ -50,7 +48,7 @@ module omero {
                 /**
                  * Returns the size of the file on disk (not as stored in the
                  * database since that value will only be updated on
-                 * {@link #save}. If the file has not yet been written to, and
+                 * {@code save}. If the file has not yet been written to, and
                  * therefore does not exist, a {@link omero.ResourceError}
                  * will be thrown.
                  */
@@ -91,7 +89,7 @@ module omero {
                  *
                  * If save has not been called, {@link omero.api.RawFileStore}
                  * instances will save the {@link omero.model.OriginalFile}
-                 * object associated with it on {@link #close}.
+                 * object associated with it on {@code close}.
                  *
                  * See also <a href="https://trac.openmicroscopy.org/ome/ticket/1651">ticket 1651</a>
                  * and <a href="https://trac.openmicroscopy.org/ome/ticket/2161">ticket 2161</a>.

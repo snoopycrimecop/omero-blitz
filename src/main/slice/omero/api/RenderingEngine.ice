@@ -1,6 +1,4 @@
 /*
- *   $Id$
- *
  *   Copyright 2010 Glencoe Software, Inc. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  *
@@ -28,7 +26,7 @@ module omero {
          * planes within the pixels set onto an <i>RGB</i> image.
          *
          * The RenderingEngine allows to fine-tune the settings that
-         * define the transformation context &#151; that is, a specification
+         * define the transformation context that is, a specification
          * of how raw pixels data is to be transformed into an image that can
          * be displayed on screen. Those settings are referred to as rendering
          * settings or display options. After tuning those settings it is
@@ -36,13 +34,13 @@ module omero {
          * be used the next time the pixels set is accessed for rendering; for
          * example by another RenderingEngine instance. Note that the display
          * options are specific to the given pixels set and are experimenter
-         * scoped &#151; that is, two different users can specify different
+         * scoped i.e. two different users can specify different
          * display options for the <i>same</i> pixels set. (A RenderingEngine
          * instance takes this into account automatically as it is always
          * bound to a given experimenter.)
          *
          * This service is <b>thread-safe</b>.
-         **/
+         */
         ["ami", "amd"] interface RenderingEngine extends PyramidService
             {
                 /**
@@ -74,7 +72,7 @@ module omero {
                  * @return An <i>RGB</i> image ready to be displayed on screen.
                  * @throws ValidationException
                  *             If <code>def</code> is <code>null</code>.
-                 * @see {@link #render}
+                 * @see #render
                  */
                 idempotent Ice::IntSeq renderAsPackedInt(omero::romio::PlaneDef def) throws ServerError;
 
@@ -104,9 +102,8 @@ module omero {
                  *   <li><code>timepoint</code> is out of range</li>
                  *   <li><code>start</code> is out of range</li>
                  *   <li><code>end</code> is out of range</li>
-                 *   <li><code>start > end</code></li>
+                 *   <li><code>start</code> is greater than <code>end</code></li>
                  * </ul>
-                 * @see omero.api.IProjection#projectPixels
                  */
                 idempotent Ice::IntSeq renderProjectedAsPackedInt(omero::constants::projection::ProjectionType algorithm, int timepoint, int stepping, int start, int end) throws ServerError;
 
@@ -152,16 +149,15 @@ module omero {
                  *   <li><code>timepoint</code> is out of range</li>
                  *   <li><code>start</code> is out of range</li>
                  *   <li><code>end</code> is out of range</li>
-                 *   <li><code>start > end</code></li>
+                 *   <li><code>start</code>is greater than <code>end</code></li>
                  * </ul>
-                 * @see omero.api.IProjection#projectPixels
                  */
                 idempotent Ice::ByteSeq renderProjectedCompressed(omero::constants::projection::ProjectionType algorithm, int timepoint, int stepping, int start, int end) throws ServerError;
 
                 /**
                  * Returns the id of the {@link omero.model.RenderingDef}
-                 * loaded by either {@link #lookupRenderingDef} or
-                 * {@link #loadRenderingDef}.
+                 * loaded by either {@code lookupRenderingDef} or
+                 * {@code loadRenderingDef}.
                  */
                 idempotent long getRenderingDefId() throws ServerError;
 
@@ -187,7 +183,7 @@ module omero {
                  * necessarily have to be linked to the given Pixels set.
                  * However, the rendering settings <b>must</b> be linked to a
                  * compatible Pixels set as defined by
-                 * {@link omero.api.IRenderingSettings#sanityCheckPixels}.
+                 * {@code omero.api.IRenderingSettings.sanityCheckPixels}.
                  *
                  * @param renderingDefId The rendering definition ID.
                  * @throws ValidationException If a RenderingDef does not
@@ -201,7 +197,7 @@ module omero {
                  * Informs the rendering engine that it should render a set of
                  * overlays on each rendered frame. These are expected to be
                  * binary masks.
-                 * @param overlays Binary mask to color map.
+                 * @param rowColorMap Binary mask to color map.
                  */
                 ["deprecate: use omero::romio::PlaneDefWithMasks instead"] idempotent void setOverlays(omero::RLong tablesId, omero::RLong imageId, LongIntMap rowColorMap) throws ServerError;
 
@@ -304,7 +300,7 @@ module omero {
                  * @see #getChannelFamily
                  * @see #getChannelNoiseReduction
                  */
-                idempotent void setQuantizationMap(int w, omero::model::Family fam, double coefficient, bool noiseReduction) throws ServerError;
+                idempotent void setQuantizationMap(int w, omero::model::Family family, double coefficient, bool noiseReduction) throws ServerError;
 
                 /**
                  * Returns the family associated to the specified channel.
@@ -477,23 +473,23 @@ module omero {
                  * will be processed as though the specific method was called with
                  * related attributes provided as arguments. The following methods are
                  * called underneath: <ul>
-                 * <li>{@link RenderingEngine#setModel(RenderingModel)}</li>
-                 * <li>{@link RenderingEngine#setDefaultZ(int)}</li>
-                 * <li>{@link RenderingEngine#setDefaultT(int)}</li>
-                 * <li>{@link RenderingEngine#setQuantumStrategy(int)}</li>
-                 * <li>{@link RenderingEngine#setCodomainInterval(int, int)}</li>
-                 * <li>{@link RenderingEngine#setActive(int, boolean)}</li>
-                 * <li>{@link RenderingEngine#setChannelWindow(int, double, double)}</li>
-                 * <li>{@link RenderingEngine#setQuantizationMap(int, Family, double, boolean)}</li>
-                 * <li>{@link RenderingEngine#setRGBA(int, int, int, int, int)}</li>
-                 * <li>{@link RenderingEngine#setChannelLookupTable(int, String)}</li>
+                 * <li>{@code RenderingEngine.setModel}</li>
+                 * <li>{@code RenderingEngine.setDefaultZ}</li>
+                 * <li>{@code RenderingEngine.setDefaultT}</li>
+                 * <li>{@code RenderingEngine.setQuantumStrategy}</li>
+                 * <li>{@code RenderingEngine.setCodomainInterval}</li>
+                 * <li>{@code RenderingEngine.setActive}</li>
+                 * <li>{@code RenderingEngine.setChannelWindow}</li>
+                 * <li>{@code RenderingEngine.setQuantizationMap}</li>
+                 * <li>{@code RenderingEngine.setRGBA}</li>
+                 * <li>{@code RenderingEngine.setChannelLookupTable}</li>
                  * </ul>
                  * If one or more attributes that apply to a particular method are
                  * <code>null</code> it will be <b>skipped</b> in its entirety. The
                  * underlying Renderer is not able to handle partial field updates.
                  * Furthermore, {@link ome.model.display.ChannelBinding} references that are
-                 * <code>null</code> and indexes in the {@link RenderingDef#WAVERENDERING}
-                 * array greater than the currently looked up {@link Pixels#SIZEC} will be
+                 * <code>null</code> and indexes in the {@code RenderingDef.WAVERENDERING}
+                 * array greater than the currently looked up {@code Pixels.SIZEC} will be
                  * skipped.
                  */
                 idempotent void updateSettings(omero::model::RenderingDef settings) throws ServerError;
@@ -518,41 +514,36 @@ module omero {
                  */
                 long resetDefaultSettings(bool save) throws ServerError;
 
-		/**
-		 * Sets the current compression level for the service. (The
-                 * default is 85%)
-		 *
-		 * @param percentage A percentage compression level from 1.00
-                 *                  (100%) to 0.01 (1%).
-		 * @throws ValidationException if the <code>percentage</code
-                 *         is out of range.
-		 */
+		         /**
+		          * Sets the current compression level for the service. (The default is 85%)
+		          *
+		          * @param percentage A percentage compression level from 1.00 (100%) to 0.01 (1%).
+		          * @throws ValidationException if the <code>percentage</code> is out of range.
+		          */
                 idempotent void setCompressionLevel(float percentage) throws ServerError;
 
-		/**
-		 * Returns the current compression level for the service.
-		 */
+		         /**
+		          * Returns the current compression level for the service.
+		          */
                 idempotent float getCompressionLevel() throws ServerError;
 
-		/**
+		        /**
                  * Returns <code>true</code> if the pixels type is signed,
                  * <code>false</code> otherwise.
                  */
                 idempotent bool isPixelsTypeSigned() throws ServerError;
 
-		/**
+		        /**
                  * Returns the minimum value for that channels depending on
-                 * the pixels type and the original range (globalmax,
-                 * globalmin)
+                 * the pixels type and the original range (globalmin, globalmax)
                  *
                  * @param w The channel index.
                  */
                 idempotent double getPixelsTypeUpperBound(int w) throws ServerError;
 
-		/**
+		        /**
                  * Returns the maximum value for that channels depending on
-                 * the pixels type and the original range (globalmax,
-                 * globalmin)
+                 * the pixels type and the original range (globalmin, globalmax)
                  *
                  * @param w The channel index.
                  */

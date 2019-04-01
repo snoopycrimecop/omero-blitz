@@ -18,7 +18,7 @@ module omero {
        * Row-level permissions definition available on
        * every OMERO.blitz type. Represents a similar
        * logic to the Unix filesystem.
-       **/
+       */
     ["protected"] class Permissions
     {
 
@@ -30,7 +30,7 @@ module omero {
        * assume that there is no such restriction.
        *
        * If null, this should be assumed to have no restrictions.
-       **/
+       */
       omero::api::BoolArray restrictions;
 
       /**
@@ -39,9 +39,9 @@ module omero {
        * which strings MAY NOT be present in this field for
        * execution to be successful. For example, if an
        * {@link omero.model.Image} contains a ""DOWNLOAD"" restriction,
-       * then an attempt to call {@link omero.api.RawFileStore#read}
+       * then an attempt to call {@code omero.api.RawFileStore.read}
        * will fail with an {@link omero.SecurityViolation}.
-       **/
+       */
       omero::api::StringSet extendedRestrictions;
 
       /**
@@ -50,18 +50,18 @@ module omero {
        * accessors are provided for the perm1 instance though it
        * is protected, though NO GUARANTEES are made on the
        * representation.
-       **/
+       */
       long perm1;
 
       /**
        * Do not use!
-       **/
+       */
       long getPerm1();
 
       /**
        * Do not use!
        * Throws {@link omero.ClientError} if mutation not allowed.
-       **/
+       */
       void setPerm1(long value);
 
       // Context-based values
@@ -75,14 +75,14 @@ module omero {
        *
        * isDisallow(ANNOTATERESTRICTION) == ! canAnnotate()
        *
-       **/
+       */
        bool isDisallow(int restriction);
 
       /**
        * Returns true if the given argument is present in the
        * extendedRestrictions set. This implies that some
        * service-specific behavior is disallowed.
-       **/
+       */
        bool isRestricted(string restriction);
 
       /**
@@ -91,7 +91,7 @@ module omero {
        *
        * The fact that the user has this object in hand
        * already identifies that it's readable.
-       **/
+       */
       bool canAnnotate();
 
       /**
@@ -101,7 +101,7 @@ module omero {
        *
        * The fact that the user has this object in hand
        * already identifies that it's readable.
-       **/
+       */
       bool canEdit();
 
       /**
@@ -110,7 +110,7 @@ module omero {
        *
        * The fact that the user has this object in hand
        * already identifies that it's readable.
-       **/
+       */
       bool canLink();
 
       /**
@@ -119,7 +119,7 @@ module omero {
        *
        * The fact that the user has this object in hand
        * already identifies that it's readable.
-       **/
+       */
       bool canDelete();
 
       /**
@@ -128,7 +128,7 @@ module omero {
        *
        * The fact that the user has this object in hand
        * already identifies that it's readable.
-       **/
+       */
       bool canChgrp();
 
       /**
@@ -137,7 +137,7 @@ module omero {
        *
        * The fact that the user has this object in hand
        * already identifies that it's readable.
-       **/
+       */
       bool canChown();
 
       // Row-based values
@@ -161,47 +161,47 @@ module omero {
 
       /**
        * Throws {@link omero.ClientError} if mutation not allowed.
-       **/
+       */
       void setUserRead(bool value);
 
       /**
        * Throws {@link omero.ClientError} if mutation not allowed.
-       **/
+       */
       void setUserAnnotate(bool value);
 
       /**
        * Throws {@link omero.ClientError} if mutation not allowed.
-       **/
+       */
       void setUserWrite(bool value);
 
       /**
        * Throws {@link omero.ClientError} if mutation not allowed.
-       **/
+       */
       void setGroupRead(bool value);
 
       /**
        * Throws {@link omero.ClientError} if mutation not allowed.
-       **/
+       */
       void setGroupAnnotate(bool value);
 
       /**
        * Throws {@link omero.ClientError} if mutation not allowed.
-       **/
+       */
       void setGroupWrite(bool value);
 
       /**
        * Throws {@link omero.ClientError} if mutation not allowed.
-       **/
+       */
       void setWorldRead(bool value);
 
       /**
        * Throws {@link omero.ClientError} if mutation not allowed.
-       **/
+       */
       void setWorldAnnotate(bool value);
 
       /**
        * Throws {@link omero.ClientError} if mutation not allowed.
-       **/
+       */
       void setWorldWrite(bool value);
 
     };

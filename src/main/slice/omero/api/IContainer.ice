@@ -1,6 +1,4 @@
 /*
- *   $Id$
- *
  *   Copyright 2010 Glencoe Software, Inc. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  *
@@ -45,7 +43,7 @@ module omero {
          * </p>
          * <p>
          * Most methods take such an <code>options</code> map which is built
-         * on the client-side using the {@link Parameters} class. The
+         * on the client-side using the {@link omero.sys.Parameters} class. The
          * currently supported options are:
          * <ul>
          * <li><b>annotator</b>(Integer): If key exists but value null,
@@ -351,7 +349,7 @@ module omero {
                  *      dataset.addProject(p);
                  * </code>
                  * then for each parent relationship a DataObject
-                 * {@link omero.model.ILink} is created.
+                 * {@link ome.model.ILink} is created.
                  *
                  * @param obj
                  *            IObject. Supported: Project, Dataset,
@@ -363,7 +361,7 @@ module omero {
 
                 /**
                  * Convenience method to save network calls. Loops over the
-                 * array of IObjects calling {@link #createDataObject}.
+                 * array of IObjects calling {@code createDataObject}.
                  *
                  * @param dataObjects
                  *            Array of Omero <code>IObjects</code>
@@ -387,7 +385,7 @@ module omero {
 
                 /**
                  * Convenience method for creating links. Functionality also
-                 * available from {@link #createDataObject}
+                 * available from {@code createDataObject}
                  *
                  * @param links Array of links to be created.
                  * @param options Parameters as above.
@@ -401,8 +399,8 @@ module omero {
                  * To link or unlink objects to the specified object, we
                  * should call the methods link or unlink. TODO Or do we use
                  * for example dataset.setProjects(set of projects) to add.
-                 * Tink has to be set as follows dataset->project and
-                 * project->dataset.
+                 * Link has to be set as follows dataset&rarr;project and
+                 * project&rarr;dataset.
                  *
                  * Alternatively, you can make sure that the collection is
                  * <b>exactly</b> how it should be in the database. If you
@@ -418,7 +416,7 @@ module omero {
 
                 /**
                  * Convenience method to save network calls. Loops over the
-                 * array of IObjects calling {@link #updateDataObject}.
+                 * array of IObjects calling {@code updateDataObject}.
                  *
                  * @param objs
                  * @param options

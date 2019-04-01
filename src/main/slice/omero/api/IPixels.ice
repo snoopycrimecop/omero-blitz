@@ -1,6 +1,4 @@
 /*
- *   $Id$
- *
  *   Copyright 2010 Glencoe Software, Inc. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  *
@@ -40,7 +38,7 @@ module omero {
                  *
                  * @param pixId Pixels id.
                  * @return Pixels object which matches <code>id</code>.
-                 **/
+                 */
                 idempotent omero::model::Pixels retrievePixDescription(long pixId) throws ServerError;
 
                 /**
@@ -80,7 +78,7 @@ module omero {
                  * </ul>
                  *
                  * @param pixId Pixels id.
-                 * @param userID  The id of the user.
+                 * @param userId  The id of the user.
                  * @return Rendering definition.
                  **/
                 idempotent omero::model::RenderingDef retrieveRndSettingsFor(long pixId, long userId) throws ServerError;
@@ -286,7 +284,7 @@ module omero {
                  *         <code>null</code> on failure.
                  * @throws ValidationException If the channel list is
                  *         <code>null</code> or of size == 0.
-                 **/
+                 */
                 omero::RLong createImage(int sizeX, int sizeY, int sizeZ, int sizeT,
                                          omero::sys::IntList channelList,
                                          omero::model::PixelsType pixelsType,
@@ -301,7 +299,7 @@ module omero {
                  * @param channelIndex The channel index within the Pixels set.
                  * @param min The channel global minimum.
                  * @param max The channel global maximum.
-                 **/
+                 */
                 void setChannelGlobalMinMax(long pixelsId, int channelIndex, double min, double max) throws ServerError;
             };
     };

@@ -65,7 +65,7 @@ module omero {
      *                   Note: servers may choose to impose a
      *                   maximum limit.
      *
-     *  start/endTime := (some) objects queried shoud have been
+     *  start/endTime := (some) objects queried should have been
      *                   created and/or modified within time span.
      *
      **/

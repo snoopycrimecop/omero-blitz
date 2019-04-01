@@ -25,7 +25,7 @@ module omero {
           * examples:
           *  - omero.cmd.ResetPasswordRequest(omename, email)
           *      sends new password to the given user
-          **/
+          */
          class ResetPasswordRequest extends Request {
              string omename;
              string email;
@@ -35,7 +35,7 @@ module omero {
           * Successful response for {@link ResetPasswordRequest}.
           * If no valid user with matching email is found,
           * an {@link ERR} will be returned.
-          **/
+          */
          class ResetPasswordResponse extends Response {
          };
 
@@ -58,7 +58,7 @@ module omero {
         /**
          * Argument-less request that will produce a
          * {@link CurrentSessionsResponse} if no {@link omero.cmd.ERR} occurs.
-         **/
+         */
         class CurrentSessionsRequest extends Request {
         };
 
@@ -69,12 +69,12 @@ module omero {
          * objects that are currently active *after* all timeouts have been
          * applied.
          * This is the value that would be returned by
-         * {@link omero.api.ISession#getSession} when joined to that session.
+         * {@code omero.api.ISession.getSession} when joined to that session.
          * Similarly, the contexts field contains the value that would be
-         * returned by a call to {@link omero.api.IAdmin#getEventContext}.
+         * returned by a call to {@code omero.api.IAdmin.getEventContext}.
          * For non-administrators, most values for all sessions other than
-         * those belonging to that user will be nulled.
-         **/
+         * those belonging to that user will be null.
+         */
         class CurrentSessionsResponse extends Response {
 
             /**
