@@ -36,7 +36,7 @@ module omero {
           * If no valid user with matching email is found,
           * an {@link ERR} will be returned.
           */
-         class ResetPasswordResponse extends Response {
+         class ResetPasswordResponse extends OK {
          };
 
         /**
@@ -75,8 +75,7 @@ module omero {
          * For non-administrators, most values for all sessions other than
          * those belonging to that user will be null.
          */
-        class CurrentSessionsResponse extends Response {
-
+        class CurrentSessionsResponse extends OK {
             /**
              * {@link omero.model.Session} objects loaded from
              * the database.

@@ -60,7 +60,7 @@ module omero {
          * will be returned under normal conditions, otherwise a {@link ERR}
          * will be returned.
          **/
-        class FindPyramidsResponse extends Response {
+        class FindPyramidsResponse extends OK {
 
             /**
              * The image IDs corresponding to the pyramid
@@ -87,7 +87,7 @@ module omero {
          * Pre-FS images will have {@code filesetAnnotationId} set; otherwise
          * {@code filesetId} will be set.
          **/
-        class OriginalMetadataResponse extends Response {
+        class OriginalMetadataResponse extends OK {
 
             /**
              * Set to the id of the {@link omero.model.Fileset} that this
@@ -134,7 +134,7 @@ module omero {
         /**
          * The used files associated with a pre-FS image.
          **/
-        class UsedFilesResponsePreFs extends Response {
+        class UsedFilesResponsePreFs extends OK {
             /**
              * The original file IDs of any archived files associated with
              * the image.
@@ -157,7 +157,7 @@ module omero {
         /**
          * The used files associated with an FS image.
          **/
-        class UsedFilesResponse extends Response {
+        class UsedFilesResponse extends OK {
             /**
              * The original file IDs of any binary files associated with the
              * image's particular series.

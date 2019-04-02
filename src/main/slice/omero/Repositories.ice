@@ -429,7 +429,7 @@ module omero {
          * to return the results, but is likely not the
          * overall best strategy.
          **/
-        class ImportResponse extends ::omero::cmd::Response {
+        class ImportResponse extends omero::cmd::OK {
 
             omero::api::PixelsList pixels;
 

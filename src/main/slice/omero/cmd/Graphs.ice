@@ -275,7 +275,7 @@ module omero {
          *   Thumbnail for the image thumbnails
          * The above map values are broken down by owner-group keys.
          */
-        class DiskUsage2Response extends Response {
+        class DiskUsage2Response extends OK {
             omero::api::LongPairToStringIntMap fileCountByReferer;
             omero::api::LongPairToStringLongMap bytesUsedByReferer;
             omero::api::LongPairIntMap totalFileCount;
