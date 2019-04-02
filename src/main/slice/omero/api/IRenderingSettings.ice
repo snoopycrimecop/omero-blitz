@@ -210,10 +210,10 @@ module omero {
                  * @param toType The type of nodes to handle.
                  * @param nodeIds Ids of the node type.
                  * @return A map with two boolean keys. The value of the key
-                 *         <code>TRUE</code> is a collection of images ID, the
+                 *         <code>TRUE</code> is a collection of image IDs, the
                  *         settings were successfully applied to.
                  *         The value of the key <code>FALSE</code> is a collection
-                 *         of images ID, the settings could not be applied to.
+                 *         of image IDs, the settings could not be applied to.
                  * @throws ValidationException if an illegal <code>type</code>
                  *         is used.
                  */
