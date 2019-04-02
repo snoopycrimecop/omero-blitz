@@ -72,7 +72,7 @@ module omero {
                 idempotent void setBatchSize(int size) throws ServerError;
 
                 /**
-                 * Returns the current batch size. If {@code #etBatchSize}
+                 * Returns the current batch size. If {@code setBatchSize}
                  * has not been called, the default value will be in effect.
                  *
                  * @return maximum number of results per call to {@code results}
@@ -142,7 +142,7 @@ module omero {
                 /**
                  * Returns the current return-unloaded setting. If true, all
                  * returned entities will be unloaded. If
-                 * {@code codesetReturnUnloaded} has not been called, the
+                 * {@code setReturnUnloaded} has not been called, the
                  * default value will be in effect.
                  */
                 idempotent bool isReturnUnloaded() throws ServerError;

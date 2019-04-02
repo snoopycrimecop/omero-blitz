@@ -26,7 +26,7 @@ module omero {
          * planes within the pixels set onto an <i>RGB</i> image.
          *
          * The RenderingEngine allows to fine-tune the settings that
-         * define the transformation context that is, a specification
+         * define the transformation context, that is, a specification
          * of how raw pixels data is to be transformed into an image that can
          * be displayed on screen. Those settings are referred to as rendering
          * settings or display options. After tuning those settings it is

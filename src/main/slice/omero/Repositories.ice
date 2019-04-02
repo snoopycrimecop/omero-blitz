@@ -138,33 +138,33 @@ module omero {
              * call to treeList("/user_1/dir0") might look something like:
              *
              * <pre>
-             * {@code
-             *  {
-             *      "/user_1/dir0/file1.txt" :
-             *      {
-             *          "id":10,
-             *          "mimetype":
-             *          "binary",
-             *          "size": 10000L
-             *      },
+             *  {@code
+             *    {
+             *        "/user_1/dir0/file1.txt" :
+             *        {
+             *            "id":10,
+             *            "mimetype":
+             *            "binary",
+             *            "size": 10000L
+             *        },
              *
-             *      "/user_1/dir0/dir1" :
-             *      {
-             *          "id": 100,
-             *          "mimetype": "Directory",
-             *          "size": 0L,
-             *          "files":
-             *          {
-             *              "/user_1/dir0/dir1/file1indir.txt" :
-             *              {
-             *                  "id": 1,
-             *                  "mimetype": "png",
-             *                  "size": 500
-             *              }
-             *           }
-             *     }
+             *        "/user_1/dir0/dir1" :
+             *        {
+             *            "id": 100,
+             *            "mimetype": "Directory",
+             *            "size": 0L,
+             *            "files":
+             *            {
+             *                "/user_1/dir0/dir1/file1indir.txt" :
+             *                {
+             *                    "id": 1,
+             *                    "mimetype": "png",
+             *                    "size": 500
+             *                }
+             *             }
+             *         }
+             *    }
              *  }
-             * }
              * </pre>
              **/
             omero::RMap treeList(string path) throws ServerError;

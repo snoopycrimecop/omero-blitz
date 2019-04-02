@@ -139,7 +139,7 @@ module omero {
                  * Looks up {@link omero.model.Experimenter} experimenters who
                  * use LDAP authentication  (has set dn on password table).
                  *
-                 * @param id if of the Experimenter. Not null.
+                 * @param id id of the Experimenter. Not null.
                  * @return Experimenter. Never null.
                  */
                 idempotent string lookupLdapAuthExperimenter(long id) throws ServerError;
