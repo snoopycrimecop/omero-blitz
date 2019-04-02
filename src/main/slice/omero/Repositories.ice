@@ -1,9 +1,6 @@
 /*
-*   $Id$
-*
 *   Copyright 2009-2013 Glencoe Software, Inc. All rights reserved.
 *   Use is subject to license terms supplied in LICENSE.txt
-*
 */
 
 #ifndef OMERO_REPOSITORY_ICE
@@ -429,7 +426,7 @@ module omero {
          * to return the results, but is likely not the
          * overall best strategy.
          **/
-        class ImportResponse extends ::omero::cmd::Response {
+        class ImportResponse extends omero::cmd::OK {
 
             omero::api::PixelsList pixels;
 
