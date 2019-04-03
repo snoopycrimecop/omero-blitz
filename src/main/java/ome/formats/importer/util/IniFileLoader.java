@@ -37,7 +37,6 @@ import loci.formats.in.FlexReader;
 import ome.formats.importer.ImportConfig;
 import ome.formats.importer.Version;
 
-import omero.gateway.BuildConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.ini4j.IniFile;
@@ -255,7 +254,7 @@ public class IniFileLoader {
     {
         try
         {
-            return BuildConfig.getBuildVersion();
+            return IniFileLoader.class.getPackage().getImplementationVersion();
         }
         catch (MissingResourceException e)
         {
