@@ -48,6 +48,7 @@ import ome.units.quantity.Length;
 import ome.units.quantity.Time;
 import ome.xml.meta.MetadataRoot;
 import ome.xml.model.AffineTransform;
+import ome.xml.model.MapPair;
 import ome.xml.model.enums.AcquisitionMode;
 import ome.xml.model.enums.ContrastMethod;
 import ome.xml.model.enums.DimensionOrder;
@@ -77,8 +78,10 @@ import omero.model.Polygon;
 import omero.model.Polyline;
 import omero.model.Rectangle;
 import omero.model.Mask;
+import omero.model.NamedValue;
 import omero.model.XmlAnnotation;
 import omero.model.LongAnnotation;
+import omero.model.MapAnnotation;
 import omero.model.BooleanAnnotation;
 import omero.model.DoubleAnnotation;
 import omero.model.CommentAnnotation;
@@ -135,6 +138,8 @@ public class OmeroMetadata extends DummyMetadata {
         new ArrayList<DoubleAnnotation>();
     private final List<CommentAnnotation> commentAnnotationList =
         new ArrayList<CommentAnnotation>();
+    private final List<MapAnnotation> mapAnnotationList =
+            new ArrayList<MapAnnotation>();
     private final List<TimestampAnnotation> timestampAnnotationList =
         new ArrayList<TimestampAnnotation>();
     private final List<TagAnnotation> tagAnnotationList =
@@ -355,6 +360,10 @@ public class OmeroMetadata extends DummyMetadata {
             else if (annotation instanceof CommentAnnotation)
             {
                 commentAnnotationList.add((CommentAnnotation) annotation);
+            }
+            else if (annotation instanceof MapAnnotation)
+            {
+                mapAnnotationList.add((MapAnnotation) annotation);
             }
             else if (annotation instanceof TimestampAnnotation)
             {
@@ -1001,6 +1010,10 @@ public class OmeroMetadata extends DummyMetadata {
             {
                 return (T) commentAnnotationList.get(index);
             }
+            else if (klass.equals(MapAnnotation.class))
+            {
+                return (T) mapAnnotationList.get(index);
+            }
             else if (klass.equals(TimestampAnnotation.class))
             {
                 return (T) timestampAnnotationList.get(index);
@@ -1215,6 +1228,48 @@ public class OmeroMetadata extends DummyMetadata {
         CommentAnnotation o = getAnnotation(
                 CommentAnnotation.class, commentAnnotationIndex);
         return o != null? fromRType(o.getTextValue()) : null;
+    }
+
+    @Override
+    public int getMapAnnotationCount()
+    {
+        return mapAnnotationList.size();
+    }
+
+    @Override
+    public String getMapAnnotationDescription(int mapAnnotationIndex)
+    {
+        return getAnnotationDescription(
+                MapAnnotation.class, mapAnnotationIndex);
+    }
+
+    @Override
+    public String getMapAnnotationID(int mapAnnotationIndex)
+    {
+        return getAnnotationID(MapAnnotation.class, mapAnnotationIndex);
+    }
+
+    @Override
+    public String getMapAnnotationNamespace(int mapAnnotationIndex)
+    {
+        return getAnnotationNamespace(
+                MapAnnotation.class, mapAnnotationIndex);
+    }
+
+    @Override
+    public List<MapPair> getMapAnnotationValue(int mapAnnotationIndex)
+    {
+        final MapAnnotation ma = getAnnotation(
+                MapAnnotation.class, mapAnnotationIndex);
+        final List<NamedValue> namedValues = ma.getMapValue();
+        if (namedValues == null) {
+            return null;
+        }
+        final List<MapPair> mapPairs = new ArrayList<>(namedValues.size());
+        for (final NamedValue namedValue : namedValues) {
+            mapPairs.add(new MapPair(namedValue.name, namedValue.value));
+        }
+        return mapPairs;
     }
 
     @Override
