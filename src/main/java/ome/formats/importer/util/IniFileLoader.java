@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.MissingResourceException;
-import java.util.ResourceBundle;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
@@ -255,8 +254,7 @@ public class IniFileLoader {
     {
         try
         {
-            ResourceBundle bundle = ResourceBundle.getBundle("omero");
-            return bundle.getString("omero.version");
+            return IniFileLoader.class.getPackage().getImplementationVersion();
         }
         catch (MissingResourceException e)
         {
