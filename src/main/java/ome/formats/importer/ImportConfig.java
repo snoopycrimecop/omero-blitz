@@ -90,7 +90,7 @@ public class ImportConfig {
     private final Properties props;
 
     /**
-     * Stores the omeroVersion from omero.properties
+     * Stores the omeroVersion from omero-server.properties
      */
     private String omeroVersion = "Unknown";
 
