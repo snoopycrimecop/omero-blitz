@@ -388,7 +388,7 @@ public class ImportConfig {
      */
     public boolean isUpgradeNeeded() {
 
-        ResourceBundle bundle = ResourceBundle.getBundle("omero");
+        ResourceBundle bundle = ResourceBundle.getBundle("omero-common");
         String url = bundle.getString("omero.upgrades.url");
         UpgradeCheck check = new UpgradeCheck(url, getVersionNumber(), agent.get());
         check.run();
