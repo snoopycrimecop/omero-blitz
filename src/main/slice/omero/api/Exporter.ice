@@ -1,6 +1,4 @@
 /*
- *   $Id$
- *
  *   Copyright 2010 Glencoe Software, Inc. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  *
@@ -20,7 +18,8 @@ module omero {
          * Stateful service for generating OME-XML or OME-TIFF from data stored
          * in OMERO. Intended usage:
          * <pre>
-         *
+         * {@code
+
          *   ExporterPrx e = sf.createExporter();
          *
          *   // Exporter is currently in the <i>configuration</i> state
@@ -54,7 +53,7 @@ module omero {
          *       read += buf.length;
          *   }
          *   e.close();
-         *
+         * }
          * </pre>
          **/
         ["ami", "amd"] interface Exporter extends StatefulServiceInterface {

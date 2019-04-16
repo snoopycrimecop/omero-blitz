@@ -1,6 +1,4 @@
 /*
- *   $Id$
- *
  *   Copyright 2010 Glencoe Software, Inc. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  *
@@ -66,7 +64,7 @@ module omero {
                  * good image (PG)</i> logic for the pixels set linked to that
                  * set of rendering settings. <b>NOTE:</b> This method should
                  * only be used to reset a rendering definition that has been
-                 * retrieved via {@link #getRenderingSettings} as it
+                 * retrieved via {@code getRenderingSettings} as it
                  * relies on certain objects being loaded. The rendering
                  * settings are saved upon completion.
                  *
@@ -84,7 +82,7 @@ module omero {
                  * good image (PG)</i> logic for the pixels set linked to that
                  * set of rendering settings. <b>NOTE:</b> This method should
                  * only be used to reset a rendering definition that has been
-                 * retrieved via {@link #getRenderingSettings(long)} as it
+                 * retrieved via {@code getRenderingSettings(long)} as it
                  * relies on certain objects being loaded. The rendering
                  * settings are not saved.
                  *
@@ -124,13 +122,13 @@ module omero {
                  * are specified by the rendering engine intelligent <i>pretty
                  * good image (PG)</i> logic.
                  *
-                 * @param dataSetId The Id of the Dataset.
+                 * @param datasetId The Id of the Dataset.
                  * @return A {@link java.util.Set} of image IDs that have had
                  *         their rendering settings reset.
                  * @throws ValidationException if the image qualified by
-                 * <code>dataSetId</code> is unlocatable.
+                 * <code>datasetId</code> is not locatable.
                  **/
-                omero::sys::LongList resetDefaultsInDataset(long dataSetId) throws ServerError;
+                omero::sys::LongList resetDefaultsInDataset(long datasetId) throws ServerError;
 
                 /**
                  * Resets a rendering settings back to one or many containers
@@ -166,7 +164,7 @@ module omero {
                  * </ul>
                  * @param type The type of nodes to handle.
                  * @param nodeIds Ids of the node type.
-                 * @return A {@link omero.sys.LongList} of image IDs that have
+                 * @return A {@link java.util.Set} of image IDs that have
                  *         had their rendering settings reset.
                  * @throws ValidationException if an illegal <code>type</code>
                  *         is used.
@@ -186,7 +184,7 @@ module omero {
                  * </ul>
                  * @param type The type of nodes to handle.
                  * @param nodeIds Ids of the node type.
-                 * @return A {@link omero.sys.LongList} of image IDs that have
+                 * @return A {@link java.util.Set} of image IDs that have
                  *         had their rendering settings reset.
                  * @throws ValidationException if an illegal <code>type</code>
                  *         is used.
@@ -211,11 +209,11 @@ module omero {
                  *             settings from.
                  * @param toType The type of nodes to handle.
                  * @param nodeIds Ids of the node type.
-                 * @return A map with two boolean keys. The value of the
-                 *         <code>TRUE</code> is a collection of images ID, the
+                 * @return A map with two boolean keys. The value of the key
+                 *         <code>TRUE</code> is a collection of image IDs, the
                  *         settings were successfully applied to.
-                 *         The value of the <code>FALSE</code> is a collection
-                 *         of images ID, the settings could not be applied to.
+                 *         The value of the key <code>FALSE</code> is a collection
+                 *         of image IDs, the settings could not be applied to.
                  * @throws ValidationException if an illegal <code>type</code>
                  *         is used.
                  */
@@ -235,8 +233,8 @@ module omero {
                  *         The value of the <code>FALSE</code> is a collection
                  *         of images ID, the settings could not be applied to.
                  * @throws ValidationException if the rendering settings
-                 *         <code>from</code> is unlocatable or the project
-                 *         <code>to</code> is unlocatable.
+                 *         <code>from</code> is not locatable or the project
+                 *         <code>to</code> is not locatable.
                  */
                 BooleanIdListMap applySettingsToProject(long from, long to) throws ServerError;
 
@@ -253,8 +251,8 @@ module omero {
                  *         The value of the <code>FALSE</code> is a collection
                  *         of images ID, the settings could not be applied to.
                  * @throws ValidationException if the rendering settings
-                 *         <code>from</code> is unlocatable or the dataset
-                 *         <code>to</code> is unlocatable.
+                 *         <code>from</code> is not locatable or the dataset
+                 *         <code>to</code> is not locatable.
                  */
                 BooleanIdListMap applySettingsToDataset(long from, long to) throws ServerError;
 
@@ -268,8 +266,8 @@ module omero {
                  * @return <code>true</code> if the settings were successfully
                  *         applied, <code>false</code> otherwise.
                  * @throws ValidationException if the rendering settings
-                 *         <code>from</code> is unlocatable or the image
-                 *         <code>to</code> is unlocatable.
+                 *         <code>from</code> is not locatable or the image
+                 *         <code>to</code> is not locatable.
                  */
                 BooleanIdListMap applySettingsToImages(long from, omero::sys::LongList to) throws ServerError;
 
@@ -283,8 +281,8 @@ module omero {
                  * @return <code>true</code> if the settings were successfully
                  *         applied, <code>false</code> otherwise.
                  * @throws ValidationException if the rendering settings
-                 *         <code>from</code> is unlocatable or the image
-                 *         <code>to</code> is unlocatable.
+                 *         <code>from</code> is not locatable or the image
+                 *         <code>to</code> is not locatable.
                  */
                 bool applySettingsToImage(long from, long to) throws ServerError;
 
@@ -297,8 +295,8 @@ module omero {
                  *           to.
                  * @return See above.
                  * @throws ValidationException if the rendering settings
-                 *         <code>from</code> is unlocatable or the
-                 *         pixels<code>to</code> is unlocatable.
+                 *         <code>from</code> is not locatable or the
+                 *         pixels<code>to</code> is not locatable.
                  */
                 bool applySettingsToPixels(long from, long to) throws ServerError;
 
@@ -308,7 +306,7 @@ module omero {
                  *
                  * @param imageId The Id of the Image.
                  * @throws ValidationException if the image qualified by
-                 *         <code>imageId</code> is unlocatable.
+                 *         <code>imageId</code> is not locatable.
                  */
                 void setOriginalSettingsInImage(long imageId) throws ServerError;
 
@@ -318,7 +316,7 @@ module omero {
                  *
                  * @param pixelsId The Id of the Pixels set.
                  * @throws ValidationException if the image qualified by
-                 *         <code>pixelsId</code> is unlocatable.
+                 *         <code>pixelsId</code> is not locatable.
                  */
                 void setOriginalSettingsForPixels(long pixelsId) throws ServerError;
 
@@ -327,12 +325,12 @@ module omero {
                  * minimum and maximum.
                  *
                  * @param datasetId The id of the dataset to handle.
-                 * @return A {@link omero.sys.LongList} of image IDs that have
+                 * @return A {@link java.util.Set} of image IDs that have
                  *         had their rendering settings reset.
                  * @throws ValidationException if the image qualified by
-                 *         <code>datasetId</code> is unlocatable.
+                 *         <code>datasetId</code> is not locatable.
                  */
-                omero::sys::LongList setOriginalSettingsInDataset(long dataSetId) throws ServerError;
+                omero::sys::LongList setOriginalSettingsInDataset(long datasetId) throws ServerError;
 
                 /**
                  * Resets a rendering settings back to channel global minimum
@@ -348,7 +346,7 @@ module omero {
                  *
                  * @param type The type of nodes to handle.
                  * @param nodeIds Ids of the node type.
-                 * @return A {@link omero.sys.LongList} of image IDs that have
+                 * @return A {@link java.util.Set} of image IDs that have
                  *         had their rendering settings reset.
                  * @throws ValidationException if an illegal <code>type</code>
                  *         is used.

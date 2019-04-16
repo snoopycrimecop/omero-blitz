@@ -1,6 +1,4 @@
 /*
- *   $Id$
- *
  *   Copyright 2010 Glencoe Software, Inc. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  *
@@ -22,14 +20,14 @@ module omero {
          * <p>
          * NOTE: The calling order for the service is as follows:
          * <ol>
-         * <li>{@link #submit} <em>or</em> {@link #attach}</li>
+         * <li>{@code submit} <em>or</em> {@code attach}</li>
          * <li>any of the other methods</li>
-         * <li>{@link #close}</li>
+         * <li>{@code close}</li>
          * </ol>
          * </p>
-         * Calling {@link #close} does not cancel or otherwise change
-         * the Job state. See {@link #cancelJob}.
-         **/
+         * Calling {@code close} does not cancel or otherwise change
+         * the Job state. See {@code cancelJob}.
+         */
         ["ami", "amd"] interface JobHandle extends StatefulServiceInterface
             {
                 /**
@@ -40,14 +38,14 @@ module omero {
                  *
                  * @param job Not null
                  */
-                long submit(omero::model::Job j) throws ServerError;
+                long submit(omero::model::Job job) throws ServerError;
 
                 /**
                  * Returns the current {@link omero.model.JobStatus} for the
                  * Job id.
                  *
                  * @throws ApiUsageException
-                 *             if the {@link Job id} does not exist.
+                 *             if the {@link omero.model.Job} does not exist.
                  */
                 omero::model::JobStatus attach(long jobId) throws ServerError;
 
@@ -97,8 +95,8 @@ module omero {
                 /**
                  * Updates the {@link omero.model.JobStatus} for the current
                  * job. The previous status is returned as a string. If the
-                 * status is {@link #CANCELLED}, this method is equivalent to
-                 * {@link #cancelJob}.
+                 * status is {@code CANCELLED}, this method is equivalent to
+                 * {@code cancelJob}.
                  */
                 idempotent string setStatus(string status) throws ServerError;
 
@@ -111,7 +109,7 @@ module omero {
                 idempotent string setMessage(string message) throws ServerError;
 
                 /**
-                 * Like {@link #setStatus} but also sets the message.
+                 * Like {@code setStatus} but also sets the message.
                  */
                 idempotent string setStatusAndMessage(string status, omero::RString message) throws ServerError;
             };

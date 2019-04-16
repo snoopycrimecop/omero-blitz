@@ -31,21 +31,21 @@ module omero {
          * Requests all pyramids files. A {@link FindPyramidsResponse}
          * will be returned under normal conditions, otherwise a {@link ERR}
          * will be returned.
-         **/
+         */
         class FindPyramids extends Request {
 
             /**
              * Retrieves the pyramids with little endian true or false.
              * If unset, both will be retrieved.
-             **/
+             */
             omero::RBool littleEndian;
             /**
              * Retrieves the pyramids created after a specified time if set.
-             **/
+             */
             omero::RTime importedAfter;
             /**
              * Retrieves the pyramids of length 0 if true
-             **/
+             */
             bool checkEmptyFile;
             /**
              * The maximum number of files to find. No limit will be applied
@@ -83,9 +83,9 @@ module omero {
         /**
          * Successful response for {@link OriginalMetadataRequest}. Contains
          * both the global and the series metadata as maps. Only one
-         * of {@link #filesetId} or {@link #filesetAnnotationId} will be set.
-         * Pre-FS images will have {@link #filesetAnnotationId} set; otherwise
-         * {@link #filesetId} will be set.
+         * of {@code filesetId} or {@code filesetAnnotationId} will be set.
+         * Pre-FS images will have {@code filesetAnnotationId} set; otherwise
+         * {@code filesetId} will be set.
          **/
         class OriginalMetadataResponse extends OK {
 
@@ -96,7 +96,7 @@ module omero {
             omero::RLong filesetId;
 
             /**
-             * Set to the id of the {@link omero.model.FilesetAnnotation}
+             * Set to the id of the {@link omero.model.FileAnnotation}
              * linked to this {@link omero.model.Image} if one exists.
              **/
             omero::RLong fileAnnotationId;
@@ -111,7 +111,7 @@ module omero {
              * Metadata specific to the series id of this
              * {@link omero.model.Image}.
              * In the {@link omero.model.Fileset} that this
-             * {@link omero.model.Image] is contained in, there may be a large
+             * {@link omero.model.Image} is contained in, there may be a large
              * number of other images, but the series metadata applies only to
              * this specific one.
              **/
@@ -249,7 +249,7 @@ module omero {
          * Disk usage report: bytes used and non-empty file counts on the
          * repository file-system for specific objects. The counts from the
          * maps may sum to more than the total if different types of object
-         * refer to the same file. Common referers include:
+         * refer to the same file. Common referrers include:
          *   Annotation for file annotations
          *   FilesetEntry for OMERO 5 image files (OMERO.fs)
          *   Job for import logs

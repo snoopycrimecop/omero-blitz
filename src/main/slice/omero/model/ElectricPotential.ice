@@ -34,7 +34,7 @@ module omero {
        * into the containing class, so that the value and unit rows
        * can be found on the table itself (e.g. detectorSettings.voltage
        * and detectorSettings.voltageUnit).
-       **/
+       */
     ["protected"] class ElectricPotential
     {
 
@@ -49,7 +49,7 @@ module omero {
        * Actual value for this unit-based field. The interpretation of
        * the value is only possible along with the
        * {@link omero.model.enums.UnitsElectricPotential} enum.
-       **/
+       */
       double getValue();
 
       void setValue(double value);
@@ -58,7 +58,7 @@ module omero {
        * {@link omero.model.enums.UnitsElectricPotential} instance which is an
        * {@link omero.model.IObject}
        * meaning that its ID is sufficient for identifying equality.
-       **/
+       */
       omero::model::enums::UnitsElectricPotential getUnit();
 
       void setUnit(omero::model::enums::UnitsElectricPotential unit);
@@ -66,7 +66,7 @@ module omero {
       /**
        * Returns the possibly unicode representation of the ""unit""
        * value for display.
-       **/
+       */
       string getSymbol();
 
       ElectricPotential copy();

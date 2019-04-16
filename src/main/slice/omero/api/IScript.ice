@@ -1,6 +1,4 @@
 /*
- *   $Id$
- *
  *   Copyright 2008 Glencoe Software, Inc. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  *
@@ -21,7 +19,7 @@ module omero {
          *
          * Typical usage might include (PYTHON):
          * <pre>
-         *
+         * {@code
          * sf = client.createSession()
          * svc = sf.getScriptService()
          * scripts = svc.getScripts()
@@ -46,7 +44,7 @@ module omero {
          *     rv = proc.getResults(0)
          * finally:
          *     proc.close(False)
-         *
+         * }
          * </pre>
          * See <a href="https://docs.openmicroscopy.org/latest/omero/developers/scripts/">OMERO.scripts</a> for more information.
          **/
@@ -61,9 +59,9 @@ module omero {
                  * This method returns official server scripts as a list of
                  * {@link omero.model.OriginalFile} objects.
                  * These scripts will be executed by the server if submitted
-                 * via {@link #runScript}. The input parameters
+                 * via {@code runScript}. The input parameters
                  * necessary for proper functioning can be retrieved via
-                 * {@link #getParams}.
+                 * {@code getParams}.
                  *
                  * The {@link omero.model.OriginalFile#path} value can be used
                  * in other official scripts via the
@@ -71,6 +69,7 @@ module omero {
                  * directory will be placed on the appropriate
                  * environment path variable.
                  * <pre>
+                 * {@code
                  * scripts = scriptService.getScripts()
                  * for script in scripts:
                  *     text = scriptService.getScriptText(script.id.val)
@@ -78,12 +77,13 @@ module omero {
                  *     path = script.path.val\[1:\]
                  *     path = path.replace("/",".")
                  *     print "Possible import: %s" % path
+                 * }
                  * </pre>
                  *
                  * @return see above.
                  * @throws ApiUsageException
                  * @throws SecurityViolation
-                 **/
+                 */
                 idempotent OriginalFileList getScripts() throws ServerError;
 
                 /**
@@ -91,9 +91,9 @@ module omero {
                  * with the specified extension as a list of
                  * {@link omero.model.OriginalFile} objects.
                  * These scripts will be executed by the server if submitted
-                 * via {@link #runScript}. The input parameters
+                 * via {@code runScript}. The input parameters
                  * necessary for proper functioning can be retrieved via
-                 * {@link #getParams}.
+                 * {@code getParams}.
                  *
                  * The {@link omero.model.OriginalFile#path} value can be used
                  * in other official scripts via the
@@ -101,19 +101,21 @@ module omero {
                  * directory will be placed on the appropriate
                  * environment path variable.
                  * <pre>
+                 * {@code
                  * scripts = scriptService.getScripts("py")
                  * for script in scripts:
                  *     text = scriptService.getScriptText(script.id.val)
                  *     path = script.path.val\[1:\] # First symbol is a "/"
                  *     path = path.replace("/",".")
                  *     print "Possible import: %s" % path
+                 * }
                  * </pre>
                  *
                  * @param mimetype the mimetype identifying the scripts.
                  * @return see above.
                  * @throws ApiUsageException
                  * @throws SecurityViolation
-                 **/
+                 */
                 idempotent OriginalFileList getScriptsByMimetype(string mimetype) throws ServerError;
 
                 /**
@@ -128,14 +130,14 @@ module omero {
                  * Get the id of an official script by the script path.
                  * The script service ensures that all script paths are unique.
                  *
-                 * Note: there is no similar method for user scripts (e.g. getUserScriptID)
+                 * Note: there is no similar method for user scripts (e.g. {@code getUserScriptID})
                  * since the path is not guaranteed to be unique.
                  *
-                 * @param scriptName The name of the script.
+                 * @param path The name of the script.
                  * @return see above.
                  * @throws ApiUsageException
                  * @throws SecurityViolation
-                 **/
+                 */
                 idempotent long getScriptID(string path) throws  ServerError;
 
                 /**
@@ -144,7 +146,7 @@ module omero {
                  * @param scriptID see above.
                  * @return see above.
                  * @throws ApiUsageException
-                 **/
+                 */
                 idempotent string getScriptText(long scriptID) throws ServerError;
 
                 /**
@@ -153,15 +155,16 @@ module omero {
                  * <em>if possible</em>, i.e. a usermode processor is running which for the
                  * current user.
                  *
-                 * @param script see above.
+                 * @param path see above.
+                 * @param scriptText see above.
                  * @return The new id of the script.
                  * @throws ApiUsageException
                  * @throws SecurityViolation
-                 **/
+                 */
                 long uploadScript(string path, string scriptText) throws ServerError;
 
                 /**
-                 * Like {@link #uploadScript} but is only callable by
+                 * Like {@code uploadScript} but is only callable by
                  * administrators. The parameters for the script are also
                  * checked.
                  **/
@@ -170,10 +173,11 @@ module omero {
                 /**
                  * Modify the text for the given script object.
                  *
-                 * @param script see above.
+                 * @param fileObject see above.
+                 * @param scriptText see above.
                  * @throws ApiUsageException
                  * @throws SecurityViolation
-                 **/
+                 */
                 void editScript(omero::model::OriginalFile fileObject, string scriptText) throws ServerError;
 
                 /**
@@ -181,7 +185,7 @@ module omero {
                  * @param scriptID see above
                  * @return see above
                  * @throws ApiUsageException
-                 **/
+                 */
                 idempotent RTypeDict getScriptWithDetails(long scriptID) throws ServerError;
 
                 /**
@@ -200,7 +204,7 @@ module omero {
                  * @param scriptID Id of the script to delete.
                  * @throws ApiUsageException
                  * @throws SecurityViolation
-                 **/
+                 */
                 void deleteScript(long scriptID) throws ServerError;
 
                 // Planned methods
@@ -214,31 +218,35 @@ module omero {
                 //
 
                 /**
-                 * If {@link ResourceError} is thrown, then no
-                 * {@link Processor} is available. Use {@link #scheduleJob}
+                 * If {@link omero.ResourceError} is thrown, then no
+                 * {@code Processor} is available. Use {@code scheduleJob}
                  * to create a {@link omero.model.ScriptJob} in the
-                 * <i>Waiting</i> state. A {@link Processor} may become
+                 * <i>Waiting</i> state. A {@code Processor} may become
                  * available.
                  *
                  * <pre>
+                 * {@code
                  * try:
                  *     proc = scriptService.runScript(1, {}, None)
                  * except ResourceError:
                  *     job = scriptService.scheduleScript(1, {}, None)
+                 * }
                  * </pre>
                  *
-                 * The {@link ScriptProcess} proxy MUST be closed before
+                 * The {@code ScriptProcess} proxy MUST be closed before
                  * exiting. If you would like the script execution to continue
                  * in the background, pass <code>True</code> as the argument.
                  *
                  * <pre>
+                 * {@code
                  * try:
                  *     proc.poll()         # See if process is finished
                  * finally:
                  *     proc.close(True)    # Detach and execution can continue
                  *     # proc.close(False) # OR script is immediately stopped.
+                 * }
                  * </pre>
-                 **/
+                 */
                 omero::grid::ScriptProcess* runScript(long scriptID, omero::RTypeDict inputs, omero::RInt waitSecs) throws ServerError;
 
                 /**
@@ -253,14 +261,14 @@ module omero {
                  * must be active which takes the scripts user or group.
                  * </p>
                  *
-                 **/
+                 */
                 idempotent
                 bool canRunScript(long scriptID) throws ServerError;
 
                 /**
                  * Used internally by processor.py to check if the script
                  * attached to the {@link omero.model.Job} has a valid script
-                 * attached, based on the {@link #acceptsList} and the current
+                 * attached, based on the {@code acceptsList} and the current
                  * security context.
                  *
                  * An example of an acceptsList might be <pre>Experimenter(myUserId, False)</pre>, meaning that
@@ -268,7 +276,7 @@ module omero {
                  * return what it would by default trust.
                  *
                  * A valid script will be returned if it exists; otherwise null.
-                 **/
+                 */
                 idempotent
                 omero::model::OriginalFile validateScript(omero::model::Job j, omero::api::IObjectList acceptsList) throws ServerError;
 

@@ -67,10 +67,12 @@ module omero {
          *
          * A typical invocation might look like (in Python):
          * <pre>
+         * {@code
          *     timeline = sf.getTimelineService()
          *     params = ParametersI().page(0,100)
          *     types = \["Project","Dataset"])
          *     map = timeline.getByPeriod(types, params, False)
+         * }
          * </pre>
          * At this point, map will not contain more than 200 objects.
          *
@@ -78,7 +80,7 @@ module omero {
          * in the ome.api package.
          *
          * TODOS: binning, stateful caching, ...
-         **/
+         */
         ["ami", "amd"] interface ITimeline extends ServiceInterface {
 
             /**
@@ -94,7 +96,7 @@ module omero {
              * AND'ed to the query to filter results.
              *
              * Merges by default based on parentType.
-             **/
+             */
             idempotent
             IObjectList
                 getMostRecentAnnotationLinks(StringSet parentTypes, StringSet childTypes,
@@ -107,7 +109,7 @@ module omero {
              *
              * Note: Currently the storage of these objects is not optimal
              * and so this method may change.
-             **/
+             */
             idempotent
             IObjectList
                 getMostRecentShareCommentLinks(omero::sys::Parameters p)
@@ -116,7 +118,7 @@ module omero {
             /**
              * Returns the last LIMIT objects of TYPES as ordered by
              * creation/modification times in the Event table.
-             **/
+             */
             idempotent
             IObjectListMap
                 getMostRecentObjects(StringSet types, omero::sys::Parameters p, bool merge)
@@ -126,7 +128,7 @@ module omero {
              * Returns the given LIMIT objects of TYPES as ordered by
              * creation/modification times in the Event table, but
              * within the given time window.
-             **/
+             */
             idempotent
             IObjectListMap
                 getByPeriod(StringSet types, omero::RTime start, omero::RTime end, omero::sys::Parameters p,  bool merge)
@@ -135,7 +137,7 @@ module omero {
             /**
              * Queries the same information as getByPeriod, but only returns the counts
              * for the given objects.
-             **/
+             */
             idempotent
             StringLongMap
                 countByPeriod(StringSet types, omero::RTime start, omero::RTime end, omero::sys::Parameters p)
@@ -147,7 +149,7 @@ module omero {
              *
              * WORKAROUND WARNING: this method returns non-managed EventLogs (i.e.
              * eventLog.getId() == null) for <i>Image acquisitions</i>.
-             **/
+             */
             idempotent
             EventLogList
                 getEventLogsByPeriod(omero::RTime start, omero::RTime end, omero::sys::Parameters p)

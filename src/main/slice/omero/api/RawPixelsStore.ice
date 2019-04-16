@@ -1,6 +1,4 @@
 /*
- *   $Id$
- *
  *   Copyright 2010 Glencoe Software, Inc. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  *
@@ -24,8 +22,8 @@ module omero {
          * various slices, stacks, regions of the 5-dimensional (X-Y planes with
          * multiple Z-sections and Channels over Time). The byte array returned
          * by the getter methods and passed to the setter methods can and will
-         * be interpreted according to results of {@link #getByteWidth},
-         * {@link #isFloat}, and {@link #isSigned}.
+         * be interpreted according to results of {@code getByteWidth},
+         * {@code isFloat}, and {@code isSigned}.
          *
          * <p>
          * <b>Read-only caveat</b>:
@@ -36,7 +34,7 @@ module omero {
          * read-only. If Pixels data writing fails and the service is
          * inadvertently closed, delete the Pixels object, and create a new
          * one. Any partially written data will be removed.
-         **/
+         */
         ["ami", "amd"] interface RawPixelsStore extends PyramidService
             {
 
@@ -53,19 +51,19 @@ module omero {
                  *        <code>false</code> is expected.
                  *
                  * See <b>Read-only caveat</b> under {@link RawPixelsStore}
-                 **/
+                 */
                 void setPixelsId(long pixelsId, bool bypassOriginalFile) throws ServerError;
 
                 /**
                  * Returns the current Pixels set identifier.
                  * @return See above.
-                 **/
+                 */
                 idempotent long getPixelsId() throws ServerError;
 
                 /**
                  * Returns the current Pixels path.
                  * @return See above.
-                 **/
+                 */
                 idempotent string getPixelsPath() throws ServerError;
 
                 /**
@@ -77,7 +75,7 @@ module omero {
                  * result in the existing cache being overwritten.
                  *
                  * @param pixelsIds Pixels IDs to cache.
-                 **/
+                 */
                 idempotent void prepare(omero::sys::LongList pixelsIds) throws ServerError;
 
                 /**
@@ -85,15 +83,15 @@ module omero {
                  * pixel store.
                  * @return 2D image plane size in bytes
                  *            <code>sizeX*sizeY*byteWidth</code>.
-                 **/
+                 */
                 idempotent long getPlaneSize() throws ServerError;
 
                 /**
                  * Retrieves the in memory size of a row or scanline of pixels
                  * in this pixel store.
                  * @return row or scanline size in bytes
-                 *         <codesizeX*byteWidth</code>
-                 **/
+                 *         <code>sizeX*byteWidth</code>
+                 */
                 idempotent int getRowSize() throws ServerError;
 
                 /**
@@ -103,7 +101,7 @@ module omero {
                  *
                  * @return stack size in bytes
                  *         <code>sizeX*sizeY*byteWidth</code>.
-                 **/
+                 */
                 idempotent long getStackSize() throws ServerError;
 
                 /**
@@ -112,14 +110,14 @@ module omero {
                  * a particular timepoint in this pixel store.
                  * @return timepoint size in bytes
                  *         <code>sizeX*sizeY*sizeZ*sizeC*byteWidth</code>.
-                 **/
+                 */
                 idempotent long getTimepointSize() throws ServerError;
 
                 /**
                  * Retrieves the in memory size of the entire pixel store.
                  * @return total size of the pixel size in bytes
                  *         <code>sizeX*sizeY*sizeZ*sizeC*sizeT*byteWidth</code>.
-                 **/
+                 */
                 idempotent long getTotalSize() throws ServerError;
 
                 /**
@@ -130,7 +128,7 @@ module omero {
                  * @param c offset across the C-axis of the pixel buffer.
                  * @param t offset across the T-axis of the pixel buffer.
                  * @return offset of the row or scanline.
-                 **/
+                 */
                 idempotent long getRowOffset(int y, int z, int c, int t) throws ServerError;
 
                 /**
@@ -140,7 +138,7 @@ module omero {
                  * @param c offset across the C-axis of the pixel buffer.
                  * @param t offset across the T-axis of the pixel buffer.
                  * @return offset of the 2D image plane.
-                 **/
+                 */
                 idempotent long getPlaneOffset(int z, int c, int t) throws ServerError;
 
                 /**
@@ -151,7 +149,7 @@ module omero {
                  * @param c offset across the C-axis of the pixel buffer.
                  * @param t offset across the T-axis of the pixel buffer.
                  * @return offset of the stack.
-                 **/
+                 */
                 idempotent long getStackOffset(int c, int t) throws ServerError;
 
                 /**
@@ -161,7 +159,7 @@ module omero {
                  *
                  * @param t offset across the T-axis of the pixel buffer.
                  * @return offset of the timepoint.
-                 **/
+                 */
                 idempotent long getTimepointOffset(int t) throws ServerError;
 
                 /**
@@ -179,12 +177,12 @@ module omero {
 
                 /**
                  * Retrieves a n-dimensional block from this pixel store.
-                 * @param start offset for each dimension within pixel store.
+                 * @param offset offset for each dimension within pixel store.
                  * @param size of each dimension (dependent on dimension).
                  * @param step needed of each dimension (dependent on
                  *             dimension).
                  * @return buffer containing the data.
-                 **/
+                 */
                 idempotent Ice::ByteSeq getHypercube(omero::sys::IntList offset, omero::sys::IntList size, omero::sys::IntList step) throws ServerError;
 
                 /**
@@ -192,7 +190,7 @@ module omero {
                  * @param size byte width of the region to retrieve.
                  * @param offset offset within the pixel store.
                  * @return buffer containing the data.
-                 **/
+                 */
                 idempotent Ice::ByteSeq getRegion(int size, long offset) throws ServerError;
 
                 /**
@@ -203,7 +201,7 @@ module omero {
                  * @param t offset across the T-axis of the pixel store.
                  * @return buffer containing the data which comprises this row
                  *                or scanline.
-                 **/
+                 */
                 idempotent Ice::ByteSeq getRow(int y, int z, int c, int t) throws ServerError;
 
                 /**
@@ -213,7 +211,7 @@ module omero {
                  * @param c offset across the C-axis of the pixel store.
                  * @param t offset across the T-axis of the pixel store.
                  * @return buffer containing the data which comprises this column.
-                 **/
+                 */
                 idempotent Ice::ByteSeq getCol(int x, int z, int c, int t) throws ServerError;
 
                 /**
@@ -222,7 +220,7 @@ module omero {
                  * @param c offset across the C-axis of the pixel store.
                  * @param t offset across the T-axis of the pixel store.
                  * @return buffer containing the data which comprises this 2D image plane.
-                 **/
+                 */
                 idempotent Ice::ByteSeq getPlane(int z, int c, int t) throws ServerError;
 
                 /**
@@ -230,12 +228,12 @@ module omero {
                  * @param z offset across the Z-axis of the pixel store.
                  * @param c offset across the C-axis of the pixel store.
                  * @param t offset across the T-axis of the pixel store.
-                 * @param count the number of pixels to retrieve.
-                 * @param offset the offset at which to retrieve <code>count</code> pixels.
+                 * @param size the number of pixels to retrieve.
+                 * @param offset the offset at which to retrieve <code>size</code> pixels.
                  * @return buffer containing the data which comprises the region of the
                  * given 2D image plane. It is guaranteed that this buffer will have been
                  * byte swapped.
-                 **/
+                 */
                 idempotent Ice::ByteSeq getPlaneRegion(int z, int c, int t, int size, int offset) throws ServerError;
 
                 /**
@@ -244,14 +242,14 @@ module omero {
                  * @param c offset across the C-axis of the pixel store.
                  * @param t offset across the T-axis of the pixel store.
                  * @return buffer containing the data which comprises this stack.
-                 **/
+                 */
                 idempotent Ice::ByteSeq getStack(int c, int t) throws ServerError;
 
                 /**
                  * Retrieves the entire number of optical sections for <b>all</b>
                  * wavelengths or channels at a particular timepoint in this pixel store.
                  * @param t offset across the T-axis of the pixel store.
-                 **/
+                 */
                 idempotent Ice::ByteSeq getTimepoint(int t) throws ServerError;
 
                 /**
@@ -279,7 +277,7 @@ module omero {
                  * @param buf a byte array of the data.
                  *
                  * See <b>Read-only caveat</b> under {@link RawPixelsStore}
-                 **/
+                 */
                 idempotent void setRegion(int size, long offset, Ice::ByteSeq buf) throws ServerError;
 
                 /**
@@ -291,7 +289,7 @@ module omero {
                  * @param t offset across the T-axis of the pixel store.
                  *
                  * See <b>Read-only caveat</b> under {@link RawPixelsStore}
-                 **/
+                 */
                 idempotent void setRow(Ice::ByteSeq buf, int y, int z, int c, int t) throws ServerError;
 
                 /**
@@ -302,7 +300,7 @@ module omero {
                  * @param t offset across the T-axis of the pixel store.
                  *
                  * See <b>Read-only caveat</b> under {@link RawPixelsStore}
-                 **/
+                 */
                 idempotent void setPlane(Ice::ByteSeq buf, int z, int c, int t) throws ServerError;
 
                 /**
@@ -313,7 +311,7 @@ module omero {
                  * @param t offset across the T-axis of the pixel store.
                  *
                  * See <b>Read-only caveat</b> under {@link RawPixelsStore}
-                 **/
+                 */
                 idempotent void setStack(Ice::ByteSeq buf, int z, int c, int t) throws ServerError;
 
                 /**
@@ -323,7 +321,7 @@ module omero {
                  * @param t offset across the T-axis of the pixel buffer.
                  *
                  * See <b>Read-only caveat</b> under {@link RawPixelsStore}
-                 **/
+                 */
                 idempotent void setTimepoint(Ice::ByteSeq buf, int t) throws ServerError;
 
                 /**
@@ -333,7 +331,7 @@ module omero {
                  * @param plane the plane (optional, default: whole region of first z/t plane)
                  * @param globalRange use the global minimum/maximum to determine the histogram range, otherwise use plane minimum/maximum value
                  * @return See above.
-                 **/
+                 */
                 idempotent IntegerIntegerArrayMap getHistogram(IntegerArray channels, int binCount, bool globalRange, omero::romio::PlaneDef plane) throws ServerError;
                 
                 /**
@@ -342,43 +340,43 @@ module omero {
                  * Note: This method can currently only handle non-pyramid images, otherwise an empty map will be returned.
                  * @param channels the channels
                  * @return See above.
-                 **/
+                 */
                 idempotent IntegerDoubleArrayMap findMinMax(IntegerArray channels) throws ServerError;
                 
                 /**
                  * Returns the byte width for the pixel store.
                  * @return See above.
-                 **/
+                 */
                 idempotent int getByteWidth() throws ServerError;
 
                 /**
                  * Returns whether or not the pixel store has signed pixels.
                  * @return See above.
-                 **/
+                 */
                 idempotent bool isSigned() throws ServerError;
 
                 /**
                  * Returns whether or not the pixel buffer has floating point pixels.
                  * @return
-                 **/
+                 */
                 idempotent bool isFloat() throws ServerError;
 
                 /**
                  * Calculates a SHA-1 message digest for the entire pixel store.
                  * @return byte array containing the message digest.
-                 **/
+                 */
                 idempotent Ice::ByteSeq calculateMessageDigest() throws ServerError;
 
                 /**
                  * Save the current state of the pixels, updating the SHA1. This should
                  * only be called AFTER all data is successfully set. Future invocations
                  * of set methods may be disallowed. This read-only status will allow
-                 * background processing (generation of thumbnails, compression, etc)
+                 * background processing (generation of thumbnails, compression, etc.)
                  * to begin. More information under {@link RawPixelsStore}.
                  *
                  * A null instance will be returned if no save was performed.
                  *
-                 **/
+                 */
                 idempotent omero::model::Pixels save() throws ServerError;
 
             };

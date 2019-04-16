@@ -1,6 +1,4 @@
 /*
- * ome.formats.OMEROMetadataStoreClient
- *
  *------------------------------------------------------------------------------
  *  Copyright (C) 2006-2017 University of Dundee. All rights reserved.
  *
@@ -1642,7 +1640,7 @@ public class OMEROMetadataStoreClient
      * Maps the user's groups for use by ScreenLogin.registerGroup()
      * Also strips system groups from this map
      *
-     * @return map of group id & name
+     * @return map of group id and name
      * @throws ServerError if the groups could not be mapped
      */
     public Map<Long, String> mapUserGroups() throws ServerError

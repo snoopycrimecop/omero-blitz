@@ -20,7 +20,7 @@ module omero {
          * all other services is dependent upon a properly created and still
          * active {@link omero.model.Session}.
          *
-         * The session uuid ({@link omero.model.Session#getUuid}) can be
+         * The session uuid ({@code omero.model.Session.getUuid}) can be
          * considered a capability token, or temporary single use password.
          * Simply by possessing it the client has access to all information
          * available to the {@link omero.model.Session}.
@@ -57,14 +57,14 @@ module omero {
                 //
 
                 /**
-                 * Allows an admin to create a {@link Session} for the give
+                 * Allows an admin to create a {@link ome.model.meta.Session} for the give
                  * {@link omero.sys.Principal}.
                  *
                  * @param principal
                  *            Non-null {@link omero.sys.Principal} with the
                  *            target user's name
                  * @param timeToLiveMilliseconds
-                 *            The time that this {@link omero.model.Session}
+                 *            The time that this {@link ome.model.meta.Session}
                  *            has until destruction. This is useful to
                  *            override the server default so that an initial
                  *            delay before the user is given the token will
@@ -72,43 +72,43 @@ module omero {
                  *            1 will cause the default max timeToLive to be
                  *            used; but timeToIdle will be disabled.
                  */
-                omero::model::Session createSessionWithTimeout(omero::sys::Principal p, long timeToLiveMilliseconds)
+                omero::model::Session createSessionWithTimeout(omero::sys::Principal principal, long timeToLiveMilliseconds)
                 throws ServerError, Glacier2::CannotCreateSessionException;
 
                 /**
-                 * Allows an admin to create a {@link omero.model.Session} for
+                 * Allows an admin to create a {@link ome.model.meta.Session} for
                  * the given {@link omero.sys.Principal}.
                  *
                  * @param principal
                  *            Non-null {@link omero.sys.Principal} with the
                  *            target user's name
                  * @param timeToLiveMilliseconds
-                 *            The time that this {@link omero.model.Session}
+                 *            The time that this {@link ome.model.meta.Session}
                  *            has until destruction. Setting the value to 0
                  *            will prevent destruction unless the session
                  *            remains idle.
                  * @param timeToIdleMilliseconds
-                 *            The time that this {@link omero.model.Session}
+                 *            The time that this {@link ome.model.meta.Session}
                  *            can remain idle before being destroyed. Setting
                  *            the value to 0 will prevent idleness based
                  *            destruction.
                  */
-                omero::model::Session createSessionWithTimeouts(omero::sys::Principal p, long timeToLiveMilliseconds, long timeToIdleMilliseconds)
+                omero::model::Session createSessionWithTimeouts(omero::sys::Principal principal, long timeToLiveMilliseconds, long timeToIdleMilliseconds)
                 throws ServerError, Glacier2::CannotCreateSessionException;
 
                 /**
                  * Retrieves the session associated with this uuid, updating
                  * the last access time as well. Throws a
-                 * {@link RemovedSessionException} if not present, or
-                 * a {@link SessionTimeoutException} if expired.
+                 * {@link omero.RemovedSessionException} if not present, or
+                 * a {@link omero.SessionTimeoutException} if expired.
                  *
-                 * This method can be used as a {@link Session} ping.
+                 * This method can be used as a {@link ome.model.meta.Session} ping.
                  */
                 idempotent omero::model::Session getSession(string sessionUuid) throws ServerError;
 
                 /**
                  * Retrieves the current reference count for the given uuid.
-                 * Has the same semantics as {@link #getSession}.
+                 * Has the same semantics as {@code getSession}.
                  */
                 idempotent int getReferenceCount(string sessionUuid) throws ServerError;
 
@@ -133,13 +133,13 @@ module omero {
                 idempotent SessionList getMyOpenSessions() throws ServerError;
 
                 /**
-                 * Like {@link #getMyOpenSessions} but returns only those
+                 * Like {@code getMyOpenSessions} but returns only those
                  * sessions with the given agent string.
                  */
                 idempotent SessionList getMyOpenAgentSessions(string agent) throws ServerError;
 
                 /**
-                 * Like {@link #getMyOpenSessions} but returns only those
+                 * Like {@code getMyOpenSessions} but returns only those
                  * sessions started by official OMERO clients.
                  */
                 idempotent SessionList getMyOpenClientSessions() throws ServerError;
@@ -175,7 +175,7 @@ module omero {
                  * Retrieves all keys in the {@link omero.model.Session} input
                  * environment.
                  *
-                 * @return a {@link StringSet} of keys
+                 * @return a {@link java.util.Set} of keys
                  */
                 idempotent StringSet getInputKeys(string sess) throws ServerError;
 

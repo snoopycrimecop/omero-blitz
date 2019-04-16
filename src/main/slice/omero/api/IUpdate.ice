@@ -1,6 +1,4 @@
 /*
- *   $Id$
- *
  *   Copyright 2010 Glencoe Software, Inc. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  *
@@ -32,7 +30,7 @@ module omero {
          * The original objects <b>should be discarded</b>.
          * </p>
          *
-         * <p>{@link #saveAndReturnIds} behaves slightly differently in that
+         * <p>{@code saveAndReturnIds} behaves slightly differently in that
          * it does <em>not</em> handle object modifications. The graph of
          * objects passed in can consist <em>ONLY</em> if either newly created
          * objects without ids or of unloaded objects with ids. <em>Note:</em>
@@ -47,7 +45,7 @@ module omero {
          * objects do not pass validation, and
          * {@link omero.OptimisticLockException} if the version of a given has
          * already been incremented.
-         **/
+         */
         ["ami", "amd"] interface IUpdate extends ServiceInterface
             {
                 void saveObject(omero::model::IObject obj) throws ServerError;
@@ -67,7 +65,7 @@ module omero {
                  * the background {@link Thread} to complete.
                  *
                  * @param row
-                 *            a persistent {@link IObject} to be deleted
+                 *            a persistent {@link omero.model.IObject} to be deleted
                  * @throws ValidationException
                  *             if the object does not exist or is nul
                  */

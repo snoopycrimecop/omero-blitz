@@ -1,6 +1,4 @@
 /*
- *   $Id$
- *
  *   Copyright 2008 Glencoe Software, Inc. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  *
@@ -46,7 +44,7 @@ module omero {
 
     /**
      * Sequences cannot subclass other types, so the Plane
-     * class extends {@link Internal} and wraps a {@link Bytes2D} instance.
+     * class extends {@code Internal} and wraps a {@code Bytes2D} instance.
      **/
     class Plane extends Internal {
         Bytes2D data;
@@ -116,7 +114,7 @@ module omero {
              * Whether or not a script will require this value to be present
              * in the input or output. If an input is missing or None when
              * non-optional, then a {@link omero.ValidationException} will be
-             * thrown on {@link #processJob}. A missing output param will be
+             * thrown on {@code processJob}. A missing output param will be
              * marked after execution.
              **/
             bool \optional;
@@ -189,8 +187,8 @@ module omero {
 
             /**
              * An enumeration of acceptable values which can be used
-             * for this parameter. If {@link #min} and {@link #max} are set,
-             * this value will be ignored. If {@link prototype} is an
+             * for this parameter. If {@code min} and {@code max} are set,
+             * this value will be ignored. If {@code prototype} is an
              * {@link omero.RCollection} or {@link omero.RMap} instance, then
              * the values in this {@link omero.RList} will be of the member
              * types of the collection or map, and not a collection or map
@@ -202,7 +200,7 @@ module omero {
              * Defines the grouping strategy for this {@link Param}.
              *
              * <p>
-             * A set of {@link Param} objects in a single {@link JobParams} can
+             * A set of {@code Param} objects in a single {@code JobParams} can
              * use dot notation to specify that they belong together,
              * and in which order they should be presented to the user.
              * </p>
@@ -274,9 +272,9 @@ module omero {
              * </p>
              *
              * <p>
-             * {@link omero.constants.namespaces.NSDOWNLOAD}, for example,
+             * {@code omero.constants.namespaces.NSDOWNLOAD}, for example,
              * indicates that users may want to download the resulting
-             * file. The {@link #prototype} of the {@link Param} should be one
+             * file. The {@code prototype} of the {@code Param} should be one
              * of: {@link omero.model.OriginalFile},
              * {@link omero.model.FileAnnotation},
              * or an annotation link (like
@@ -386,7 +384,7 @@ module omero {
             ParamMap outputs;
 
             /**
-             * {@link omero.model.Format#value} of the stdout stream produced
+             * {@code omero.model.Format.value} of the stdout stream produced
              * by the script. If this value is not otherwise set (i.e. is
              * None), the default of "text/plain" will be set. This is
              * typically a good idea if the script uses "print" or the logging
@@ -400,7 +398,7 @@ module omero {
             string stdoutFormat;
 
             /**
-             * {@link omero.model.Format#value} of the stderr stream produced by
+             * {@code omero.model.Format.value} of the stderr stream produced by
              * the script. If this value is not otherwise set (i.e. is None),
              * the default of "text/plain" will be set. This is typically a
              * good idea if the script uses "print" or the logging module.
@@ -414,7 +412,7 @@ module omero {
 
             /**
              * Defines machine readable interpretations for this
-             * {@link JobParams}.
+             * {@code JobParams}.
              *
              * <p>
              * Where the description field should provide information for
@@ -508,10 +506,10 @@ module omero {
         };
 
         /**
-         * Extension of the {@link Process} interface which is returned by
-         * {@link IScript} when an {@link omero.model.ScriptJob} is launched.
-         * It is critical that instances of (@link ScriptProcess} are closed
-         * on completetion. See the {@link #close} method for more information.
+         * Extension of the {@code Process} interface which is returned by
+         * {@code IScript} when an {@link omero.model.ScriptJob} is launched.
+         * It is critical that instances of (@code ScriptProcess} are closed
+         * on completion. See the {@link #close} method for more information.
          **/
         interface ScriptProcess extends Process {
 
@@ -544,7 +542,7 @@ module omero {
              * Closes this process and frees server resources attached to it.
              * If the detach argument is True, then the background process
              * will continue executing. The user can reconnect to the process
-             * via the {@link IScript} service.
+             * via the {@code IScript} service.
              *
              * If the detach argument is False, then the background process
              * will be shutdown immediately, and all intermediate results
@@ -566,7 +564,7 @@ module omero {
 
         /**
          * Internal callback interface which is passed to the
-         * {@link Processor#accepts} method
+         * {@code Processor.accepts} method
          * to query whether or not a processor will accept a certain operation.
          **/
         interface ProcessorCallback {
@@ -588,9 +586,9 @@ module omero {
 
             /**
              * Called by {@link omero.grid.SharedResources} to find a suitable
-             * target for {@link omero.grid.SharedResources#acquireProcessor}.
+             * target for {@code omero.grid.SharedResources.acquireProcessor}.
              * New processor instances are added to the checklist by using
-             * {@link omero.grid.SharedResources#addProcessor}. All processors
+             * {@code omero.grid.SharedResources.addProcessor}. All processors
              * must respond with their session uuid in order to authorize
              * the action.
              **/
@@ -603,7 +601,7 @@ module omero {
             /**
              * Used by servers to find out what jobs are still active.
              * Response will be sent to
-             * {@link ProcessorCallback#responseRunning}
+             * {@code ProcessorCallback.responseRunning}
              **/
             idempotent
             void requestRunning(ProcessorCallback* cb);
@@ -611,7 +609,7 @@ module omero {
             /**
              * Parses a job and returns metadata definition required
              * for properly submitting the job. This object will be
-             * cached by the server, and passed back into {@link #processJob}
+             * cached by the server, and passed back into {@code processJob}
              **/
             idempotent
             JobParams parseJob(string session, omero::model::Job jobObject) throws ServerError;
@@ -619,8 +617,8 @@ module omero {
             /**
              * Starts a process based on the given job
              * If this processor cannot handle the given job, a
-             * null process will be returned. The {@param params} argument
-             * was created by a previously call to {@link #parseJob}.
+             * null process will be returned. The {@code params} argument
+             * was created by a previously call to {@code parseJob}.
              **/
             Process* processJob(string session, JobParams params, omero::model::Job jobObject) throws ServerError;
 

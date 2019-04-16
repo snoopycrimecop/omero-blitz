@@ -1,6 +1,4 @@
 /*
- *   $Id$
- *
  *   Copyright 2010 Glencoe Software, Inc. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  *
@@ -21,7 +19,7 @@ module omero {
         /**
          * Access to reflective type information. Also provides simplified
          * access to special types like enumerations.
-         **/
+         */
         ["ami", "amd"] interface ITypes extends ServiceInterface
             {
                 omero::model::IObject createEnumeration(omero::model::IObject newEnum) throws ServerError;
@@ -36,7 +34,7 @@ module omero {
                  *              found.
                  * @return A managed enumeration. Never null.
                  * @throws ApiUsageException
-                 *         if {@link omero.model.IEnum} is not found.
+                 *         if {@link ome.model.IEnum} is not found.
                  */
                 idempotent omero::model::IObject getEnumeration(string type, string value) throws ServerError;
                 idempotent IObjectList allEnumerations(string type) throws ServerError;
@@ -76,11 +74,11 @@ module omero {
 
                 /**
                  * Returns a list of classes which implement
-                 * {@link omero.model.IAnnotated}. These can
+                 * {@link ome.model.IAnnotated}. These can
                  * be used in combination with {@link omero.api.Search}.
                  *
-                 * @return a {@link StringSet} of
-                 *         {@link omero.model.IAnnotated} implementations
+                 * @return a {@link java.util.Set} of
+                 *         {@link ome.model.IAnnotated} implementations
                  */
                 idempotent StringSet getAnnotationTypes() throws ServerError;
 
@@ -89,7 +87,7 @@ module omero {
                  * contained objects.
                  *
                  * @return map of classes that extend IEnum
-                 * @throws RuntimeExceptionif xml parsing failure.
+                 * @throws RuntimeException if xml parsing failure.
                  */
                 idempotent IObjectListMap getEnumerationsWithEntries() throws ServerError;
 

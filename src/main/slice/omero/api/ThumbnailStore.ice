@@ -1,6 +1,4 @@
 /*
- *   $Id$
- *
  *   Copyright 2010 Glencoe Software, Inc. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  *
@@ -24,12 +22,12 @@ module omero {
          * <p>
          * NOTE: The calling order for the service is as follows:
          * <ol>
-         * <li>{@link #setPixelsId}</li>
+         * <li>{@code setPixelsId}</li>
          * <li>any of the thumbnail accessor methods or
-         * {@link #resetDefaults}</li>
+         * {@code resetDefaults}</li>
          * </ol>
          * </p>
-         **/
+         */
         ["ami", "amd"] interface ThumbnailStore extends StatefulServiceInterface
             {
                 /**
@@ -63,7 +61,7 @@ module omero {
 
                 /**
                  * This method manages the state of the service; it should be
-                 * invoked directly after {@link #setPixelsId}. If it is not
+                 * invoked directly after {@code setPixelsId}. If it is not
                  * invoked with a valid rendering definition ID before using
                  * the thumbnail accessor methods execution continues as if
                  * <code>renderingDefId</code> were set to <code>null</code>.
@@ -89,7 +87,7 @@ module omero {
                  * rendering settings (RenderingDef). If the thumbnail exists
                  * in the on-disk cache it will be returned directly,
                  * otherwise it will be created as in
-                 * {@link #getThumbnailDirect}, placed in the on-disk
+                 * {@code getThumbnailDirect}, placed in the on-disk
                  * cache and returned. If the thumbnail is missing, a clock will
                  * be returned to signify that the thumbnail is yet to be generated.
                  *
@@ -102,11 +100,11 @@ module omero {
                  * @throws ApiUsageException
                  *             if:
                  *             <ul>
-                 *             <li><code>sizeX</code> > pixels.sizeX</li>
+                 *             <li><code>sizeX</code> is greater than pixels.sizeX</li>
                  *             <li><code>sizeX</code> is negative</li>
-                 *             <li><code>sizeY</code> > pixels.sizeY</li>
+                 *             <li><code>sizeY</code> is greater than pixels.sizeY</li>
                  *             <li><code>sizeY</code> is negative</li>
-                 *             <li>{@link #setPixelsId} has not yet been called</li>
+                 *             <li>{@code setPixelsId} has not yet been called</li>
                  *             </ul>
                  * @return a JPEG thumbnail byte buffer.
                  * @see #getThumbnailDirect
@@ -118,7 +116,7 @@ module omero {
                  * rendering settings (RenderingDef). If the thumbnail exists
                  * in the on-disk cache it will be returned directly,
                  * otherwise it will be created as in
-                 * {@link #getThumbnailDirect}, placed in the on-disk
+                 * {@code getThumbnailDirect}, placed in the on-disk
                  * cache and returned. If the thumbnail is still to be generated, an empty array will
                  * be returned.
                  *
@@ -131,11 +129,11 @@ module omero {
                  * @throws ApiUsageException
                  *             if:
                  *             <ul>
-                 *             <li><code>sizeX</code> > pixels.sizeX</li>
+                 *             <li><code>sizeX</code> is greater than pixels.sizeX</li>
                  *             <li><code>sizeX</code> is negative</li>
-                 *             <li><code>sizeY</code> > pixels.sizeY</li>
+                 *             <li><code>sizeY</code> is greater than pixels.sizeY</li>
                  *             <li><code>sizeY</code> is negative</li>
-                 *             <li>{@link #setPixelsId} has not yet been called</li>
+                 *             <li>{@code setPixelsId} has not yet been called</li>
                  *             </ul>
                  * @return a JPEG thumbnail byte buffer
                  * @see #getThumbnailDirect
@@ -147,10 +145,10 @@ module omero {
                  * given sets of rendering settings (RenderingDef). If the
                  * thumbnails exist in the on-disk cache they will be returned
                  * directly, otherwise they will be created as in
-                 * {@link #getThumbnailDirect}, placed in the on-disk cache
+                 * {@code getThumbnailDirect}, placed in the on-disk cache
                  * and returned. Unlike the other thumbnail retrieval methods,
                  * this method <b>may</b> be called without first calling
-                 * {@link #setPixelsId}.
+                 * {@code setPixelsId}.
                  *
                  * @param sizeX the X-axis width of the thumbnail.
                  *              <code>null</code> specifies the default size
@@ -172,12 +170,12 @@ module omero {
                  * given sets of rendering settings (RenderingDef). If the
                  * Thumbnails exist in the on-disk cache they will be returned
                  * directly, otherwise they will be created as in
-                 * {@link #getThumbnailByLongestSideDirect}. The longest
+                 * {@code getThumbnailByLongestSideDirect}. The longest
                  * side of the image will be used to calculate the size for
                  * the smaller side in order to keep the aspect ratio of the
                  * original image. Unlike the other thumbnail retrieval
                  * methods, this method <b>may</b> be called without first
-                 * calling {@link #setPixelsId}.
+                 * calling {@code setPixelsId}.
                  *
                  * @param size the size of the longest side of the thumbnail
                  *             requested. <code>null</code> specifies the
@@ -194,8 +192,8 @@ module omero {
                 /**
                  * Retrieves a thumbnail for a pixels set using a given set of
                  * rendering settings (RenderingDef). If the thumbnail exists
-                 * in the on-disk cache it will bereturned directly, otherwise
-                 * it will be created as in {@link #getThumbnailDirect},
+                 * in the on-disk cache it will be returned directly, otherwise
+                 * it will be created as in {@code getThumbnailDirect},
                  * placed in the on-disk cache and returned. The longest side
                  * of the image will be used to calculate the size for the
                  * smaller side in order to keep the aspect ratio of the
@@ -206,8 +204,8 @@ module omero {
                  *             default size of 48.
                  * @throws ApiUsageException if:
                  *         <ul>
-                 *         <li><code>size</code> > pixels.sizeX and pixels.sizeY</li>
-                 *         <li>{@link #setPixelsId} has not yet been called</li>
+                 *         <li><code>size</code> is greater than pixels.sizeX and pixels.sizeY</li>
+                 *         <li>{@code setPixelsId} has not yet been called</li>
                  *             </ul>
                  * @return a JPEG thumbnail byte buffer.
                  * @see #getThumbnail
@@ -228,8 +226,8 @@ module omero {
                  * @throws ApiUsageException
                  *             if:
                  *             <ul>
-                 *             <li><code>size</code> > pixels.sizeX and pixels.sizeY</li>
-                 *             <li>{@link #setPixelsId} has not yet been called</li>
+                 *             <li><code>size</code> is greater than pixels.sizeX and pixels.sizeY</li>
+                 *             <li>{@code setPixelsId} has not yet been called</li>
                  *             </ul>
                  * @return a JPEG thumbnail byte buffer.
                  * @see #getThumbnailDirect
@@ -250,11 +248,11 @@ module omero {
                  * @throws ApiUsageException
                  *             if:
                  *             <ul>
-                 *             <li><code>sizeX</code> > pixels.sizeX</li>
+                 *             <li><code>sizeX</code> is greater than pixels.sizeX</li>
                  *             <li><code>sizeX</code> is negative</li>
-                 *             <li><code>sizeY</code> > pixels.sizeY</li>
+                 *             <li><code>sizeY</code> is greater than pixels.sizeY</li>
                  *             <li><code>sizeY</code> is negative</li>
-                 *             <li>{@link #setPixelsId} has not yet been called</li>
+                 *             <li>{@code setPixelsId} has not yet been called</li>
                  *             </ul>
                  * @return a JPEG thumbnail byte buffer.
                  * @see #getThumbnail
@@ -279,13 +277,13 @@ module omero {
                  * @throws ApiUsageException
                  *             if:
                  *             <ul>
-                 *             <li><code>sizeX</code> > pixels.sizeX</li>
+                 *             <li><code>sizeX</code> is greater than pixels.sizeX</li>
                  *             <li><code>sizeX</code> is negative</li>
-                 *             <li><code>sizeY</code> > pixels.sizeY</li>
+                 *             <li><code>sizeY</code> is greater than pixels.sizeY</li>
                  *             <li><code>sizeY</code> is negative</li>
                  *             <li><code>theZ</code> is out of range</li>
                  *             <li><code>theT</code> is out of range</li>
-                 *             <li>{@link #setPixelsId} has not yet been called</li>
+                 *             <li>{@code setPixelsId} has not yet been called</li>
                  *             </ul>
                  * @return a JPEG thumbnail byte buffer.
                  * @see #getThumbnail
@@ -309,8 +307,8 @@ module omero {
                  * @throws ApiUsageException
                  *             if:
                  *             <ul>
-                 *             <li><code>size</code> > pixels.sizeX and pixels.sizeY</li>
-                 *             <li>{@link #setPixelsId} has not yet been called</li>
+                 *             <li><code>size</code> is greater than pixels.sizeX and pixels.sizeY</li>
+                 *             <li>{@code setPixelsId} has not yet been called</li>
                  *             </ul>
                  * @return a JPEG thumbnail byte buffer.
                  * @see #getThumbnailDirect
@@ -340,11 +338,11 @@ module omero {
                   * @throws ApiUsageException
                   *             if:
                   *             <ul>
-                  *             <li><code>sizeX</code> > pixels.sizeX</li>
+                  *             <li><code>sizeX</code> is greater than pixels.sizeX</li>
                   *             <li><code>sizeX</code> is negative</li>
-                  *             <li><code>sizeY</code> > pixels.sizeY</li>
+                  *             <li><code>sizeY</code> is greater than pixels.sizeY</li>
                   *             <li><code>sizeY</code> is negative</li>
-                  *             <li>{@link #setPixelsId} has not yet been called</li>
+                  *             <li>{@code setPixelsId} has not yet been called</li>
                   *             </ul>
                   * @see #getThumbnail
                   * @see #getThumbnailDirect
@@ -356,7 +354,7 @@ module omero {
                  * given set of rendering settings (RenderingDef) in the
                  * on-disk cache. Unlike the other thumbnail creation methods,
                  * this method <b>may</b> be called without first calling
-                 * {@link #setPixelsId}. This method <b>will not</b> reset or
+                 * {@code setPixelsId}. This method <b>will not</b> reset or
                  * modify rendering settings in any way. If rendering settings
                  * for a pixels set are not present, thumbnail creation for
                  * that pixels set <b>will not</b> be performed.
@@ -368,7 +366,7 @@ module omero {
                  * @throws ApiUsageException
                  *             if:
                  *             <ul>
-                 *             <li><code>size</code> > pixels.sizeX and pixels.sizeY</li>
+                 *             <li><code>size</code> is greater than pixels.sizeX and pixels.sizeY</li>
                  *             <li><code>size</code> is negative</li>
                  *             </ul>
                  * @see #createThumbnail

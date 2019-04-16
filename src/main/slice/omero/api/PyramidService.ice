@@ -1,6 +1,4 @@
 /*
- *   $Id$
- *
  *   Copyright 2011 Glencoe Software, Inc. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  *
@@ -25,7 +23,7 @@ module omero {
          * Initially this contains simply the sizeX/sizeY so that the
          * client can calculate percentages. Eventually, this may also
          * include columns, rows, etc.
-         **/
+         */
         sequence<ResolutionDescription> ResolutionDescriptions;
 
         ["ami", "amd"]
@@ -36,7 +34,7 @@ module omero {
                  * pixels pyramid to provide sub-resolutions of the data.
                  * @return <code>true</code> if the pixels store requires a
                  * pixels pyramid and <code>false</code> otherwise.
-                 **/
+                 */
                 idempotent bool requiresPixelsPyramid() throws ServerError;
 
                 /**
@@ -45,27 +43,27 @@ module omero {
                  * @return The number of resolution levels. This value does not
                  * necessarily indicate either the presence or absence of a
                  * pixels pyramid.
-                 **/
+                 */
                 idempotent int getResolutionLevels() throws ServerError;
 
                 /**
                  * Retrieves a more complete definition of the resolution
                  * level in question. The size of this array will be of
-                 * length {@link #getResolutionLevels}.
-                 **/
+                 * length {@code getResolutionLevels}.
+                 */
                 idempotent ResolutionDescriptions getResolutionDescriptions() throws ServerError;
 
                 /**
                  * Retrieves the active resolution level.
                  * @return The active resolution level.
-                 **/
+                 */
                 idempotent int getResolutionLevel() throws ServerError;
 
                 /**
                  * Sets the active resolution level.
                  * @param resolutionLevel The resolution level to be used by
                  * the pixel buffer.
-                 **/
+                 */
                 idempotent void setResolutionLevel(int resolutionLevel) throws ServerError;
 
                 /**
@@ -73,7 +71,7 @@ module omero {
                  * @return An array of <code>length = 2</code> where the first
                  * value of the array is the tile width and the second value is
                  * the tile height.
-                 **/
+                 */
                 idempotent Ice::IntSeq getTileSize() throws ServerError;
 
             };

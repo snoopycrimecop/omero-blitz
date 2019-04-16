@@ -28,7 +28,7 @@ module omero {
          * never return a null or empty {@link java.util.Collection}, but
          * instead will throw a {@link omero.ValidationException}.
          *
-         **/
+         */
         ["ami", "amd"] interface IQuery extends ServiceInterface
             {
 
@@ -40,7 +40,7 @@ module omero {
                  * @param id the entity's id
                  * @return an initialized entity
                  * @throws ValidationException if the id doesn't exist.
-                 **/
+                 */
                 idempotent omero::model::IObject get(string klass, long id) throws ServerError;
 
 
@@ -51,7 +51,7 @@ module omero {
                  * @param klass klass the type of the entity. Not null.
                  * @param id the entity's id
                  * @return an initialized entity or null if id doesn't exist.
-                 **/
+                 */
                 idempotent omero::model::IObject find(string klass, long id) throws ServerError;
 
                 /**
@@ -62,8 +62,8 @@ module omero {
                  * @param filter filters the result set. Can be null.
                  * @return a collection if initialized entities or an empty
                  *         List if none exist.
-                 **/
-                idempotent IObjectList           findAll(string klass, omero::sys::Filter filter) throws ServerError;
+                 */
+                idempotent IObjectList findAll(string klass, omero::sys::Filter filter) throws ServerError;
 
                 /**
                  * Searches based on provided example entity. The example
@@ -71,13 +71,13 @@ module omero {
                  * exception will be thrown.
                  *
                  * Note: findByExample does not operate on the <code>id</code>
-                 * field. For that, use {@link #find}, {@link #get},
-                 * {@link #findByQuery}, or {@link #findAllByQuery}.
+                 * field. For that, use {@code find}, {@code get},
+                 * {@code findByQuery}, or {@code findAllByQuery}.
                  *
                  * @param example Non-null example object.
                  * @return Possibly null IObject result.
                  * @throws ApiUsageException if more than one result is return.
-                 **/
+                 */
                 idempotent omero::model::IObject findByExample(omero::model::IObject example) throws ServerError;
 
                 /**
@@ -87,15 +87,14 @@ module omero {
                  *
                  * Note: findAllbyExample does not operate on the
                  * <code>id</code> field.
-                 * For that, use {@link #find}, {@link #get},
-                 * {@link #findByQuery}, or {@link #findAllByQuery}
-                 *
+                 * For that, use {@code find}, {@code get},
+                 * {@code findByQuery}, or {@code findAllByQuery}.
                  *
                  * @param example Non-null example object.
                  * @param filter filters the result set. Can be null.
                  * @return Possibly empty List of IObject results.
-                 **/
-                idempotent IObjectList           findAllByExample(omero::model::IObject example, omero::sys::Filter filter) throws ServerError;
+                 */
+                idempotent IObjectList findAllByExample(omero::model::IObject example, omero::sys::Filter filter) throws ServerError;
 
                 /**
                  * Searches a given field matching against a String. Method
@@ -106,12 +105,12 @@ module omero {
                  * @param klass type of entity to be searched
                  * @param field the name of the field, either as simple string
                  *              or as public static final from the entity
-                 *              class, e.g. {@link omero.model.Project#NAME}
+                 *              class, e.g. {@code omero.model.Project.NAME}
                  * @param value String used for search.
                  * @return found entity or possibly null.
                  * @throws ome.conditions.ApiUsageException
                  *             if more than one result.
-                 **/
+                 */
                 idempotent omero::model::IObject findByString(string klass, string field, string value) throws ServerError;
 
                 /**
@@ -123,14 +122,14 @@ module omero {
                  * @param klass type of entity to be searched. Not null.
                  * @param field the name of the field, either as simple string
                  *              or as public static final from the entity
-                 *              class, e.g. {@link omero.model.Project#NAME}.
+                 *              class, e.g. {@code omero.model.Project.NAME}.
                  *              Not null.
                  * @param value String used for search. Not null.
                  * @param caseSensitive whether to use LIKE or ILIKE
                  * @param filter filters the result set. Can be null.
                  * @return A list (possibly empty) with the results.
-                 **/
-                idempotent IObjectList           findAllByString(string klass, string field, string value, bool caseSensitive, omero::sys::Filter filter) throws ServerError;
+                 */
+                idempotent IObjectList findAllByString(string klass, string field, string value, bool caseSensitive, omero::sys::Filter filter) throws ServerError;
 
                 /**
                  * Executes the stored query with the given name. If a query
@@ -144,7 +143,7 @@ module omero {
                  * @param params
                  * @return Possibly null IObject result.
                  * @throws ValidationException
-                 **/
+                 */
                 idempotent omero::model::IObject findByQuery(string query, omero::sys::Parameters params) throws ServerError;
 
                 /**
@@ -182,7 +181,7 @@ module omero {
                  * @param params
                  * @return Possibly empty List of IObject results.
                  */
-                idempotent IObjectList           findAllByQuery(string query, omero::sys::Parameters params) throws ServerError;
+                idempotent IObjectList findAllByQuery(string query, omero::sys::Parameters params) throws ServerError;
 
                 /**
                  * Executes a full text search based on Lucene. Each term in
@@ -214,7 +213,7 @@ module omero {
                  * @return A list of loaded {@link omero.model.IObject}
                  *         instances. Never null.
                  **/
-                idempotent IObjectList           findAllByFullText(string klass, string query, omero::sys::Parameters params) throws ServerError;
+                idempotent IObjectList findAllByFullText(string klass, string query, omero::sys::Parameters params) throws ServerError;
 
                 /**
                  * Return a sequence of {@link omero.RType} sequences.
@@ -265,8 +264,8 @@ module omero {
                  * </pre>
                  * </p>
                  *
-                 **/
-                idempotent RTypeSeqSeq           projection(string query, omero::sys::Parameters params) throws ServerError;
+                 */
+                idempotent RTypeSeqSeq projection(string query, omero::sys::Parameters params) throws ServerError;
 
                 /**
                  * Refreshes an entire {@link omero.model.IObject} graph,
@@ -283,7 +282,7 @@ module omero {
                  *         with the database.
                  * @throws ApiUsageException if any non-managed entities are
                  *         found.
-                 **/
+                 */
                 idempotent omero::model::IObject refresh(omero::model::IObject iObject) throws ServerError;
             };
 

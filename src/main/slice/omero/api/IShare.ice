@@ -1,6 +1,4 @@
 /*
- *   $Id$
- *
  *   Copyright 2010 Glencoe Software, Inc. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  *
@@ -29,7 +27,7 @@ module omero {
                  * the execution of the current session for all database
                  * reads. Writing to the database will not be allowed. If
                  * share does not exist or is not accessible (non-members) or
-                 * is disabled, then an {@link ValidationException} is thrown.
+                 * is disabled, then an {@link omero.ValidationException} is thrown.
                  */
                 idempotent void activate(long shareId) throws ServerError;
 
@@ -72,11 +70,11 @@ module omero {
                  * Gets all owned shares for the current
                  * {@link omero.model.Experimenter}.
                  *
-                 * @param onlyActive
+                 * @param active
                  *            if true, then only shares which can be used for
                  *            login will be returned. All <i>draft</i> shares
-                 *            (see {@link #createShare}) and closed shares (see
-                 *            {@link #closeShare}) will be filtered.
+                 *            (see {@code createShare}) and closed shares (see
+                 *            {@code closeShare}) will be filtered.
                  * @return set of shares. Never null. May be empty.
                  */
                 idempotent SessionList getOwnShares(bool active) throws ServerError;
@@ -85,11 +83,11 @@ module omero {
                  * Gets all shares where current
                  * {@link omero.model.Experimenter} is a member.
                  *
-                 * @param onlyActive
+                 * @param active
                  *            if true, then only shares which can be used for
                  *            login will be returned. All <i>draft</i> shares
-                 *            (see {@link #createShare}) and closed shares (see
-                 *            {@link #closeShare}) will be filtered.
+                 *            (see {@code createShare}) and closed shares (see
+                 *            {@code closeShare}) will be filtered.
                  * @return set of shares. Never null. May be empty.
                  */
                 idempotent SessionList getMemberShares(bool active) throws ServerError;
@@ -98,11 +96,13 @@ module omero {
                  * Gets all shares owned by the given
                  * {@link omero.model.Experimenter}.
                  *
-                 * @param onlyActive
+                 * @param user
+                 *            the experimenter
+                 * @param active
                  *            if true, then only shares which can be used for
                  *            login will be returned. All <i>draft</i> shares
-                 *            (see {@link #createShare}) and closed shares (see
-                 *            {@link #closeShare}) will be filtered.
+                 *            (see {@code createShare}) and closed shares (see
+                 *            {@code closeShare}) will be filtered.
                  * @return set of shares. Never null. May be empty.
                  */
                 idempotent SessionList getSharesOwnedBy(omero::model::Experimenter user, bool active) throws ServerError;
@@ -111,11 +111,13 @@ module omero {
                  * Gets all shares where given
                  * {@link omero.model.Experimenter} is a member.
                  *
-                 * @param onlyActive
+                 * @param user
+                 *            the experimenter
+                 * @param active
                  *            if true, then only shares which can be used for
                  *            login will be returned. All <i>draft</i> shares
-                 *            (see {@link #createShare}) and closed shares (see
-                 *            {@link #closeShare}) will be filtered.
+                 *            (see {@code createShare}) and closed shares (see
+                 *            {@code closeShare}) will be filtered.
                  * @return set of shares. Never null. May be empty.
                  */
                 idempotent SessionList getMemberSharesFor(omero::model::Experimenter user, bool active) throws ServerError;
@@ -154,7 +156,7 @@ module omero {
                  *            if true, then the share is immediately available
                  *            for use. If false, then the share is in draft
                  *            state. All methods on this interface will work
-                 *            for shares <em>except</em> {@link #activate}.
+                 *            for shares <em>except</em> {@code activate}.
                  *            Similarly, the share password cannot be used by
                  *            guests to login.
                  */
@@ -171,7 +173,7 @@ module omero {
                 /**
                  * Closes {@link omero.model.Session} share. No further logins
                  * will be possible and all getters (e.g.
-                 * {@link #getMemberShares}, {@link #getOwnShares}, ...) will
+                 * {@code getMemberShares}, {@code getOwnShares}, ...) will
                  * filter these results if {@code onlyActive} is true.
                  */
                 void closeShare(long shareId) throws ServerError;
@@ -179,7 +181,7 @@ module omero {
                 /**
                  * Adds new {@link omero.model.IObject} items to
                  * {@link omero.model.Session} share. Conceptually calls
-                 * {@link #addObjects} for every argument passed, but the
+                 * {@code addObjects} for every argument passed, but the
                  * graphs will be merged.
                  */
                 void addObjects(long shareId, IObjectList iobjects) throws ServerError;
@@ -256,11 +258,11 @@ module omero {
 
                 /**
                  * Get a single set containing the
-                 * {@link omero.model.Experimenter#getOmeName} login names
+                 * {@code omero.model.Experimenter.getOmeName} login names
                  * of the users as well email addresses for guests.
                  *
                  * @param shareId
-                 * @return a {@link StringSet} containing the login of all
+                 * @return a {@link java.util.Set} containing the login of all
                  *         users
                  * @throws ValidationException
                  *         if there is a conflict between email addresses and

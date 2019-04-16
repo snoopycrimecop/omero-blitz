@@ -60,7 +60,9 @@ public class OMECredentials {
 
   /**
    * Get credentials from a string. The following two formats are recognized:
-   * <code>ip.address?port=54321&username=login&password=secret&id=12345</code>
+   * {@code
+   * ip.address?port=54321&username=login&password=secret&id=12345
+   * }
    * or:
    * <pre>
    * server=ip.address

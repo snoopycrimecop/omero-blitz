@@ -1,6 +1,4 @@
 /*
- *   $Id$
- *
  *   Copyright 2014 University of Dundee. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  *
@@ -38,7 +36,7 @@ module omero {
          *      userIds=\[...] )
          *      sends email to active members of given groups and selected users
          *  - extra=\[...] allows to set extra email address if not in DB
-         **/
+         */
          class SendEmailRequest extends Request {
              string subject;
              string body;
@@ -51,9 +49,9 @@ module omero {
          };
 
          /**
-         * Successful response for {@link SendEmailRequest}. Contains
+         * Successful response for {@code SendEmailRequest}. Contains
          * a list of invalid users that has no email address set.
-         * If no recipients or invalid users found, an {@link ERR} will be
+         * If no recipients or invalid users found, an {@code ERR} will be
          * returned.
          *
          * - invalidusers is a list of userIds that email didn't pass criteria
@@ -61,7 +59,7 @@ module omero {
          * - invalidemails is a list of email addresses that send email failed
          * - total is a total number of email in the pull to be sent.
          * - success is a number of emails that were sent successfully.
-         **/
+         */
          class SendEmailResponse extends Response {
              long total;
              long success;

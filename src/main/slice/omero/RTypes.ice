@@ -1,6 +1,4 @@
 /*
- *   $Id$
- *
  *   Copyright 2007 Glencoe Software, Inc. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  *
@@ -98,12 +96,14 @@ module omero {
    * Extends RString and simply provides runtime
    * information to the server that this string
    * is intended as a ""protected"" class parameter. Used especially
-   * by {@link omero.system.ParamMap} (omero/System.ice)
+   * by {@code omero.system.ParamMap} (omero/System.ice)
    * 
    * Usage:
    * <pre>
+   * {@code
    *   omero::RClass c = ...; // from service
    *   if (!c.null && c.val.equals("Image")) { ... }
+   * }
    * </pre>
    **/
   ["protected"] class RClass extends RString
@@ -123,13 +123,12 @@ module omero {
   // Collections
 
   /**
-   * Simple sequence of {@link RType} instances. Note: when passing
-   * an {@link RTypeSeq} over the wire, null sequence is maintained and
+   * Simple sequence of {@code RType} instances. Note: when passing
+   * an {@code RTypeSeq} over the wire, null sequence is maintained and
    * will be turned into an empty sequence. If nullability is
-   * required, see the {@link RCollection} types.
+   * required, see the {@code RCollection} types.
    *
    * @see RCollection
-   * @see RTypeDict
    */
   ["java:type:java.util.ArrayList<omero.RType>:java.util.List<omero.RType>"]
   sequence<RType> RTypeSeq;
@@ -165,7 +164,7 @@ module omero {
   };
 
   /**
-   * {@link RCollection} mapped to an array on the server of a type given
+   * {@code RCollection} mapped to an array on the server of a type given
    * by a random member of the RTypeSeq. Only pass consistent arrays!
    * homogeneous lists.
    **/
@@ -174,34 +173,33 @@ module omero {
   };
 
   /**
-   * {@link RCollection} mapped to a java.util.List on the server
+   * {@code RCollection} mapped to a java.util.List on the server
    **/
   ["protected"] class RList extends RCollection
   {
   };
 
   /**
-   * {@link RCollection} mapped to a java.util.HashSet on the server
+   * {@code RCollection} mapped to a java.util.HashSet on the server
    **/
   ["protected"] class RSet extends RCollection
   {
   };
 
   /**
-   * Simple dictionary of {@link RType} instances. Note: when passing
+   * Simple dictionary of {@code RType} instances. Note: when passing
    * an RTypeDict over the wire, a null map will not be maintained and
    * will be turned into an empty map. If nullability is
-   * required, see the {@link RMap} type.
+   * required, see the {@code RMap} type.
    **/
   ["java:type:java.util.HashMap<String,omero.RType>"]
   dictionary<string,omero::RType> RTypeDict;
 
   /**
-   * Similar to {@link RCollection}, the {@link RMap} class permits the passing
-   * of a possible null {@link RTypeDict} where any other {@link RType} is
+   * Similar to {@code RCollection}, the {@code RMap} class permits the passing
+   * of a possible null {@code RTypeDict} where any other {@code RType} is
    * expected.
    *
-   * @see RTypeDict
    * @see RCollection
    **/
   ["protected"] class RMap extends RType {

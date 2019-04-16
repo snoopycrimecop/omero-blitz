@@ -1,6 +1,4 @@
 /*
- *   $Id$
- *
  *   Copyright 2007 Glencoe Software, Inc. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  *
@@ -186,7 +184,7 @@ module omero
     };
 
   /**
-   * Thrown when the password for a user has expried. Use: ISession.changeExpiredCredentials()
+   * Thrown when the password for a user has expired. Use: ISession.changeExpiredCredentials()
    * and login as guest. This does -not- subclass from the omero.ServerError class because the
    * Ice Glacier2::SessionManager interface can only throw CCSEs.
    */
@@ -262,7 +260,7 @@ module omero
   /**
    * Too many simultaneous database users. This implies that a
    * connection to the database could not be acquired, no data
-   * was saved or modifed. Clients may want to wait the given
+   * was saved or modified. Clients may want to wait the given
    * backOff period, and retry.
    */
   exception DatabaseBusyException extends ConcurrencyException

@@ -1,6 +1,4 @@
 /*
- *   $Id$
- *
  *   Copyright 2009 Glencoe Software, Inc. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  *
@@ -47,7 +45,7 @@ module omero {
             /**
              * Unregisters a {@link omero.grid.Processor} from Storm
              * notifications. If the processor was not already registered via
-             * {@link #addProcessor} this is a no-op.
+             * {@code addProcessor} this is a no-op.
              **/
             void
                 removeProcessor(omero::grid::Processor* proc)
@@ -72,9 +70,9 @@ module omero {
                 throws ServerError;
 
             /**
-             * Returns true if a {@link Tables} service is active in the grid.
-             * If this value is false, then all calls to {@link #newTable}
-             * or {@link #openTable} will either fail or return null (possibly
+             * Returns true if a {@code Tables} service is active in the grid.
+             * If this value is false, then all calls to {@code #ewTable}
+             * or {@code openTable} will either fail or return null (possibly
              * blocking while waiting for a service to startup)
              **/
             idempotent

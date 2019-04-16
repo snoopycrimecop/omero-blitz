@@ -1,6 +1,4 @@
 /*
- *   $Id$
- *
  *   Copyright 2008 Glencoe Software, Inc. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  */
@@ -31,7 +29,7 @@ public interface TopicManager extends ApplicationListener {
 
     /**
      * Enforces <em>no</em> security constraints. For the moment, that is the
-     * responsibility of application code. WILL CHANGE>
+     * responsibility of application code. WILL CHANGE
      */
     public void register(String topicName, Ice.ObjectPrx prx, boolean strict)
     throws omero.ServerError;

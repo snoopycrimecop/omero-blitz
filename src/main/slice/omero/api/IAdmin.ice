@@ -139,6 +139,7 @@ module omero {
                  * Looks up {@link omero.model.Experimenter} experimenters who
                  * use LDAP authentication  (has set dn on password table).
                  *
+                 * @param id id of the Experimenter. Not null.
                  * @return Experimenter. Never null.
                  */
                 idempotent string lookupLdapAuthExperimenter(long id) throws ServerError;
@@ -203,12 +204,9 @@ module omero {
                  * not have the proper id nor the proper omeName (which is
                  * immutable). To change the users default group (which is the
                  * only other customizable option), use
-                 * {@link #setDefaultGroup}
+                 * {@code setDefaultGroup}
                  *
                  * @see #setDefaultGroup
-                 * @param experimenter A data transfer object. Only the fields:
-                 *        firstName, middleName, lastName, email, and
-                 *        institution are checked. Not null.
                  */
                 void updateSelf(omero::model::Experimenter experimenter) throws ServerError;
 
@@ -245,7 +243,7 @@ module omero {
                 /**
                  * Retrieves the {@link omero.model.OriginalFile} object
                  * attached to this user as specified by
-                 * {@link #uploadMyUserPhoto}.
+                 * {@code uploadMyUserPhoto}.
                  * The return value is order by the most recently modified
                  * file first.
                  *
@@ -259,7 +257,7 @@ module omero {
                  * The root and guest experimenters may not be renamed.
                  *
                  * Before a SecurityViolation would be thrown, however, this
-                 * method will pass to {@link #updateSelf} <em>if</em> the
+                 * method will pass to {@code #updateSelf} <em>if</em> the
                  * current user matches the given experimenter.
                  *
                  * @param experimenter the Experimenter to update.
@@ -381,13 +379,13 @@ module omero {
 
                 /**
                  * Creates and returns a new group. The
-                 * {@link omero.model.Details#setPermissions} method should be
+                 * {@code omero.model.Details.setPermissions} method should be
                  * called on the instance which is passed. The given
                  * {@link omero.model.Permissions} will become the default for
                  * all objects created while logged into this group, possibly
                  * modified by the user's umask settings.
                  * If no permissions is set, the default will be
-                 * {@link omero.model.Permissions#USER_PRIVATE},
+                 * {@code omero.model.Permissions.USER_PRIVATE},
                  * i.e. a group in which no user can see the other group
                  * member's data.
                  *
@@ -395,7 +393,7 @@ module omero {
                  *
                  * @param group  a new
                  * {@link omero.model.ExperimenterGroup} instance. Not null.
-                 * @return id of the newly created {@link ExperimenterGroup}
+                 * @return id of the newly created {@link omero.model.ExperimenterGroup}
                  */
                 long createGroup(omero::model::ExperimenterGroup group) throws ServerError;
 
@@ -413,7 +411,7 @@ module omero {
                  * <ul>
                  * <li>The root experimenter is required to be in both the
                  * user and system groups.</li>
-                 * <li>An experimenter may not remove themself from the user
+                 * <li>An experimenter may not remove themselves from the user
                  * or system group.</li>
                  * <li>An experimenter may not be a member of only the user
                  * group, some other group is also required as the default
@@ -537,7 +535,7 @@ module omero {
                  * <em>Warning:</em>This method requires the user to be
                  * authenticated with a password and not with a one-time
                  * session id. To avoid this problem, use
-                 * {@link #changePasswordWithOldPassword}.
+                 * {@code changePasswordWithOldPassword}.
                  * </p>
                  *
                  * See also <a href="https://trac.openmicroscopy.org/ome/ticket/911">ticket 911</a>

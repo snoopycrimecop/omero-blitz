@@ -95,7 +95,7 @@ module omero {
     /**
      * Server-side names used for each of the services
      * defined in API.ice. These names can be used in
-     * the ServiceFactory.getByName() and createByName()
+     * the {@code ServiceFactory.getByName} and {@code createByName}
      * methods.
      **/
     const string ADMINSERVICE     = "omero.api.IAdmin";
@@ -164,7 +164,7 @@ module omero {
     };
 
     /**
-     * Log levels used by {@link RawAccessRequest}'s {@code log} command for {@code path}.
+     * Log levels used by {@code RawAccessRequest}'s {@code log} command for {@code path}.
      **/
     enum LogLevel { Trace, Debug, Info, Warn, Error };
 
@@ -246,43 +246,43 @@ module omero {
     module permissions {
 
       /**
-       * Index into the {@link omero.model.Permissions#restrictions}
-       * {@link omero.api.BoolArray} field to test whether or not
+       * Index into the {@code omero.model.Permissions.restrictions}
+       * {@code omero.api.BoolArray} field to test whether or not
        * the link restriction has been applied to the current object.
        **/
       const int LINKRESTRICTION = 0;
 
       /**
-       * Index into the {@link omero.model.Permissions#restrictions}
-       * {@link omero.api.BoolArray} field to test whether or not
+       * Index into the {@code omero.model.Permissions.restrictions}
+       * {@code omero.api.BoolArray} field to test whether or not
        * the edit restriction has been applied to the current object.
        **/
       const int EDITRESTRICTION = 1;
 
       /**
-       * Index into the {@link omero.model.Permissions#restrictions}
-       * {@link omero.api.BoolArray} field to test whether or not
+       * Index into the {@code omero.model.Permissions.restrictions}
+       * {@code omero.api.BoolArray} field to test whether or not
        * the delete restriction has been applied to the current object.
        **/
       const int DELETERESTRICTION = 2;
 
       /**
-       * Index into the {@link omero.model.Permissions#restrictions}
-       * {@link omero.api.BoolArray} field to test whether or not
+       * Index into the {@code omero.model.Permissions.restrictions}
+       * {@code omero.api.BoolArray} field to test whether or not
        * the annotate restriction has been applied to the current object.
        **/
       const int ANNOTATERESTRICTION = 3;
 
       /**
-       * Index into the {@link omero.model.Permissions#restrictions}
-       * {@link omero.api.BoolArray} field to test whether or not
+       * Index into the {@code omero.model.Permissions.restrictions}
+       * {@code omero.api.BoolArray} field to test whether or not
        * the chgrp restriction has been applied to the current object.
        **/
       const int CHGRPRESTRICTION = 4;
 
       /**
-       * Index into the {@link omero.model.Permissions#restrictions}
-       * {@link omero.api.BoolArray} field to test whether or not
+       * Index into the {@code omero.model.Permissions.restrictions}
+       * {@code omero.api.BoolArray} field to test whether or not
        * the chown restriction has been applied to the current object.
        **/
       const int CHOWNRESTRICTION = 5;
