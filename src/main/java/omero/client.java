@@ -25,6 +25,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.security.Security;
@@ -398,19 +400,22 @@ public class client {
             }
         }
 
-        // Port, setting to default if not present
-        String port = parseAndSetInt(id, "omero.port",
+        String router = checkForHosturl(id.properties);
+        if (router == null) {
+            // Port, setting to default if not present
+            String port = parseAndSetInt(id, "omero.port",
                 omero.constants.GLACIER2PORT.value);
 
-        // Default Router, set a default and then replace
-        String router = id.properties.getProperty("Ice.Default.Router");
-        if (router == null || router.length() == 0) {
-            router = omero.constants.DEFAULTROUTER.value;
-        }
-        String host = id.properties.getPropertyWithDefault("omero.host",
+            // Default Router, set a default and then replace
+            router = id.properties.getProperty("Ice.Default.Router");
+            if (router == null || router.length() == 0) {
+                router = omero.constants.DEFAULTROUTER.value;
+            }
+            String host = id.properties.getPropertyWithDefault("omero.host",
                 "<\"omero.host\" not set>");
-        router = router.replaceAll("@omero.port@", port);
-        router = router.replaceAll("@omero.host@", host);
+            router = router.replaceAll("@omero.port@", port);
+            router = router.replaceAll("@omero.host@", host);
+        }
         id.properties.setProperty("Ice.Default.Router", router);
 
         // Dump properties
@@ -534,6 +539,58 @@ public class client {
         nClient.setAgent(__agent + ";secure=" + secure);
         nClient.joinSession(getSessionId());
         return nClient;
+    }
+
+    /**
+     * Checks whether the host is a URI, returns the Ice endpoint if so
+     * @param pmap Ice properties
+     * @return The Ice endpoint if host was a URI, or null
+     */
+    private String checkForHosturl(Ice.Properties pmap) {
+        String host = pmap.getPropertyWithDefault("omero.host", "");
+        int omeroPort = pmap.getPropertyAsIntWithDefault("omero.port", -1);
+        if (host.isEmpty()) {
+            return null;
+        }
+
+        URI uri;
+
+        try {
+            uri = new URI(host);
+        } catch (URISyntaxException e) {
+            return null;
+        }
+
+        String protocol = uri.getScheme();
+        String server = uri.getHost();
+        if (protocol == null || server == null) {
+            return null;
+        }
+        int port = uri.getPort();
+        String path = uri.getPath();
+
+        if (port < 1 && omeroPort >= 1) {
+            port = omeroPort;
+        }
+
+        if (port < 1) {
+            if (protocol.equals("ws")) port = 80;
+            else if (protocol.equals("wss")) port = 443;
+            else if (protocol.equals("tcp")) port = 4063;
+            else if (protocol.equals("ssl")) port = 4064;
+            else throw new omero.ClientError("Port required for protocol: " + protocol);
+        }
+
+        String icerouter = String.format(
+            "OMERO.Glacier2/router:%s -p %d -h %s", protocol, port, server);
+        if (path != null && !path.isEmpty()) {
+            icerouter += String.format(" -r %s", path);
+        }
+        // omero.port is used elsewhere so update
+        pmap.setProperty("omero.port", String.valueOf(port));
+        // The hostname may be required
+        pmap.setProperty("omero.url.host", server);
+        return icerouter;
     }
 
     // Destruction
