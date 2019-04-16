@@ -90,7 +90,7 @@ public class ImportConfig {
     private final Properties props;
 
     /**
-     * Stores the omeroVersion from omero.properties
+     * Stores the omeroVersion from omero-server.properties
      */
     private String omeroVersion = "Unknown";
 
@@ -388,7 +388,7 @@ public class ImportConfig {
      */
     public boolean isUpgradeNeeded() {
 
-        ResourceBundle bundle = ResourceBundle.getBundle("omero");
+        ResourceBundle bundle = ResourceBundle.getBundle("omero-common");
         String url = bundle.getString("omero.upgrades.url");
         UpgradeCheck check = new UpgradeCheck(url, getVersionNumber(), agent.get());
         check.run();

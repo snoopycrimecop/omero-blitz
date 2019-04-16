@@ -34,7 +34,6 @@ import com.google.common.collect.SetMultimap;
  * @since 5.0
  */
 public enum FilePathRestrictionInstance {
-    /* these names are listed in etc/omero.properties */
 
     /** proscribe naming that probably causes system problems on Microsoft Windows */
     WINDOWS_REQUIRED("Windows required"),
