@@ -1,6 +1,4 @@
 /*
- *   $Id$
- *
  *   Copyright 2008 Glencoe Software, Inc. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  */
@@ -17,7 +15,7 @@ import omero.grid.ClusterNodePrx;
 
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -30,7 +28,7 @@ public class RingTest extends MockObjectTestCase {
     Executor ex;
     Registry reg;
     OmeroContext ctx;
-    SimpleJdbcTemplate jdbc;
+    JdbcTemplate jdbc;
     Ice.ObjectAdapter oa;
     Ice.Communicator ic;
     Mock mockIc, mockOa, mockEx, mockReg;

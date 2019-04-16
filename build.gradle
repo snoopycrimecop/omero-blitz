@@ -28,6 +28,10 @@ ext {
 
 dependencies {
     testImplementation("junit:junit:4.12")
+    testImplementation("jmock:jmock:1.+")
+    testImplementation("org.testng:testng:6.14.2")
+    testImplementation('nl.javadude.assumeng:assumeng:1.2.4')
+    testImplementation('org.openmicroscopy:omero-common-test:5.5.0-m4')
 
     api("org.openmicroscopy:omero-server:5.5.0-m5")
 
@@ -58,6 +62,13 @@ if (slice.iceVersion.contains("3.7")) {
     }
     sourceSets.main.java {
         srcDirs "src/main/ice36", slice.output
+    }
+}
+
+test {
+    // enable TestNG support (default is JUnit)
+    useTestNG() {
+        suites "src/test/resources/unit.testng.xml"
     }
 }
 
