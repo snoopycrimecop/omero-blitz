@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "org.openmicroscopy"
-version = "5.5.0-SNAPSHOT"
+version = "5.5.0-m6"
 
 repositories {
     mavenLocal()
@@ -33,7 +33,7 @@ dependencies {
     testImplementation('nl.javadude.assumeng:assumeng:1.2.4')
     testImplementation('org.openmicroscopy:omero-common-test:5.5.0-m4')
 
-    api("org.openmicroscopy:omero-server:5.5.0-m5")
+    api("org.openmicroscopy:omero-server:5.5.0-m6")
 
     implementation("com.sun.activation:javax.activation:1.2.0")
     implementation("org.ini4j:ini4j:0.4.1")
