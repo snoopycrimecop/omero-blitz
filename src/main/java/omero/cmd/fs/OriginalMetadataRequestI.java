@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
@@ -54,7 +55,6 @@ import omero.constants.namespaces.NSCOMPANIONFILE;
 import omero.util.IceMapper;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 
 /**
  * Original metadata loader, handling both pre-FS and post-FS data.
@@ -255,8 +255,9 @@ public class OriginalMetadataRequestI extends OriginalMetadataRequest implements
         if (equalsIndex == null) {
             return null;
         } else {
-            return Maps.immutableEntry(keyValue.substring(0, equalsIndex).trim(),
-                                       keyValue.substring(equalsIndex + 1).trim());
+            return new AbstractMap.SimpleImmutableEntry<>(
+                    keyValue.substring(0, equalsIndex).trim(),
+                    keyValue.substring(equalsIndex + 1).trim());
         }
     }
 
