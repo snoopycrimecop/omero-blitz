@@ -21,8 +21,7 @@ package ome.services.blitz.repo.path;
 
 import java.io.File;
 import java.io.IOException;
-
-import com.google.common.base.Function;
+import java.util.function.Function;
 
 /**
  * Transform between repository {@link FsFile} path and server-local {@link File}.
