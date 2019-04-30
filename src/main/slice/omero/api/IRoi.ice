@@ -201,9 +201,6 @@ module omero {
                  * to the {@link omero.model.Plate} containing the given image
                  * AND which are attached to at least one
                  * {@link omero.model.Roi}
-                 *
-                 * @param opts, userId and groupId are respected based on the
-                 *        ownership of the annotation.
                  */
                 ["deprecate:IROI is deprecated."]
                 idempotent

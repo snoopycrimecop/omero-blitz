@@ -147,7 +147,7 @@ module omero {
    * from java.lang.Object).
    *
    * Unlike the other rtypes which are used internally within the
-   * {@link omero.model} classes, these types are mutable since they solely
+   * {@code omero.model} classes, these types are mutable since they solely
    * pass through the
    *
    * This flexible mechanism is not used in all API calls because

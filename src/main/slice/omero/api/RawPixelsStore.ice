@@ -249,6 +249,7 @@ module omero {
                  * Retrieves the entire number of optical sections for <b>all</b>
                  * wavelengths or channels at a particular timepoint in this pixel store.
                  * @param t offset across the T-axis of the pixel store.
+                 * @return buffer containing the data which comprises this stack.
                  */
                 idempotent Ice::ByteSeq getTimepoint(int t) throws ServerError;
 
@@ -357,7 +358,7 @@ module omero {
 
                 /**
                  * Returns whether or not the pixel buffer has floating point pixels.
-                 * @return
+                 * @return See above.
                  */
                 idempotent bool isFloat() throws ServerError;
 
