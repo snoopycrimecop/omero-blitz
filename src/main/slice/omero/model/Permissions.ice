@@ -25,10 +25,9 @@ module omero {
       /**
        * Restrictions placed on the current object for the current
        * user. Indexes into this array are based on constants
-       * in the {@link omero.constants.permissions} module. If a
+       * in the {@code omero.constants.permissions} module. If a
        * restriction index is not present, then it is safe to
        * assume that there is no such restriction.
-       *
        * If null, this should be assumed to have no restrictions.
        */
       omero::api::BoolArray restrictions;
