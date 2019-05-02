@@ -19,6 +19,7 @@
 
 package omero.cmd.graphs;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -30,7 +31,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
-import com.google.common.collect.Maps;
 
 import ome.model.core.OriginalFile;
 import ome.model.core.Pixels;
@@ -76,7 +76,7 @@ public abstract class BaseGraphTraversalProcessor implements GraphTraversal.Proc
             LOGGER.warn("not all the objects of type " + className + " could be deleted");
         }
         if (DELETION_CLASS_NAMES.contains(className)) {
-            deletionLog.add(Maps.immutableEntry(className.substring(className.lastIndexOf('.') + 1), ids));
+            deletionLog.add(new AbstractMap.SimpleImmutableEntry<>(className.substring(className.lastIndexOf('.') + 1), ids));
         }
     }
 
