@@ -23,12 +23,11 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Predicate;
 
 import ome.model.IObject;
 import ome.services.graphs.GraphException;
@@ -83,7 +82,7 @@ public class SkipTailPolicy {
             @Override
             public final Set<Details> review(Map<String, Set<Details>> linkedFrom, Details rootObject,
                     Map<String, Set<Details>> linkedTo, Set<String> notNullable, boolean isErrorRules) throws GraphException {
-                if (isSkipClass.apply(rootObject.subject.getClass())) {
+                if (isSkipClass.test(rootObject.subject.getClass())) {
                     if (LOGGER.isDebugEnabled()) {
                         LOGGER.debug("halting review at " + rootObject);
                     }
@@ -95,7 +94,7 @@ public class SkipTailPolicy {
                     final Iterator<Details> changesIterator = changes.iterator();
                     while (changesIterator.hasNext()) {
                         final Details change = changesIterator.next();
-                        if (change.action == Action.INCLUDE && isSkipClass.apply(change.subject.getClass())) {
+                        if (change.action == Action.INCLUDE && isSkipClass.test(change.subject.getClass())) {
                             if (LOGGER.isDebugEnabled()) {
                                 LOGGER.debug("forestalling policy-based change " + change);
                             }

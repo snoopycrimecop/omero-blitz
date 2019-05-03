@@ -29,6 +29,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
@@ -43,9 +45,7 @@ import ome.services.graphs.GraphTraversal.Processor;
 import ome.services.graphs.ModelObjectSequencer;
 import omero.cmd.GraphModify2;
 
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import com.google.common.base.Predicate;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.SetMultimap;
 
@@ -375,7 +375,7 @@ public class GraphUtil {
     public static Predicate<Class<? extends IObject>> getPredicateFromClasses(final Iterable<Class<? extends IObject>> matchTypes) {
         return new Predicate<Class<? extends IObject>>() {
             @Override
-            public boolean apply(Class<? extends IObject> subjectType) {
+            public boolean test(Class<? extends IObject> subjectType) {
                 for (final Class<? extends IObject> matchType : matchTypes) {
                     if (matchType.isAssignableFrom(subjectType)) {
                         return true;

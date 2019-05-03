@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2017 University of Dundee & Open Microscopy Environment.
+ * Copyright (C) 2014-2019 University of Dundee & Open Microscopy Environment.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -20,6 +20,7 @@
 package omero.cmd.graphs;
 
 import java.lang.reflect.Method;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -29,6 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import org.apache.commons.beanutils.NestedNullException;
 import org.apache.commons.beanutils.PropertyUtils;
@@ -40,15 +43,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
-import com.google.common.base.Function;
-import com.google.common.base.Functions;
-import com.google.common.base.Predicate;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.SetMultimap;
 
@@ -183,7 +182,7 @@ public class DuplicateI extends Duplicate implements IRequest, ReadOnlyStatus.Is
                 return SkipTailPolicy.getSkipTailPolicy(graphPolicy,
                         new Predicate<Class<? extends IObject>>() {
                     @Override
-                    public boolean apply(Class<? extends IObject> modelObject) {
+                    public boolean test(Class<? extends IObject> modelObject) {
                         final Inclusion classification = classifier.getClass(modelObject);
                         return classification == Inclusion.REFERENCE || classification == Inclusion.IGNORE;
                     }});
@@ -336,7 +335,7 @@ public class DuplicateI extends Duplicate implements IRequest, ReadOnlyStatus.Is
                         }
                         /* copy original property value to duplicate, creating new instances of collections */
                         final Object value = PropertyUtils.getProperty(original, property);
-                        final Object duplicateValue = GraphUtil.copyComplexValue(Functions.constant(null), value);
+                        final Object duplicateValue = GraphUtil.copyComplexValue(x -> null, value);
                         PropertyUtils.setProperty(duplicate, property, duplicateValue);
                     }
                 }
@@ -363,7 +362,7 @@ public class DuplicateI extends Duplicate implements IRequest, ReadOnlyStatus.Is
                         originalClass = original.getClass().getName();
                     }
                     final Long originalId = ((IObject) original).getId();
-                    return originalClassIdToDuplicates.get(Maps.immutableEntry(originalClass, originalId));
+                    return originalClassIdToDuplicates.get(new AbstractMap.SimpleImmutableEntry<>(originalClass, originalId));
                 } else {
                     return null;
                 }
@@ -519,7 +518,7 @@ public class DuplicateI extends Duplicate implements IRequest, ReadOnlyStatus.Is
                                     }
                                     final Long originalId = ((IObject) original).getId();
                                     final IObject duplicate =
-                                            originalClassIdToDuplicates.get(Maps.immutableEntry(originalClass, originalId));
+                                            originalClassIdToDuplicates.get(new AbstractMap.SimpleImmutableEntry<>(originalClass, originalId));
                                     if (duplicate == null) {
                                         return null;
                                     }
@@ -550,7 +549,7 @@ public class DuplicateI extends Duplicate implements IRequest, ReadOnlyStatus.Is
                                 }
                                 final Long originalId = ((IObject) original).getId();
                                 final IObject duplicate =
-                                        originalClassIdToDuplicates.get(Maps.immutableEntry(originalClass, originalId));
+                                        originalClassIdToDuplicates.get(new AbstractMap.SimpleImmutableEntry<>(originalClass, originalId));
                                 if (duplicate == null) {
                                     return null;
                                 }
@@ -822,7 +821,7 @@ public class DuplicateI extends Duplicate implements IRequest, ReadOnlyStatus.Is
                     }
                     final String originalClass = Hibernate.getClass(original).getName();
                     final Long originalId = original.getId();
-                    originalClassIdToDuplicates.put(Maps.immutableEntry(originalClass, originalId), duplicate);
+                    originalClassIdToDuplicates.put(new AbstractMap.SimpleImmutableEntry<>(originalClass, originalId), duplicate);
                     originalsToDuplicates.put(original, duplicate);
                 }
             }
