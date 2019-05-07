@@ -87,9 +87,10 @@ public abstract class BaseGraphTraversalProcessor implements GraphTraversal.Proc
      */
     public void deleteFiles(Deletion deletionInstance) {
         for (final Map.Entry<String, Collection<Long>> deletionBatch : deletionLog) {
-            final ImmutableSetMultimap.Builder<String, Long> targets = ImmutableSetMultimap.builder();
-            targets.putAll(deletionBatch.getKey(), deletionBatch.getValue());
-            deletionInstance.deleteFiles(targets.build());
+            deletionInstance.deleteFiles(
+                    ImmutableSetMultimap.<String, Long>builder()
+                    .putAll(deletionBatch.getKey(), deletionBatch.getValue())
+                    .build());
         }
         deletionLog.clear();
     }
