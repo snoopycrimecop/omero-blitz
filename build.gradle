@@ -45,6 +45,10 @@ dependencies {
     implementation("net.sf.ehcache:ehcache:2.10.6")
 }
 
+configurations.all {
+    exclude group: 'com.google.code.findbugs'
+}
+
 if (slice.iceVersion.contains("3.7")) {
     slice.output = file("$generatedDir/ice37")
     dependencies {
