@@ -1,6 +1,4 @@
 #*
- *   $Id$
- *
  *   Copyright 2007-2014 Glencoe Software, Inc. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  *
@@ -8,7 +6,7 @@
 
 Note: lines not prefixed with [...] will be omitted in the final product.
 The other prefixes are used by blitz/build.xml to determine how this file
-wil be split. This is done because the individual velocity if/elseif's
+will be split. This is done because the individual velocity if/elseif's
 and sets are nearly identical.
 
 Here we turn off all prefixes except for ice.  Since <>I files are
@@ -177,6 +175,9 @@ DECLARATION BLOCK:
 [$jav] import java.util.*;
 [$jav] import static omero.rtypes.*;
 [$jav] import ome.conditions.*;
+#if($type.deprecated)
+[$jav] @Deprecated
+#end
 [$jav] public class ${PojoI} extends ${Pojo}
 [$jav]    implements ome.model.ModelBased {
 
@@ -193,6 +194,14 @@ Note how the whitespace for the python definitions is important.
 [$pyc] __name__ = "omero.model"
 
 [$pyc] class ${PojoI}(_omero_model.$Pojo):
+#if($type.deprecated)
+[$pyc]
+[$pyc]       # Deprecation Warning
+[$pyc]       def warn_of_deprecation():
+[$pyc]           import warnings
+[$pyc]           warnings.warn("$Pojo is deprecated", DeprecationWarning)
+[$pyc]       warn_of_deprecation()
+#end
 [$pyc]
 [$pyc]       # Property Metadata
 [$pyc]       _field_info_data = namedtuple("FieldData", ["wrapper", "nullable"])
@@ -258,6 +267,9 @@ STATIC FIELDS:
 
 [$hdr]    public:
 #foreach( $property in $type.propertyClosure )
+#if($property.deprecated)
+[$jav]       @Deprecated
+#end
 [$jav]       public static final String ${property.nameUpper} = "${type.id}_${property.name}";
 [$pyc]       ${property.nameUpper} =  "${type.id}_${property.name}"
 [$hdr]       static const std::string ${property.nameUpper};
@@ -348,10 +360,20 @@ since all collections are lists in ice.
 #end
 
 #if(  $property.one2Many )
-[$Ice]     ["java:type:java.util.ArrayList"] sequence<$genericTypeC> ${seqName};
+#if($property.deprecated)
+[$Ice]     ["java:type:java.util.ArrayList", "deprecate:$property.name is deprecated."]
+#else
+[$Ice]     ["java:type:java.util.ArrayList"]
+#end
+[$Ice]     sequence<$genericTypeC> ${seqName};
 #if( $property.isLink )
 ## TODO: this could be defined just once if done carefully.
-[$Ice]     ["java:type:java.util.ArrayList"] sequence<omero::model::${property.shortTarget}> ${Pojo}Linked${property.targetName}Seq;
+#if($property.deprecated)
+[$Ice]     ["java:type:java.util.ArrayList", "deprecate:$property.name is deprecated."]
+#else
+[$Ice]     ["java:type:java.util.ArrayList"]
+#end
+[$Ice]     sequence<omero::model::${property.shortTarget}> ${Pojo}Linked${property.targetName}Seq;
 #end
 
 [$jav]           if (load) {
@@ -447,7 +469,12 @@ Calculate inheritance. This is done here because sequences must first be defined
 #set( $extendsDeclaration = $type.superclass.replaceFirst("ome.model..+?[.]","omero::model::" ) )
 #end
 
-[$ice]     ["protected"] class ${type.shortname}
+#if($type.deprecated)
+[$ice]     ["protected", "deprecate:$type.shortname is deprecated."]
+#else
+[$ice]     ["protected"]
+#end
+[$ice]     class ${type.shortname}
 [$ice]     extends $extendsDeclaration
 [$ice]     {
 
@@ -849,6 +876,9 @@ Properties used throughout the accessor generation
 
 ## TODO use empty List or null?
 
+#if($property.deprecated)
+[$Ice]       ["deprecate:$property.name is deprecated."]
+#end
 #if( $property.one2Many )##JAVA_TYPE ----------------------------------------------
 ## #684 Mapping all sets to lists.
 #set( $javaType = "java.util.List" )
@@ -866,8 +896,14 @@ Properties used throughout the accessor generation
 #set( $copyMethod = "this.set${PropertyName}( ($javaType) mapper.findCollection( (Collection) source.retrieve(${type.id}.${PropertyName.toUpperCase()})), null /* FIXME - argument unneeded */);" )
 
 [$Ice]       $seqName ${fieldName};
+#if($property.deprecated)
+[$Ice]       ["deprecate:$property.name is deprecated."]
+#end
 [$Ice]       bool ${property.name}Loaded;
 #if( $property.isLink && !$property.actualTarget.global)
+#if($property.deprecated)
+[$Ice]       ["deprecate:$property.name is deprecated."]
+#end
 [$Ice]       omero::sys::CountMap ${property.name}CountPerOwner;
 #end
 
@@ -1005,6 +1041,9 @@ Properties used throughout the accessor generation
 #set( $cppType = "${iceType}" )
 #set( $copyMethod = "this.${fieldName} = omero.util.IceMapper.convertNamedValueList(source.get${PropertyName}());" );
 [$Ice]       omero::api::NamedValueList ${property.name};
+#if($property.deprecated)
+[$Ice]       ["deprecate:$property.name is deprecated."]
+#end
 [$Ice]       omero::api::StringStringMap get${PropertyName}AsMap();
 
 #elseif( $javaType.startsWith("java.lang.String")) ## for Event
@@ -1024,7 +1063,13 @@ since slice has no concept of visibility. Instead, the special collection
 methods below will be used for access.
 
 #if( ! $property.one2Many )
+#if($property.deprecated)
+[$Ice]       ["deprecate:$property.name is deprecated."]
+#end
 [$Ice]       $iceType get${PropertyName}();
+#if($property.deprecated)
+[$Ice]       ["deprecate:$property.name is deprecated."]
+#end
 [$Ice]       void set${PropertyName}($iceType the${PropertyName});
 #end
 
@@ -1069,6 +1114,9 @@ Unload
 [$Col]        *
 [$Col]        */
 [$Col]       void unload${PropertyName}();
+#if($property.deprecated)
+[$jav]       @Deprecated
+#end
 [$jav]       public void unload${PropertyName}($JAV_CURRENT_COLL) {
 [$jav]           ${unloadIfIsSet}
 [$jav]           ${fieldName} = null;
@@ -1083,18 +1131,28 @@ Unload
 #end
 [$cpp]       }
 [$pyc]       def unload${PropertyName}(self, $PYC_CURRENT_COLL):
+#if($property.deprecated)
+[$pyc]           import warnings
+[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+#end
 [$pyc]           self._${property.name}Loaded = False
 [$pyc]           self._${fieldName} = None;
 [$pyc]
 Original accessors: will have their visibility reduced if
 the special set methods are added.
 
+#if($property.deprecated)
+[$jav]       @Deprecated
+#end
 [$jav]       $access $javaType get${property.nameCapped}($JAV_CURRENT) throws omero.UnloadedEntityException {
 [$jav]           errorIfUnloaded();
 [$jav]           return $getter;
 [$jav]       }
 [$jav]
 #if( $property.class.name == "ome.dsl.MapField" )
+#if($property.deprecated)
+[$jav]       @Deprecated
+#end
 [$jav]       public java.util.Map<String, String> get${property.nameCapped}AsMap($JAV_CURRENT) throws omero.UnloadedEntityException {
 [$jav]           errorIfUnloaded();
 [$jav]           java.util.Map<String, String> rv = new java.util.HashMap<String, String>();
@@ -1107,12 +1165,18 @@ the special set methods are added.
 [$jav]       }
 [$jav]
 #end
+#if($property.deprecated)
+[$jav]       @Deprecated
+#end
 [$jav]       $access void set${PropertyName}($javaType $property.name, $JAV_CURRENT) throws omero.UnloadedEntityException {
 [$jav]           errorIfUnloaded();
 [$jav]           this.$fieldName = $setter;
 [$jav]           $unloadedJava
 [$jav]       }
 [$jav]
+#if($property.deprecated)
+[$jav]       @Deprecated
+#end
 [$jav]       private void copy${PropertyName}($type.id source, omero.util.IceMapper mapper) {
 [$jav]           $copyMethod
 #if ($property.one2Many && $property.isLink && !$property.actualTarget.global)
@@ -1120,6 +1184,9 @@ the special set methods are added.
 #end
 [$jav]       }
 [$jav]
+#if($property.deprecated)
+[$jav]       @Deprecated
+#end
 [$jav]       private void fill${PropertyName}($type.id target, omero.util.IceMapper mapper) {
 #if( $type.id.equals("ome.model.internal.Permissions") )
 [$jav]             ome.model.internal.Permissions p = ome.util.Utils.toPermissions((Long)this.getPerm1());
@@ -1209,10 +1276,18 @@ It's unclear if these methods are useful at all, but for the moment lowering the
 "visibility" to make __getattr__ logic work properly.
 
 [$pyc]       def ${pyaccess}get${property.nameCapped}(self, $PYC_CURRENT):
+#if($property.deprecated)
+[$pyc]           import warnings
+[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+#end
 [$pyc]           self.errorIfUnloaded()
 [$pyc]           return self._${fieldName}
 [$pyc]
 [$pyc]       def ${pyaccess}set${PropertyName}(self, _${property.name}, $PYC_CURRENT, wrap=False):
+#if($property.deprecated)
+[$pyc]           import warnings
+[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+#end
 [$pyc]           self.errorIfUnloaded()
 [$pyc]           if wrap and self._field_info.${fieldName}.wrapper is not None:
 [$pyc]               if _${property.name} is not None:
@@ -1222,6 +1297,10 @@ It's unclear if these methods are useful at all, but for the moment lowering the
 [$pyc]
 #if( $property.class.name == "ome.dsl.MapField" )
 [$pyc]       def ${pyaccess}get${property.nameCapped}AsMap(self, $PYC_CURRENT):
+#if($property.deprecated)
+[$pyc]           import warnings
+[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+#end
 [$pyc]           self.errorIfUnloaded()
 [$pyc]           rv = dict()
 [$pyc]           for nv in self._${property.name}:
@@ -1261,6 +1340,9 @@ which would take away our type safety. Instead, we add a boolean
 field for every sequence. NOTE: These methods may not be needed
 and instead sizeOf would suffice.
 
+#if($property.deprecated)
+[$jav]       @Deprecated
+#end
 [$jav]       public boolean is${PropertyName}Loaded() {
 [$jav]           return ${propLoaded};
 [$jav]       }
@@ -1269,12 +1351,22 @@ and instead sizeOf would suffice.
 [$cpp]           return ${propLoaded};
 [$cpp]       }
 [$pyc]       def is${PropertyName}Loaded(self):
+#if($property.deprecated)
+[$pyc]           import warnings
+[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+#end
 [$pyc]           return self._${propLoaded}
 [$pyc]
 
 sizeOf ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+#if($property.deprecated)
+[$Ice]       ["deprecate:$property.name is deprecated."]
+#end
 [$Ice]       int sizeOf${PropertyName}();
+#if($property.deprecated)
+[$jav]       @Deprecated
+#end
 [$jav]       public int sizeOf${PropertyName}($JAV_CURRENT) throws omero.UnloadedEntityException {
 [$jav]           errorIfUnloaded();
 [$jav]           if (!${propLoaded}) return -1;
@@ -1287,6 +1379,10 @@ sizeOf ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 [$cpp]           return static_cast<Ice::Int>(${fieldName}.size());
 [$cpp]       }
 [$pyc]       def sizeOf${PropertyName}(self, $PYC_CURRENT):
+#if($property.deprecated)
+[$pyc]           import warnings
+[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+#end
 [$pyc]           self.errorIfUnloaded()
 [$pyc]           if not self._${propLoaded}: return -1
 [$pyc]           return len(self._${fieldName})
@@ -1294,7 +1390,13 @@ sizeOf ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Copy ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+#if($property.deprecated)
+[$Ice]       ["deprecate:$property.name is deprecated."]
+#end
 [$Ice]       $iceType copy${PropertyName}();
+#if($property.deprecated)
+[$jav]       @Deprecated
+#end
 [$jav]       public $javaType copy${PropertyName}($JAV_CURRENT) throws omero.UnloadedEntityException{
 [$jav]           errorIfUnloaded();
 [$jav]           if (!${propLoaded}) throwNullCollectionException("${fieldName}");
@@ -1302,6 +1404,10 @@ Copy ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 [$jav]           return result;
 [$jav]       }
 [$pyc]       def copy${PropertyName}(self, $PYC_CURRENT):
+#if($property.deprecated)
+[$pyc]           import warnings
+[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+#end
 [$pyc]           self.errorIfUnloaded()
 [$pyc]           if not self._${propLoaded}: self.throwNullCollectionException("${fieldName}")
 [$pyc]           return list(self._${fieldName})
@@ -1322,6 +1428,9 @@ Iterators are language-specific since there's no slice concept
 for them. Therefore, to use these, developers must down-cast.
 
 [$Ice]       // See language-specific iterator methods
+#if($property.deprecated)
+[$jav]       @Deprecated
+#end
 [$jav]       public Iterator iterate${PropertyName}() throws omero.UnloadedEntityException {
 [$jav]           errorIfUnloaded();
 [$jav]           if (!${propLoaded}) throwNullCollectionException("${fieldName}");
@@ -1340,6 +1449,10 @@ for them. Therefore, to use these, developers must down-cast.
 [$cpp]           return ${fieldName}.end();
 [$cpp]       }
 [$pyc]       def iterate${PropertyName}(self):
+#if($property.deprecated)
+[$pyc]           import warnings
+[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+#end
 [$pyc]           self.errorIfUnloaded()
 [$pyc]           if not self._${propLoaded}: self.throwNullCollectionException("${fieldName}")
 [$pyc]           return iter(self._${fieldName})
@@ -1362,7 +1475,13 @@ Set modifications:
 
 add single
 
+#if($property.deprecated)
+[$Ice]       ["deprecate:$property.name is deprecated."]
+#end
 [$Ice]       void add${property.fieldName}(${property.shortType} target);
+#if($property.deprecated)
+[$jav]       @Deprecated
+#end
 [$jav]       public void add${property.fieldName}(${property.shortType} target, $JAV_CURRENT) throws omero.UnloadedEntityException {
 [$jav]           errorIfUnloaded();
 [$jav]           if (!${propLoaded}) throwNullCollectionException("${fieldName}");
@@ -1370,6 +1489,10 @@ add single
 [$jav]           target.set$Inverse( this );
 [$jav]       }
 [$pyc]       def add${property.fieldName}(self, target, $PYC_CURRENT):
+#if($property.deprecated)
+[$pyc]           import warnings
+[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+#end
 [$pyc]           self.errorIfUnloaded()
 [$pyc]           if not self._${propLoaded}: self.throwNullCollectionException("${fieldName}")
 [$pyc]           self._${fieldName}.append( target );
@@ -1389,7 +1512,13 @@ addAll set
 [$Ice]        * Adds all the members of the ${iceType} sequence to
 [$Ice]        * the ${fieldName} field.
 [$Ice]        */
+#if($property.deprecated)
+[$Ice]       ["deprecate:$property.name is deprecated."]
+#end
 [$Ice]       void addAll${property.fieldName}Set(${iceType} targets);
+#if($property.deprecated)
+[$jav]       @Deprecated
+#end
 [$jav]       public void addAll${property.fieldName}Set($javaType<${property.shortType}> targets, $JAV_CURRENT) throws omero.UnloadedEntityException {
 [$jav]           errorIfUnloaded();
 [$jav]           if (!${propLoaded}) throwNullCollectionException("${fieldName}");
@@ -1399,6 +1528,10 @@ addAll set
 [$jav]           }
 [$jav]       }
 [$pyc]       def addAll${property.fieldName}Set(self, targets, $PYC_CURRENT):
+#if($property.deprecated)
+[$pyc]           import warnings
+[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+#end
 [$pyc]           self.errorIfUnloaded()
 [$pyc]           if  not self._${propLoaded}: self.throwNullCollectionException("${fieldName}")
 [$pyc]           self._${fieldName}.extend( targets )
@@ -1421,7 +1554,13 @@ addAll set
 
 remove single
 
+#if($property.deprecated)
+[$Ice]       ["deprecate:$property.name is deprecated."]
+#end
 [$Ice]       void remove${property.fieldName}(${property.shortType} theTarget);
+#if($property.deprecated)
+[$jav]       @Deprecated
+#end
 [$jav]       public void remove${property.fieldName}(${property.shortType} target, $JAV_CURRENT) throws omero.UnloadedEntityException {
 [$jav]           errorIfUnloaded();
 [$jav]           if (!${propLoaded}) throwNullCollectionException("${fieldName}");
@@ -1429,6 +1568,10 @@ remove single
 [$jav]           target.set$Inverse( null );
 [$jav]       }
 [$pyc]       def remove${property.fieldName}(self, target, $PYC_CURRENT):
+#if($property.deprecated)
+[$pyc]           import warnings
+[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+#end
 [$pyc]           self.errorIfUnloaded()
 [$pyc]           if not self._${propLoaded}: self.throwNullCollectionException("${fieldName}")
 [$pyc]           self._${fieldName}.remove( target )
@@ -1452,7 +1595,13 @@ removeAll multiple
 [$Ice]        * Removes all the members of the ${iceType} sequence from
 [$Ice]        * the ${fieldName} field.
 [$Ice]        */
+#if($property.deprecated)
+[$Ice]       ["deprecate:$property.name is deprecated."]
+#end
 [$Ice]       void removeAll${property.fieldName}Set(${iceType} targets);
+#if($property.deprecated)
+[$jav]       @Deprecated
+#end
 [$jav]       public void removeAll${property.fieldName}Set($javaType<${property.shortType}> targets, $JAV_CURRENT) throws omero.UnloadedEntityException {
 [$jav]           errorIfUnloaded();
 [$jav]           if (!${propLoaded}) throwNullCollectionException("${fieldName}");
@@ -1462,6 +1611,10 @@ removeAll multiple
 [$jav]           }
 [$jav]       }
 [$pyc]       def removeAll${property.fieldName}Set(self, targets, $PYC_CURRENT):
+#if($property.deprecated)
+[$pyc]           import warnings
+[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+#end
 [$pyc]           self.errorIfUnloaded()
 [$pyc]           if not self._${propLoaded}: self.throwNullCollectionException("${fieldName}")
 [$pyc]           for elt in targets:
@@ -1485,7 +1638,13 @@ removeAll multiple
 
 clear
 
+#if($property.deprecated)
+[$Ice]       ["deprecate:$property.name is deprecated."]
+#end
 [$Ice]       void clear${PropertyName}();
+#if($property.deprecated)
+[$jav]       @Deprecated
+#end
 [$jav]       public void clear${PropertyName}($JAV_CURRENT) throws omero.UnloadedEntityException {
 [$jav]           errorIfUnloaded();
 [$jav]           if (!${propLoaded}) throwNullCollectionException("${fieldName}");
@@ -1495,6 +1654,10 @@ clear
 [$jav]           ${fieldName}.clear();
 [$jav]       }
 [$pyc]       def clear${PropertyName}(self, $PYC_CURRENT):
+#if($property.deprecated)
+[$pyc]           import warnings
+[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+#end
 [$pyc]           self.errorIfUnloaded()
 [$pyc]           if not self._${propLoaded}: self.throwNullCollectionException("${fieldName}")
 [$pyc]           for elt in self._${fieldName}:
@@ -1528,8 +1691,14 @@ super class where the property was defined.
 [$Ice]        * The argument's id must match and it's update id must be present and
 [$Ice]        * greater than or equal to that of the current object.
 [$Ice]        */
+#if($property.deprecated)
+[$Ice]       ["deprecate:$property.name is deprecated."]
+#end
 [$Ice]       void reload${PropertyName}(${ActualPojo} toCopy);
 
+#if($property.deprecated)
+[$jav]       @Deprecated
+#end
 [$jav]       public void reload${PropertyName}(${ActualPojo} toCopy, $JAV_CURRENT) throws omero.UnloadedEntityException {
 [$jav]           errorIfUnloaded();
 [$jav]           if (${propLoaded}) {
@@ -1555,6 +1724,10 @@ super class where the property was defined.
 [$jav]           ${propLoaded} = true;
 [$jav]       }
 [$pyc]       def reload${PropertyName}(self, toCopy, $PYC_CURRENT):
+#if($property.deprecated)
+[$pyc]           import warnings
+[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+#end
 [$pyc]           self.errorIfUnloaded()
 [$pyc]           if self._${propLoaded}:
 [$pyc]               raise omero.ClientError("Cannot reload active collection: ${fieldName}")
@@ -1605,17 +1778,35 @@ super class where the property was defined.
 ===============================================================
 
 #if( ${property.ordered} )
+#if($property.deprecated)
+[$Ice]       ["deprecate:$property.name is deprecated."]
+#end
 [$Ice]       ${property.shortType} get${property.shortType}(int index);
+#if($property.deprecated)
+[$Ice]       ["deprecate:$property.name is deprecated."]
+#end
 [$Ice]       ${property.shortType} set${property.shortType}(int index, ${property.shortType} theElement);
+#if($property.deprecated)
+[$Ice]       ["deprecate:$property.name is deprecated."]
+#end
 [$Ice]       ${property.shortType} getPrimary${property.shortType}();
+#if($property.deprecated)
+[$Ice]       ["deprecate:$property.name is deprecated."]
+#end
 [$Ice]       ${property.shortType} setPrimary${property.shortType}(${property.shortType} theElement);
 
+#if($property.deprecated)
+[$jav]       @Deprecated
+#end
 [$jav]       public ${property.shortType} get${property.shortType}(int index, $JAV_CURRENT) throws IndexOutOfBoundsException {
 [$jav]           errorIfUnloaded();
 [$jav]           if (!${propLoaded}) throwNullCollectionException("${fieldName}");
 [$jav]           return ${fieldName}.get(index);
 [$jav]       }
 [$jav]
+#if($property.deprecated)
+[$jav]       @Deprecated
+#end
 [$jav]       public ${property.shortType} set${property.shortType}(int index, ${property.shortType} element, $JAV_CURRENT) throws IndexOutOfBoundsException {
 [$jav]           errorIfUnloaded();
 [$jav]           if (!${propLoaded}) throwNullCollectionException("${fieldName}");
@@ -1626,12 +1817,18 @@ super class where the property was defined.
 [$jav]           return old;
 [$jav]       }
 [$jav]
+#if($property.deprecated)
+[$jav]       @Deprecated
+#end
 [$jav]       public ${property.shortType} getPrimary${property.shortType}($JAV_CURRENT) throws IndexOutOfBoundsException {
 [$jav]           errorIfUnloaded();
 [$jav]           if (!${propLoaded}) throwNullCollectionException("${fieldName}");
 [$jav]           return ${fieldName}.get(0);
 [$jav]       }
 [$jav]
+#if($property.deprecated)
+[$jav]       @Deprecated
+#end
 [$jav]       public ${property.shortType} setPrimary${property.shortType}(${property.shortType} element, $JAV_CURRENT) throws IndexOutOfBoundsException {
 [$jav]           errorIfUnloaded();
 [$jav]           if (!${propLoaded}) throwNullCollectionException("${fieldName}");
@@ -1684,11 +1881,19 @@ super class where the property was defined.
 [$cpp]
 
 [$pyc]       def get${property.shortType}(self, index, $PYC_CURRENT):
+#if($property.deprecated)
+[$pyc]           import warnings
+[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+#end
 [$pyc]           self.errorIfUnloaded()
 [$pyc]           if not self._${propLoaded}: self.throwNullCollectionException("${fieldName}")
 [$pyc]           return self._${fieldName}[index]
 [$pyc]
 [$pyc]       def set${property.shortType}(self, index, element, $PYC_CURRENT, wrap=False):
+#if($property.deprecated)
+[$pyc]           import warnings
+[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+#end
 [$pyc]           self.errorIfUnloaded()
 [$pyc]           if not self._${propLoaded}: self.throwNullCollectionException("${fieldName}")
 [$pyc]           old = self._${fieldName}[index]
@@ -1701,11 +1906,19 @@ super class where the property was defined.
 [$pyc]           return old
 [$pyc]
 [$pyc]       def getPrimary${property.shortType}(self, $PYC_CURRENT):
+#if($property.deprecated)
+[$pyc]           import warnings
+[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+#end
 [$pyc]           self.errorIfUnloaded()
 [$pyc]           if not self._${propLoaded}: self.throwNullCollectionException("${fieldName}")
 [$pyc]           return self._${fieldName}[0]
 [$pyc]
 [$pyc]       def setPrimary${property.shortType}(self, element, $PYC_CURRENT):
+#if($property.deprecated)
+[$pyc]           import warnings
+[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+#end
 [$pyc]           self.errorIfUnloaded()
 [$pyc]           if not self._${propLoaded}: self.throwNullCollectionException("${fieldName}")
 [$pyc]           index = self._${fieldName}.index(element)
@@ -1742,7 +1955,13 @@ COUNTS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #if( !$property.actualTarget.global )
 #set( $GETCOUNTMETHOD = "get${property.nameCapped}CountPerOwner" )
 #set( $GETCOUNTVALUE  = "${property.name}CountPerOwner" )
+#if($property.deprecated)
+[$Ice]       ["deprecate:$property.name is deprecated."]
+#end
 [$Ice]       omero::sys::CountMap $GETCOUNTMETHOD();
+#if($property.deprecated)
+[$jav]       @Deprecated
+#end
 [$jav]       public java.util.Map<Long, Long> $GETCOUNTMETHOD($JAV_CURRENT) {
 [$jav]           return this.$GETCOUNTVALUE;
 [$jav]       }
@@ -1752,6 +1971,10 @@ COUNTS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 [$cpp]           return $GETCOUNTVALUE;
 [$cpp]       }
 [$pyc]       def $GETCOUNTMETHOD(self, $PYC_CURRENT):
+#if($property.deprecated)
+[$pyc]           import warnings
+[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+#end
 [$pyc]           return self._$GETCOUNTVALUE
 [$pyc]
 #end
@@ -1760,7 +1983,13 @@ ADD ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #set( $ADD2METHOD = "add${property.shortType}ToBoth")
 
+#if($property.deprecated)
+[$Ice]       ["deprecate:$property.name is deprecated."]
+#end
 [$Ice]       ${property.shortType} link${property.targetName}(${property.shortTarget} addition);
+#if($property.deprecated)
+[$jav]       @Deprecated
+#end
 [$jav]       public ${property.shortType} link${property.targetName}(${property.shortTarget} addition, $JAV_CURRENT) throws omero.UnloadedEntityException {
 [$jav]           errorIfUnloaded();
 [$jav]           if (!${propLoaded}) throwNullCollectionException("${fieldName}");
@@ -1770,6 +1999,10 @@ ADD ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 [$jav]           return link;
 [$jav]       }
 [$pyc]       def link${property.targetName}(self, addition, $PYC_CURRENT):
+#if($property.deprecated)
+[$pyc]           import warnings
+[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+#end
 [$pyc]           self.errorIfUnloaded()
 [$pyc]           if not self._${propLoaded}: self.throwNullCollectionException("${fieldName}")
 [$pyc]           link = _omero_model.${property.shortType}I()
@@ -1795,7 +2028,13 @@ TODO: do we need to do link.parent = ...;
 [$Ice]        * the other side of the link is loaded, add the current instance to
 [$Ice]        * it as well.
 [$Ice]        */
+#if($property.deprecated)
+[$Ice]       ["deprecate:$property.name is deprecated."]
+#end
 [$Ice]       void $ADD2METHOD(omero::model::${property.shortType} link, bool bothSides);
+#if($property.deprecated)
+[$jav]       @Deprecated
+#end
 [$jav]       public void $ADD2METHOD(${property.shortType} link, boolean bothSides, $JAV_CURRENT) throws omero.UnloadedEntityException {
 [$jav]           errorIfUnloaded();
 [$jav]           if (!${propLoaded}) throwNullCollectionException("${fieldName}");
@@ -1808,6 +2047,10 @@ TODO: Should we check for nulls in other?
 #end
 [$jav]       }
 [$pyc]       def $ADD2METHOD(self, link, bothSides):
+#if($property.deprecated)
+[$pyc]           import warnings
+[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+#end
 [$pyc]           self.errorIfUnloaded()
 [$pyc]           if not self._${propLoaded}: self.throwNullCollectionException("${fieldName}")
 [$pyc]           self._${fieldName}.append( link )
@@ -1836,7 +2079,13 @@ TODO: Should we check for nulls in other?
 FIND
 ================================
 
+#if($property.deprecated)
+[$Ice]       ["deprecate:$property.name is deprecated."]
+#end
 [$Ice]       $iceType find${property.shortType}(${property.shortTarget} removal);
+#if($property.deprecated)
+[$jav]       @Deprecated
+#end
 [$jav]       public List<$property.shortType> find${property.shortType}(${property.shortTarget} removal, $JAV_CURRENT) throws omero.UnloadedEntityException {
 [$jav]           errorIfUnloaded();
 [$jav]           if (!${propLoaded}) throwNullCollectionException("${fieldName}");
@@ -1847,6 +2096,10 @@ FIND
 [$jav]           return result;
 [$jav]       }
 [$pyc]       def find${property.shortType}(self, removal, $PYC_CURRENT):
+#if($property.deprecated)
+[$pyc]           import warnings
+[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+#end
 [$pyc]           self.errorIfUnloaded()
 [$pyc]           if not self._${propLoaded}: self.throwNullCollectionException("${fieldName}")
 [$pyc]           result = list()
@@ -1893,7 +2146,13 @@ REMOVE
 [$cpp]       };
 [$cpp]
 
+#if($property.deprecated)
+[$Ice]       ["deprecate:$property.name is deprecated."]
+#end
 [$Ice]       void unlink${property.targetName}(${property.shortTarget} removal);
+#if($property.deprecated)
+[$jav]       @Deprecated
+#end
 [$jav]       public void unlink${property.targetName}(${property.shortTarget} removal, $JAV_CURRENT) throws omero.UnloadedEntityException {
 [$jav]           errorIfUnloaded();
 [$jav]           if (!${propLoaded}) throwNullCollectionException("${fieldName}");
@@ -1910,7 +2169,13 @@ REMOVE
 [$Ice]        * the other side of the link is loaded, remove the current instance from
 [$Ice]        * it as well.
 [$Ice]        */
+#if($property.deprecated)
+[$Ice]       ["deprecate:$property.name is deprecated."]
+#end
 [$Ice]       void $REMOVE2METHOD(omero::model::${property.shortType} link, bool bothSides);
+#if($property.deprecated)
+[$jav]       @Deprecated
+#end
 [$jav]       public void $REMOVE2METHOD(${property.shortType} link, boolean bothSides, $JAV_CURRENT  ) throws omero.UnloadedEntityException, omero.UnloadedCollectionException {
 [$jav]           errorIfUnloaded();
 [$jav]           if (!${propLoaded}) throwNullCollectionException("${fieldName}");
@@ -1922,6 +2187,10 @@ REMOVE
 #end
 [$jav]       }
 [$pyc]       def unlink${property.targetName}(self, removal, $PYC_CURRENT):
+#if($property.deprecated)
+[$pyc]           import warnings
+[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+#end
 [$pyc]           self.errorIfUnloaded()
 [$pyc]           if not self._${propLoaded}: self.throwNullCollectionException("${fieldName}")
 [$pyc]           toRemove = self.find${property.shortType}(removal)
@@ -1929,6 +2198,10 @@ REMOVE
 [$pyc]               self.$REMOVE2METHOD( next, True )
 [$pyc]
 [$pyc]       def $REMOVE2METHOD(self, link, bothSides, $PYC_CURRENT):
+#if($property.deprecated)
+[$pyc]           import warnings
+[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+#end
 [$pyc]           self.errorIfUnloaded()
 [$pyc]           if not self._${propLoaded}: self.throwNullCollectionException("${fieldName}")
 [$pyc]           self._${fieldName}.remove( link )
@@ -1964,7 +2237,13 @@ REMOVE
 Linked Lists
 ==============================
 
+#if($property.deprecated)
+[$Ice]       ["deprecate:$property.name is deprecated."]
+#end
 [$Ice]       ${ActualPojo}Linked${property.targetName}Seq linked${property.targetName}List();
+#if($property.deprecated)
+[$jav]       @Deprecated
+#end
 [$jav]        public List<${property.shortTarget}> linked${property.targetName}List($JAV_CURRENT) throws omero.UnloadedEntityException {
 [$jav]            errorIfUnloaded();
 [$jav]            if (!${propLoaded}) throwNullCollectionException("${PropertyName}");
@@ -1990,6 +2269,10 @@ Linked Lists
 [$cpp]        }
 
 [$pyc]       def linked${property.targetName}List(self, $PYC_CURRENT):
+#if($property.deprecated)
+[$pyc]           import warnings
+[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+#end
 [$pyc]           self.errorIfUnloaded()
 [$pyc]           if not self.${propLoaded}: self.throwNullCollectionException("${PropertyName}")
 [$pyc]           linked = []
