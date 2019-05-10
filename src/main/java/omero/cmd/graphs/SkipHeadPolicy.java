@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 University of Dundee & Open Microscopy Environment.
+ * Copyright (C) 2014-2019 University of Dundee & Open Microscopy Environment.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -23,15 +23,15 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.SetMultimap;
 
@@ -82,14 +82,14 @@ public class SkipHeadPolicy {
         };
 
         final ImmutableSet<Class <? extends IObject>> startFromClasses =
-                ImmutableSet.copyOf(Collections2.transform(startFrom, getClassFromName));
+                ImmutableSet.copyOf(startFrom.stream().map(getClassFromName).collect(Collectors.toSet()));
 
         final Predicate<IObject> isStartFrom = new Predicate<IObject>() {
             private final Predicate<Class<? extends IObject>> tester = GraphUtil.getPredicateFromClasses(startFromClasses);
 
             @Override
-            public boolean apply(IObject subject) {
-                return tester.apply(subject.getClass());
+            public boolean test(IObject subject) {
+                return tester.test(subject.getClass());
             }
         };
 
@@ -124,7 +124,7 @@ public class SkipHeadPolicy {
             @Override
             public final Set<Details> review(Map<String, Set<Details>> linkedFrom, Details rootObject,
                     Map<String, Set<Details>> linkedTo, Set<String> notNullable, boolean isErrorRules) throws GraphException {
-                if (rootObject.action == startAction && isStartFrom.apply(rootObject.subject)) {
+                if (rootObject.action == startAction && isStartFrom.test(rootObject.subject)) {
                     if (LOGGER.isDebugEnabled()) {
                         LOGGER.debug("deferring review of " + rootObject);
                     }

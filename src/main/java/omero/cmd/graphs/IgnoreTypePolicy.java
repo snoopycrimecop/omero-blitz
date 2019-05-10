@@ -20,12 +20,11 @@
 package omero.cmd.graphs;
 
 import java.util.Collection;
+import java.util.function.Predicate;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Predicate;
 
 import ome.model.IObject;
 import ome.services.graphs.GraphPolicy;
@@ -55,7 +54,7 @@ public class IgnoreTypePolicy {
 
         final Predicate<Class<? extends IObject>> isTypeToIgnore = new Predicate<Class<? extends IObject>>() {
             @Override
-            public boolean apply(Class<? extends IObject> objectClass) {
+            public boolean test(Class<? extends IObject> objectClass) {
                 for (final Class<? extends IObject> typeToIgnore : typesToIgnore) {
                     if (typeToIgnore.isAssignableFrom(objectClass)) {
                         return true;
@@ -68,7 +67,7 @@ public class IgnoreTypePolicy {
         return new BaseGraphPolicyAdjuster(graphPolicyToAdjust) {
             @Override
             protected boolean isAdjustedBeforeReview(Details object) {
-                if (object.action == GraphPolicy.Action.EXCLUDE && isTypeToIgnore.apply(object.subject.getClass())) {
+                if (object.action == GraphPolicy.Action.EXCLUDE && isTypeToIgnore.test(object.subject.getClass())) {
                     object.action = GraphPolicy.Action.OUTSIDE;
                     if (LOGGER.isDebugEnabled()) {
                         LOGGER.debug("ignoring all objects of its type, so making " + object);

@@ -19,6 +19,7 @@
 
 package omero.cmd.graphs;
 
+import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,7 +31,6 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import ome.model.IObject;
@@ -81,7 +81,7 @@ public class ChildOptionsPolicy {
                             cachedNamespace = namespace;
                             namespaceCache.put(namespace, cachedNamespace);
                         }
-                        objectNamespaces.put(Maps.immutableEntry(realClass, id), cachedNamespace);
+                        objectNamespaces.put(new AbstractMap.SimpleImmutableEntry<>(realClass, id), cachedNamespace);
                     }
                 }
                 super.noteDetails(session, object, realClass, id);
@@ -95,7 +95,7 @@ public class ChildOptionsPolicy {
              */
             private boolean isTargetNamespace(ChildOptionI childOption, IObject object) {
                 if (object instanceof Annotation) {
-                    final Entry<String, Long> classAndId = Maps.immutableEntry(object.getClass().getName(), object.getId());
+                    final Entry<String, Long> classAndId = new AbstractMap.SimpleImmutableEntry<>(object.getClass().getName(), object.getId());
                     return childOption.isTargetNamespace(objectNamespaces.get(classAndId));
                 } else {
                     return true;

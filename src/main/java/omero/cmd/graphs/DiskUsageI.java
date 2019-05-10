@@ -20,6 +20,7 @@
 package omero.cmd.graphs;
 
 import java.io.File;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -38,7 +39,6 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.SetMultimap;
 
 import ome.api.IQuery;
@@ -107,77 +107,77 @@ public class DiskUsageI extends DiskUsage implements IRequest, ReadOnlyStatus.Is
     static {
         final ImmutableMultimap.Builder<String, Map.Entry<String, String>> builder = ImmutableMultimap.builder();
 
-        builder.put("Project", Maps.immutableEntry("Dataset",
+        builder.put("Project", new AbstractMap.SimpleImmutableEntry<>("Dataset",
                 "SELECT child.id FROM ProjectDatasetLink WHERE parent.id IN (:ids)"));
-        builder.put("Dataset", Maps.immutableEntry("Image",
+        builder.put("Dataset", new AbstractMap.SimpleImmutableEntry<>("Image",
                 "SELECT child.id FROM DatasetImageLink WHERE parent.id IN (:ids)"));
-        builder.put("Folder", Maps.immutableEntry("Image",
+        builder.put("Folder", new AbstractMap.SimpleImmutableEntry<>("Image",
                 "SELECT child.id FROM FolderImageLink WHERE parent.id IN (:ids)"));
-        builder.put("Folder", Maps.immutableEntry("Roi",
+        builder.put("Folder", new AbstractMap.SimpleImmutableEntry<>("Roi",
                 "SELECT child.id FROM FolderRoiLink WHERE parent.id IN (:ids)"));
-        builder.put("Folder", Maps.immutableEntry("Folder",
+        builder.put("Folder", new AbstractMap.SimpleImmutableEntry<>("Folder",
                 "SELECT id FROM Folder WHERE parentFolder.id IN (:ids)"));
-        builder.put("Screen", Maps.immutableEntry("Plate",
+        builder.put("Screen", new AbstractMap.SimpleImmutableEntry<>("Plate",
                 "SELECT child.id FROM ScreenPlateLink WHERE parent.id IN (:ids)"));
-        builder.put("Plate", Maps.immutableEntry("Well",
+        builder.put("Plate", new AbstractMap.SimpleImmutableEntry<>("Well",
                 "SELECT id FROM Well WHERE plate.id IN (:ids)"));
-        builder.put("Plate", Maps.immutableEntry("PlateAcquisition",
+        builder.put("Plate", new AbstractMap.SimpleImmutableEntry<>("PlateAcquisition",
                 "SELECT id FROM PlateAcquisition WHERE plate.id IN (:ids)"));
-        builder.put("PlateAcquisition", Maps.immutableEntry("WellSample",
+        builder.put("PlateAcquisition", new AbstractMap.SimpleImmutableEntry<>("WellSample",
                 "SELECT id FROM WellSample WHERE plateAcquisition.id IN (:ids)"));
-        builder.put("Well", Maps.immutableEntry("WellSample",
+        builder.put("Well", new AbstractMap.SimpleImmutableEntry<>("WellSample",
                 "SELECT id FROM WellSample WHERE well.id IN (:ids)"));
-        builder.put("Well", Maps.immutableEntry("Reagent",
+        builder.put("Well", new AbstractMap.SimpleImmutableEntry<>("Reagent",
                 "SELECT child.id FROM WellReagentLink WHERE parent.id IN (:ids)"));
-        builder.put("WellSample", Maps.immutableEntry("Image",
+        builder.put("WellSample", new AbstractMap.SimpleImmutableEntry<>("Image",
                 "SELECT image.id FROM WellSample WHERE id IN (:ids)"));
-        builder.put("Image", Maps.immutableEntry("Pixels",
+        builder.put("Image", new AbstractMap.SimpleImmutableEntry<>("Pixels",
                 "SELECT id FROM Pixels WHERE image.id IN (:ids)"));
-        builder.put("Pixels", Maps.immutableEntry("Thumbnail",
+        builder.put("Pixels", new AbstractMap.SimpleImmutableEntry<>("Thumbnail",
                 "SELECT id FROM Thumbnail WHERE pixels.id IN (:ids)"));
-        builder.put("Pixels", Maps.immutableEntry("OriginalFile",
+        builder.put("Pixels", new AbstractMap.SimpleImmutableEntry<>("OriginalFile",
                 "SELECT parent.id FROM PixelsOriginalFileMap WHERE child.id IN (:ids)"));
-        builder.put("Pixels", Maps.immutableEntry("Channel",
+        builder.put("Pixels", new AbstractMap.SimpleImmutableEntry<>("Channel",
                 "SELECT id FROM Channel WHERE pixels.id IN (:ids)"));
-        builder.put("Pixels", Maps.immutableEntry("PlaneInfo",
+        builder.put("Pixels", new AbstractMap.SimpleImmutableEntry<>("PlaneInfo",
                 "SELECT id FROM PlaneInfo WHERE pixels.id IN (:ids)"));
-        builder.put("Channel", Maps.immutableEntry("LogicalChannel",
+        builder.put("Channel", new AbstractMap.SimpleImmutableEntry<>("LogicalChannel",
                 "SELECT logicalChannel.id FROM Channel WHERE id IN (:ids)"));
-        builder.put("Image", Maps.immutableEntry("Fileset",
+        builder.put("Image", new AbstractMap.SimpleImmutableEntry<>("Fileset",
                 "SELECT fileset.id FROM Image WHERE id IN (:ids)"));
-        builder.put("Fileset", Maps.immutableEntry("Job",
+        builder.put("Fileset", new AbstractMap.SimpleImmutableEntry<>("Job",
                 "SELECT child.id FROM FilesetJobLink WHERE parent.id IN (:ids)"));
-        builder.put("Job", Maps.immutableEntry("OriginalFile",
+        builder.put("Job", new AbstractMap.SimpleImmutableEntry<>("OriginalFile",
                 "SELECT child.id FROM JobOriginalFileLink WHERE parent.id IN (:ids)"));
-        builder.put("Fileset", Maps.immutableEntry("Image",
+        builder.put("Fileset", new AbstractMap.SimpleImmutableEntry<>("Image",
                 "SELECT id FROM Image WHERE fileset.id IN (:ids)"));
-        builder.put("Fileset", Maps.immutableEntry("FilesetEntry",
+        builder.put("Fileset", new AbstractMap.SimpleImmutableEntry<>("FilesetEntry",
                 "SELECT id FROM FilesetEntry WHERE fileset.id IN (:ids)"));
-        builder.put("FilesetEntry", Maps.immutableEntry("OriginalFile",
+        builder.put("FilesetEntry", new AbstractMap.SimpleImmutableEntry<>("OriginalFile",
                 "SELECT originalFile.id FROM FilesetEntry WHERE id IN (:ids)"));
-        builder.put("Annotation", Maps.immutableEntry("OriginalFile",
+        builder.put("Annotation", new AbstractMap.SimpleImmutableEntry<>("OriginalFile",
                 "SELECT file.id FROM FileAnnotation WHERE id IN (:ids)"));
-        builder.put("Image", Maps.immutableEntry("Roi",
+        builder.put("Image", new AbstractMap.SimpleImmutableEntry<>("Roi",
                 "SELECT id FROM Roi WHERE image.id IN (:ids)"));
-        builder.put("Roi", Maps.immutableEntry("Shape",
+        builder.put("Roi", new AbstractMap.SimpleImmutableEntry<>("Shape",
                 "SELECT id FROM Shape WHERE roi.id IN (:ids)"));
-        builder.put("Roi", Maps.immutableEntry("OriginalFile",
+        builder.put("Roi", new AbstractMap.SimpleImmutableEntry<>("OriginalFile",
                 "SELECT source.id FROM Roi WHERE id IN (:ids)"));
-        builder.put("Image", Maps.immutableEntry("Instrument",
+        builder.put("Image", new AbstractMap.SimpleImmutableEntry<>("Instrument",
                 "SELECT instrument.id FROM Image WHERE id IN (:ids)"));
-        builder.put("Instrument", Maps.immutableEntry("Detector",
+        builder.put("Instrument", new AbstractMap.SimpleImmutableEntry<>("Detector",
                 "SELECT id FROM Detector WHERE instrument.id IN (:ids)"));
-        builder.put("Instrument", Maps.immutableEntry("Dichroic",
+        builder.put("Instrument", new AbstractMap.SimpleImmutableEntry<>("Dichroic",
                 "SELECT id FROM Dichroic WHERE instrument.id IN (:ids)"));
-        builder.put("Instrument", Maps.immutableEntry("Filter",
+        builder.put("Instrument", new AbstractMap.SimpleImmutableEntry<>("Filter",
                 "SELECT id FROM Filter WHERE instrument.id IN (:ids)"));
-        builder.put("Instrument", Maps.immutableEntry("LightSource",
+        builder.put("Instrument", new AbstractMap.SimpleImmutableEntry<>("LightSource",
                 "SELECT id FROM LightSource WHERE instrument.id IN (:ids)"));
-        builder.put("Instrument", Maps.immutableEntry("Objective",
+        builder.put("Instrument", new AbstractMap.SimpleImmutableEntry<>("Objective",
                 "SELECT id FROM Objective WHERE instrument.id IN (:ids)"));
-        builder.put("Dichroic", Maps.immutableEntry("LightPath",
+        builder.put("Dichroic", new AbstractMap.SimpleImmutableEntry<>("LightPath",
                 "SELECT id FROM LightPath WHERE dichroic.id IN (:ids)"));
-        builder.put("LogicalChannel", Maps.immutableEntry("LightPath",
+        builder.put("LogicalChannel", new AbstractMap.SimpleImmutableEntry<>("LightPath",
                 "SELECT lightPath.id FROM LogicalChannel WHERE id IN (:ids)"));
 
         TRAVERSAL_QUERIES = builder.build();

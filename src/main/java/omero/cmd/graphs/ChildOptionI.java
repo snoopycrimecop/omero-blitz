@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 University of Dundee & Open Microscopy Environment.
+ * Copyright (C) 2014-2019 University of Dundee & Open Microscopy Environment.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -22,13 +22,12 @@ package omero.cmd.graphs;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableSet;
 
 import ome.model.IObject;
@@ -100,12 +99,12 @@ public class ChildOptionI extends ChildOption {
         if (CollectionUtils.isEmpty(includeType)) {
             typeInclusions = ImmutableSet.of();
         } else {
-            typeInclusions = ImmutableSet.copyOf(Collections2.transform(includeType, getClassFromName));
+            typeInclusions = ImmutableSet.copyOf(includeType.stream().map(getClassFromName).collect(Collectors.toSet()));
         }
         if (CollectionUtils.isEmpty(excludeType)) {
             typeExclusions = ImmutableSet.of();
         } else {
-            typeExclusions = ImmutableSet.copyOf(Collections2.transform(excludeType, getClassFromName));
+            typeExclusions = ImmutableSet.copyOf(excludeType.stream().map(getClassFromName).collect(Collectors.toSet()));
         }
 
         if (typeInclusions.isEmpty() && typeExclusions.isEmpty()) {
@@ -140,12 +139,12 @@ public class ChildOptionI extends ChildOption {
         if (CollectionUtils.isEmpty(includeNs)) {
             if (CollectionUtils.isEmpty(excludeNs)) {
                 /* there is no adjustment to make, not even for any default namespaces */
-                isTargetNamespace = Predicates.alwaysTrue();
+                isTargetNamespace = x -> true;
             } else {
                 final ImmutableSet<String> nsExclusions = ImmutableSet.copyOf(excludeNs);
                 isTargetNamespace = new Predicate<String>() {
                     @Override
-                    public boolean apply(String namespace) {
+                    public boolean test(String namespace) {
                         return !nsExclusions.contains(namespace);
                     }
                 };
@@ -155,7 +154,7 @@ public class ChildOptionI extends ChildOption {
                 final ImmutableSet<String> nsInclusions = ImmutableSet.copyOf(includeNs);
                 isTargetNamespace = new Predicate<String>() {
                     @Override
-                    public boolean apply(String namespace) {
+                    public boolean test(String namespace) {
                         return nsInclusions.contains(namespace);
                     }
                 };
@@ -186,7 +185,7 @@ public class ChildOptionI extends ChildOption {
      * @return if child objects that are annotations in this namespace are affected by this child option
      */
     public boolean isTargetNamespace(String namespace) {
-        return isTargetNamespace.apply(namespace);
+        return isTargetNamespace.test(namespace);
     }
 
     /**

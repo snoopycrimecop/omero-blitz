@@ -21,12 +21,11 @@ package omero.cmd.graphs;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import ome.services.graphs.GraphPolicy;
 import omero.cmd.IRequest;
 import omero.cmd.Response;
-
-import com.google.common.base.Function;
 
 /**
  * Requests that can be wrapped by a {@link SkipHeadI} request.
