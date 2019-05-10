@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 University of Dundee & Open Microscopy Environment.
+ * Copyright (C) 2012-2019 University of Dundee & Open Microscopy Environment.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -26,11 +26,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
-
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 
 /**
  * An analog of {@link File} representing an FS repository file-path.
@@ -150,7 +149,7 @@ public class FsFile {
      * @return the transformed path
      */
     public FsFile transform(Function<String, String> componentTransformer) {
-        return new FsFile(Lists.transform(this.components, componentTransformer));
+        return new FsFile(this.components.stream().map(componentTransformer).collect(Collectors.toList()));
     }
     
     /**

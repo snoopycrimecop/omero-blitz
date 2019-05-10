@@ -36,8 +36,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import loci.formats.FormatReader;
 import ome.system.EventContext;
@@ -94,14 +96,11 @@ import org.slf4j.MDC;
 
 import Ice.Current;
 
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import com.google.common.math.IntMath;
 
@@ -125,21 +124,15 @@ public class ManagedRepositoryI extends PublicRepositoryI
      * The suggestImportPaths method sanitizes the paths in due course.
      * From the server side, we cannot imitate ImportLibrary.createImport
      * in applying client-side specifics to clean up the path. */
-    private static final ClientFilePathTransformer nopClientTransformer =
-            new ClientFilePathTransformer(new Function<String, String>() {
-                @Override
-                public String apply(String from) {
-                    return from;
-                }
-    });
+    private static final ClientFilePathTransformer nopClientTransformer = new ClientFilePathTransformer(Function.identity());
 
     /* used for generating %monthname% for path templates */
     private static final DateFormatSymbols DATE_FORMAT = new DateFormatSymbols();
 
     /* referenced by only the bare-bones ManagedRepositoryI constructor used in testing */
     private static final String ALL_CHECKSUM_ALGORITHMS =
-            Joiner.on(',').join(Collections2.transform(ChecksumAlgorithmMapper.getAllChecksumAlgorithms(),
-                    ChecksumAlgorithmMapper.CHECKSUM_ALGORITHM_NAMER));
+            Joiner.on(',').join(ChecksumAlgorithmMapper.getAllChecksumAlgorithms()
+                    .stream().map(ChecksumAlgorithmMapper.CHECKSUM_ALGORITHM_NAMER).collect(Collectors.toList()));
 
     /* template paths: matches any special expansion term */
     private static final Pattern TEMPLATE_TERM = Pattern.compile("%([a-zA-Z]+)(:([^%/]+))?%");
@@ -333,7 +326,7 @@ public class ManagedRepositoryI extends PublicRepositoryI
 
     public ChecksumAlgorithm suggestChecksumAlgorithm(List<ChecksumAlgorithm> supported, Current __current) {
         final Set<String> supportedNames =
-                new HashSet<String>(Lists.transform(supported, ChecksumAlgorithmMapper.CHECKSUM_ALGORITHM_NAMER));
+                supported.stream().map(ChecksumAlgorithmMapper.CHECKSUM_ALGORITHM_NAMER).collect(Collectors.toSet());
         for (final ChecksumAlgorithm configured : listChecksumAlgorithms(__current)) {
             if (supportedNames.contains(ChecksumAlgorithmMapper.CHECKSUM_ALGORITHM_NAMER.apply(configured))) {
                 return configured;

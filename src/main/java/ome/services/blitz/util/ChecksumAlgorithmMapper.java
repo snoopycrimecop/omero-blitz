@@ -23,8 +23,8 @@ import static omero.rtypes.rstring;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
 
 import ome.util.checksum.ChecksumType;

@@ -19,7 +19,7 @@
 
 package ome.services.blitz.repo.path;
 
-import com.google.common.base.Function;
+import java.util.function.Function;
 
 /**
  * @author m.t.b.carroll@dundee.ac.uk

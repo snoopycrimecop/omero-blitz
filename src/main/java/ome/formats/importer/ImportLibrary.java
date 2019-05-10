@@ -21,6 +21,7 @@ package ome.formats.importer;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -90,7 +91,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Maps;
 
 import Ice.Current;
 
@@ -588,7 +588,7 @@ public class ImportLibrary implements IObservable
                 @Override
                 public Map.Entry<Integer, String> call() throws Exception {
                     final String checksum = uploadFile(proc, srcFiles, fileIndex, checksumProviderFactory, estimator, buf.get());
-                    return Maps.immutableEntry(fileIndex, checksum);
+                    return new AbstractMap.SimpleImmutableEntry<>(fileIndex, checksum);
                 }});
         }
         final ExecutorCompletionService<Map.Entry<Integer, String>> threadQueue = new ExecutorCompletionService<>(threadPool);
