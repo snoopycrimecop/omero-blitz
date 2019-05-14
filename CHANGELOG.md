@@ -14,7 +14,7 @@
 5.5.0-m7 (April 2019)
 ---------------------
 
-- Remove the java gateway code.
+- Remove the Java Gateway code.
 
 5.5.0-m6 (April 2019)
 ---------------------
@@ -42,8 +42,6 @@
 - Fix comments in FS Blitz API.
 - Include map annotations in image metadata export.
 - Add License file.
-
-
 
 5.5.0-m4 (March 2019)
 ---------------------
