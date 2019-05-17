@@ -4,10 +4,18 @@ task pythonZip(type: Zip) {
     from pythonOutputDir
 }
 
+task zipIcedoc(type: Zip) {
+    archiveClassifier.set("icedoc")
+    from compileIcedoc
+}
+
 publishing {
     publications {
         blitzPython(MavenPublication) {
             artifact pythonZip
+        }
+        serverIcedoc(MavenPublication) {
+            artifact zipIcedoc
         }
     }
 }

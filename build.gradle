@@ -4,7 +4,7 @@ plugins {
     id "org.openmicroscopy.dsl" version "5.5.0-m6"
     id "org.openmicroscopy.blitz" version "5.5.0-m5"
     id "org.openmicroscopy.project" version "5.5.0-m5"
-    id "org.openmicroscopy.gradle.ice-builder.slice" version "1.5.0-m4"
+    id "org.openmicroscopy.gradle.ice-builder.slice" version "1.5.0-SNAPSHOT"
 }
 
 group = "org.openmicroscopy"
@@ -22,6 +22,7 @@ java {
 
 ext {
     pythonOutputDir = "$buildDir/toArchive/python"
+    iceOutputDir = "$buildDir/toArchive/icedoc"
     generatedDir = "${blitz.outputDir.get()}"
     generatedSliceDir = "${generatedDir}/slice"
 }
@@ -177,6 +178,14 @@ compileSlice.dependsOn "copySliceFiles"
 
 // Set compileJava to additionally depend on "splitJava"
 compileJava.dependsOn "generateJava"
+
+task compileIcedoc(type: com.zeroc.gradle.icebuilder.slice.IceDocsTask, dependsOn: "compileSlice") {
+    source = "src/main/slice"
+    outputDir = file("${iceOutputDir}")
+    includeDirs = files("${generatedSliceDir}", "src/main/slice")
+    header = file("src/main/resources/header.txt")
+    footer = file("src/main/resources/footer.txt")
+}
 
 // Add publish functionality
 apply from: "publish.gradle"
