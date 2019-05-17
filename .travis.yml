@@ -16,7 +16,7 @@ before_install:
   - sudo apt-key adv --keyserver keyserver.ubuntu.com --recv 5E6DA83306132997
   - sudo apt-add-repository "deb http://zeroc.com/download/apt/ubuntu14.04 stable main"
   - sudo apt-get update -q
-  - sudo apt-get install libzeroc-ice-java -y
+  - sudo apt-get install libzeroc-ice-java zeroc-ice-utils -y
   - sudo pip install https://github.com/ome/zeroc-ice-py-ubuntu1404/releases/download/0.1.0/zeroc_ice-3.6.4-cp27-none-linux_x86_64.whl
   - sudo ln -s /usr/local/bin/slice2py /usr/bin/slice2py
 
