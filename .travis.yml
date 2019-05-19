@@ -26,3 +26,5 @@ install:
 script:
   - ./gradlew publishToMavenLocal -x javadoc
   - ./gradlew test
+  - test -f build/distributions/omero-blitz-*-icedoc.zip
+  - test -f build/distributions/omero-blitz-*-python.zip
