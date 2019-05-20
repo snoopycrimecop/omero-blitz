@@ -4,7 +4,7 @@ plugins {
     id "org.openmicroscopy.dsl" version "5.5.0-m6"
     id "org.openmicroscopy.blitz" version "5.5.0-m5"
     id "org.openmicroscopy.project" version "5.5.0-m5"
-    id "org.openmicroscopy.gradle.ice-builder.slice" version "1.5.0-SNAPSHOT"
+    id "org.openmicroscopy.gradle.ice-builder.slice" version "1.5.0-m5"
 }
 
 group = "org.openmicroscopy"
