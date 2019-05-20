@@ -14,7 +14,7 @@ publishing {
         blitzPython(MavenPublication) {
             artifact pythonZip
         }
-        serverIcedoc(MavenPublication) {
+        blitzIcedoc(MavenPublication) {
             artifact zipIcedoc
         }
     }
