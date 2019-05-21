@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2017 University of Dundee & Open Microscopy Environment.
+ * Copyright (C) 2014-2019 University of Dundee & Open Microscopy Environment.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -80,6 +80,7 @@ public class Delete2I extends Delete2 implements IRequest, ReadOnlyStatus.IsAwar
     private Helper helper;
     private GraphHelper graphHelper;
     private GraphTraversal graphTraversal;
+    private InternalProcessor internalProcessor;
 
     private GraphTraversal.PlanExecutor unlinker;
     private GraphTraversal.PlanExecutor processor;
@@ -133,8 +134,10 @@ public class Delete2I extends Delete2 implements IRequest, ReadOnlyStatus.IsAwar
 
         graphPolicy = IgnoreTypePolicy.getIgnoreTypePolicy(graphPolicy, graphHelper.getClassesFromNames(typesToIgnore));
 
+        internalProcessor = new InternalProcessor();
+
         graphTraversal = graphHelper.prepareGraphTraversal(childOptions, REQUIRED_ABILITIES, graphPolicy, graphPolicyAdjusters,
-                aclVoter, graphPathBean, unnullable, new InternalProcessor(), dryRun);
+                aclVoter, graphPathBean, unnullable, internalProcessor, dryRun);
 
         graphPolicyAdjusters = null;
     }
@@ -197,7 +200,7 @@ public class Delete2I extends Delete2 implements IRequest, ReadOnlyStatus.IsAwar
             final SetMultimap<String, Long> result = (SetMultimap<String, Long>) object;
             if (!dryRun) {
                 try {
-                    deletionInstance.deleteFiles(GraphUtil.trimPackageNames(result));
+                    internalProcessor.deleteFiles(deletionInstance);
                 } catch (Exception e) {
                     helper.cancel(new ERR(), e, "file-delete-fail");
                 }

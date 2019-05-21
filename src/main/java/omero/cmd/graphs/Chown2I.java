@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2017 University of Dundee & Open Microscopy Environment.
+ * Copyright (C) 2014-2019 University of Dundee & Open Microscopy Environment.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -105,6 +105,7 @@ public class Chown2I extends Chown2 implements IRequest, ReadOnlyStatus.IsAware,
     private Helper helper;
     private GraphHelper graphHelper;
     private GraphTraversal graphTraversal;
+    private InternalProcessor internalProcessor;
     private Set<Long> acceptableGroupsFrom;
     private Set<Long> acceptableGroupsTo;
 
@@ -199,8 +200,10 @@ public class Chown2I extends Chown2 implements IRequest, ReadOnlyStatus.IsAware,
         graphPolicy.registerPredicate(new GroupPredicate(securityRoles));
         graphPolicy.registerPredicate(new PermissionsPredicate());
 
+        internalProcessor = new InternalProcessor(requiredAbilities);
+
         graphTraversal = graphHelper.prepareGraphTraversal(childOptions, REQUIRED_ABILITIES, graphPolicy, graphPolicyAdjusters,
-                aclVoter, graphPathBean, unnullable, new InternalProcessor(requiredAbilities), dryRun);
+                aclVoter, graphPathBean, unnullable, internalProcessor, dryRun);
 
         if (isChownPrivilege) {
             graphTraversal.setOwnsAll();
@@ -354,7 +357,7 @@ public class Chown2I extends Chown2 implements IRequest, ReadOnlyStatus.IsAware,
                     (Entry<SetMultimap<String, Long>, SetMultimap<String, Long>>) object;
             if (!dryRun) {
                 try {
-                    deletionInstance.deleteFiles(GraphUtil.trimPackageNames(result.getValue()));
+                    internalProcessor.deleteFiles(deletionInstance);
                 } catch (Exception e) {
                     helper.cancel(new ERR(), e, "file-delete-fail");
                 }

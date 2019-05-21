@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 University of Dundee & Open Microscopy Environment.
+ * Copyright (C) 2014-2019 University of Dundee & Open Microscopy Environment.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -19,13 +19,24 @@
 
 package omero.cmd.graphs;
 
+import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSetMultimap;
+
+import ome.model.core.OriginalFile;
+import ome.model.core.Pixels;
+import ome.model.display.Thumbnail;
 import ome.model.internal.Details;
+import ome.services.delete.Deletion;
 import ome.services.graphs.GraphException;
 import ome.services.graphs.GraphTraversal;
 
@@ -38,7 +49,13 @@ public abstract class BaseGraphTraversalProcessor implements GraphTraversal.Proc
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseGraphTraversalProcessor.class);
 
+    /* compare with ome.services.delete.files.FileDeleter.Type */
+    private static final Collection<String> DELETION_CLASS_NAMES = ImmutableSet.of(
+            OriginalFile.class.getName(), Pixels.class.getName(), Thumbnail.class.getName());
+
     protected final Session session;
+
+    private final List<Map.Entry<String, Collection<Long>>> deletionLog = new ArrayList<>();
 
     public BaseGraphTraversalProcessor(Session session) {
         this.session = session;
@@ -58,6 +75,24 @@ public abstract class BaseGraphTraversalProcessor implements GraphTraversal.Proc
         if (count != ids.size()) {
             LOGGER.warn("not all the objects of type " + className + " could be deleted");
         }
+        if (DELETION_CLASS_NAMES.contains(className)) {
+            deletionLog.add(new AbstractMap.SimpleImmutableEntry<>(className.substring(className.lastIndexOf('.') + 1), ids));
+        }
+    }
+
+    /**
+     * Delete data from the filesystem in the order in which the related batches were passed to
+     * {@link #deleteInstances(String, Collection)}.
+     * @param deletionInstance a deletion instance for deleting files
+     */
+    public void deleteFiles(Deletion deletionInstance) {
+        for (final Map.Entry<String, Collection<Long>> deletionBatch : deletionLog) {
+            deletionInstance.deleteFiles(
+                    ImmutableSetMultimap.<String, Long>builder()
+                    .putAll(deletionBatch.getKey(), deletionBatch.getValue())
+                    .build());
+        }
+        deletionLog.clear();
     }
 
     @Override
