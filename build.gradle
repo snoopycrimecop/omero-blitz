@@ -21,9 +21,10 @@ java {
 }
 
 ext {
+    databaseType = "psql"
     pythonOutputDir = "$buildDir/toArchive/python"
     iceOutputDir = "$buildDir/toArchive/icedoc"
-    generatedDir = "${blitz.outputDir.get()}"
+    generatedDir = "build/${databaseType}"
     generatedSliceDir = "${generatedDir}/slice"
 }
 
@@ -78,12 +79,10 @@ test {
     }
 }
 
-clean {
-    delete generatedDir
-}
-
 dsl {
-    database "psql"
+    database databaseType
+
+    outputDir file("${generatedDir}")
 
     singleFile {
         iceMap {
@@ -104,6 +103,7 @@ dsl {
 }
 
 api {
+    outputDir file("${generatedDir}")
     language {
         java {
             language "java"
