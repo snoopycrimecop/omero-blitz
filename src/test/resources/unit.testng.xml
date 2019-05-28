@@ -26,6 +26,7 @@
       <package name="omero.gateway.model.*"/>
       <package name="omero.gateway.util.*"/>
       <package name="omero.util.*"/>
+      <package name="omero.ClientDefaultRouterTest"/>
     </packages>
   </test>
 
