@@ -24,6 +24,7 @@
       <package name="omero.cmd.graphs.*"/>
       <package name="omero.model.*"/>
       <package name="omero.util.*"/>
+      <package name="omero.ClientDefaultRouterTest"/>
     </packages>
   </test>
 
