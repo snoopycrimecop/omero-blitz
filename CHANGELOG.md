@@ -1,7 +1,13 @@
+5.5.1 (May 2019)
+----------------
+
+- Update omero-server dependency version.
+- Support websocket and url style connection strings.
+
 5.5.0 (May 2019)
 ----------------
 
-- Move clients' graph requests onto background threads
+- Move clients' graph requests onto background threads.
 - Generate Ice doc.
 - Move repository location properties.
 - Fix remaining Javadoc warnings.
