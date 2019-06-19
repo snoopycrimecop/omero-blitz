@@ -405,8 +405,10 @@ public class SharedResourcesI extends AbstractCloseableAmdServant implements
 
         sf.allow(tablePrx);
         register(tablePrx);
-        new TableCloserI(sf, tablePrx, sessionedID("Table"));
-        return tablePrx;
+        TableCloserI closer = new TableCloserI(sf, tablePrx, sessionedID("Table"));
+        closer.setApplicationContext(this.ctx);
+        closer.setHolder(holder);
+        return closer.getProxy();
     }
 
     // Check job
