@@ -7,7 +7,7 @@
 
 package ome.services.blitz.impl;
 
-import ome.api.ISession;
+import ome.api.local.LocalSession;
 import ome.services.blitz.util.BlitzExecutor;
 import omero.RType;
 import omero.ServerError;
@@ -45,7 +45,7 @@ import Ice.Current;
  */
 public class SessionI extends AbstractAmdServant implements _ISessionOperations {
 
-    public SessionI(ISession service, BlitzExecutor be) {
+    public SessionI(LocalSession service, BlitzExecutor be) {
         super(service, be);
     }
 
@@ -111,7 +111,21 @@ public class SessionI extends AbstractAmdServant implements _ISessionOperations 
 
     public void getSession_async(AMD_ISession_getSession __cb,
             String sessionUuid, Current __current) throws ServerError {
-        callInvokerOnRawArgs(__cb, __current, sessionUuid);
+        boolean quietly = false;
+        if (__current != null && __current.ctx != null) {
+            quietly = Boolean.valueOf(__current.ctx.getOrDefault("quietly", "false"));
+        }
+
+        try {
+            if (quietly) {
+                __current.operation = "getSessionQuietly";
+            }
+            callInvokerOnRawArgs(__cb, __current, sessionUuid);
+        } finally {
+            if (quietly) {
+                __current.operation = "getSession";
+            }
+        }
 
     }
 

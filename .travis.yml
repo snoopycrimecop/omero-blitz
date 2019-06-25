@@ -19,11 +19,14 @@ before_install:
   - sudo apt-get install libzeroc-ice-java zeroc-ice-utils -y
   - sudo pip install https://github.com/ome/zeroc-ice-py-ubuntu1404/releases/download/0.1.0/zeroc_ice-3.6.4-cp27-none-linux_x86_64.whl
   - sudo ln -s /usr/local/bin/slice2py /usr/bin/slice2py
+  - pushd /tmp && wget https://github.com/ome/build-infra/archive/master.zip && unzip -j master.zip && popd
 
 install:
   - DIR=$PWD; (cd /tmp; gradle wrapper --gradle-version=5.2.1; mv .gradle gradle gradlew $DIR)
 
 script:
+  # Uncomment to perform a quick build
+  # env PATH=$PATH:/tmp quick-build /tmp/properties && cat /tmp/properties
   - ./gradlew publishToMavenLocal -x javadoc
   - ./gradlew test
   - test -f build/distributions/omero-blitz-*-icedoc.zip
