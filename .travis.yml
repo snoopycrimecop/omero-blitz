@@ -25,7 +25,8 @@ install:
   - DIR=$PWD; (cd /tmp; gradle wrapper --gradle-version=5.2.1; mv .gradle gradle gradlew $DIR)
 
 script:
-  - env PATH=$PATH:/tmp quick-build /tmp/properties && cat /tmp/properties
+  # Uncomment to perform a quick build
+  # env PATH=$PATH:/tmp quick-build /tmp/properties && cat /tmp/properties
   - ./gradlew publishToMavenLocal -x javadoc
   - ./gradlew test
   - test -f build/distributions/omero-blitz-*-icedoc.zip
