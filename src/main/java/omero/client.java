@@ -211,9 +211,10 @@ public class client {
             boolean isChanged = false;
             for (String algorithm : value.split(",")) {
                 algorithm = algorithm.trim();
+                final String algorithmLower = algorithm.toLowerCase();
                 if (algorithm.isEmpty()) {
                     /* ignore */
-                } else if ("anon".equals(algorithm.toLowerCase())) {
+                } else if (algorithmLower.equals("anon") || algorithmLower.endsWith("_anon")) {
                     isChanged = true;
                 } else {
                     algorithms.add(algorithm);
