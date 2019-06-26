@@ -65,6 +65,8 @@ public class TableCloserI extends AbstractCloseableAmdServant
     protected void preClose(Current current) throws Throwable {
         try {
             this.table.close();
+        } catch (Ice.ObjectNotExistException onee) {
+            // already closed, e.g. by table.delete()
         } finally {
             sf.unregisterServant(tableId);
         }
