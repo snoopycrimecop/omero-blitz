@@ -6,6 +6,8 @@
 package ome.services.blitz.impl;
 
 import Ice.Current;
+import ome.services.blitz.util.UnregisterServantMessage;
+import ome.util.messages.InternalMessage;
 import omero.RType;
 import omero.ServerError;
 import omero.api.StatefulServiceInterfacePrx;
@@ -38,13 +40,10 @@ public class TableCloserI extends AbstractCloseableAmdServant
 
     private final Ice.Identity statefulId;
 
-    private final ServiceFactoryI sf;
-
     public TableCloserI(ServiceFactoryI sf, TablePrx tablePrx, Ice.Identity id)
             throws omero.ServerError {
         super(null, null);
         this.table = tablePrx;
-        this.sf = sf;
         this.tableId = id;
         this.statefulId = new Ice.Identity(id.name + "-closer", id.category);
         this.self = TablePrxHelper.uncheckedCast(
@@ -68,7 +67,18 @@ public class TableCloserI extends AbstractCloseableAmdServant
         } catch (Ice.ObjectNotExistException onee) {
             // already closed, e.g. by table.delete()
         } finally {
-            sf.unregisterServant(tableId);
+            Ice.Current copy = new Ice.Current();
+            copy.adapter = current.adapter;
+            copy.con = current.con;
+            copy.ctx = current.ctx;
+            copy.encoding = current.encoding;
+            copy.facet = current.facet;
+            copy.id = new Ice.Identity(current.id.name + "-closer", current.id.category);
+            copy.mode = current.mode;
+            copy.operation = current.operation;
+            copy.requestId = current.requestId;
+            InternalMessage msg = new UnregisterServantMessage(this, copy, holder);
+            ctx.publishMessage(msg);
         }
     }
 
