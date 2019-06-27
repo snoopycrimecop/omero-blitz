@@ -140,14 +140,15 @@ public class ModelImportTarget implements ImportTarget {
         IUpdatePrx update = client.getServiceFactory().getUpdateService();
 
         if ("Project".equals(simpleName)) {
-            if (!name.contains("/")) {
-                throw new RuntimeException("Project name is missing a '/': " + name);
+            if (!name.contains("/Dataset:")) {
+                throw new RuntimeException(String.format("Project name must include '/Dataset:' (%s)", name));
             }
-            String[] tokens = name.split("/", 2);
+            String[] tokens = name.split("/Dataset:", 2);
             name = tokens[0];
-            log.info("Creating sub-target: {}", tokens[1]);
+            String subname = "Dataset:" + tokens[1];
+            log.info("Creating sub-target: {}", subname);
             subTarget = new ModelImportTarget();
-            subTarget.init(tokens[1]);
+            subTarget.init(subname);
         }
 
         if (discriminator.matches("^[-+%@]?name$")) {
@@ -193,13 +194,15 @@ public class ModelImportTarget implements ImportTarget {
         }
 
         if (subTarget != null) {
+            // Note: this assumes that the only supertarget is a Project. If that is extended,
+            // assumptions will need to be reviewed.
             log.info("Super-target loaded: {}:{}", simpleName, id);
             IObject sub = subTarget.load(client, ic);
-            // FIXME: need general method
+            ParametersI params = new ParametersI().add("pid", rlong(id)).add("did", sub.getId());
             List<List<omero.RType>> rv = query.projection(
-                    "select pdl.id from ProjectDatasetLink pdl where pdl.parent.id = :pid " +
-                    "and pdl.child.id = :did",
-                    new ParametersI().add("pid", rlong(id)).add("did", sub.getId()));
+                    "select pdl.id from ProjectDatasetLink pdl " +
+                            "where pdl.parent.id = :pid " +
+                            "and pdl.child.id = :did", params);
             if (rv.size() == 0) {
                 ProjectDatasetLink pdl = new ProjectDatasetLinkI();
                 pdl.setParent(new ProjectI(id, false));
