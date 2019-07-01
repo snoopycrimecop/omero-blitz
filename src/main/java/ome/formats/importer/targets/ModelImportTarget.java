@@ -19,7 +19,18 @@
 
 package ome.formats.importer.targets;
 
-import static omero.rtypes.rstring;
+import ome.formats.OMEROMetadataStoreClient;
+import ome.formats.importer.ImportContainer;
+import omero.api.IQueryPrx;
+import omero.api.IUpdatePrx;
+import omero.model.DatasetI;
+import omero.model.IObject;
+import omero.model.ProjectDatasetLink;
+import omero.model.ProjectDatasetLinkI;
+import omero.model.ProjectI;
+import omero.sys.ParametersI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -27,16 +38,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import ome.formats.OMEROMetadataStoreClient;
-import ome.formats.importer.ImportContainer;
-import omero.api.IQueryPrx;
-import omero.api.IUpdatePrx;
-import omero.model.*;
 import static omero.rtypes.rlong;
-import omero.sys.ParametersI;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static omero.rtypes.rstring;
 
 /**
  * @since 5.1.2
