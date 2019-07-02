@@ -1,3 +1,11 @@
+5.5.3 (Jule 2019)
+-----------------
+
+- Bump omero-server and omero-common-test version.
+- Fix Ice SSL ciphers (#58, #59)
+- Properly close table services (#57, #60)
+- Add -T Project:name:x/Dataset:name:y support (#61)
+
 5.5.2 (June 2019)
 -----------------
 
