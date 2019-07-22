@@ -195,12 +195,26 @@ Note how the whitespace for the python definitions is important.
 
 [$pyc] class ${PojoI}(_omero_model.$Pojo):
 #if($type.deprecated)
+#set( $deprecation = true )
+#else
+#foreach($property in $type.propertyClosure)
+#if($property.deprecated)
+#set( $deprecation = true )
+#break
+#end
+#end##foreach
+#end
+#if($deprecation)
+[$pyc]
+[$pyc]       deprecations_warned = set()
 [$pyc]
 [$pyc]       # Deprecation Warning
-[$pyc]       def warn_of_deprecation():
-[$pyc]           import warnings
-[$pyc]           warnings.warn("$Pojo is deprecated", DeprecationWarning)
-[$pyc]       warn_of_deprecation()
+[$pyc]       @staticmethod
+[$pyc]       def warn_of_deprecation(item):
+[$pyc]           if item not in ${PojoI}.deprecations_warned:
+[$pyc]               ${PojoI}.deprecations_warned.add(item)
+[$pyc]               from warnings import warn
+[$pyc]               warn(item + " is deprecated", DeprecationWarning)
 #end
 [$pyc]
 [$pyc]       # Property Metadata
@@ -434,6 +448,9 @@ DEFAULT CONSTRUCTOR BLOCK:
 Python combines the two constructors. See below for a comparison.
 [$pyc]       def __init__(self, id=None, loaded=None):
 [$pyc]           super(${Pojo}I, self).__init__()
+#if($type.deprecated)
+[$pyc]           ${PojoI}.warn_of_deprecation("$Pojo")
+#end
 [$pyc]           if id is not None and isinstance(id, (str, unicode)) and ":" in id:
 [$pyc]               parts = id.split(":")
 [$pyc]               if len(parts) != 2:
@@ -1132,8 +1149,7 @@ Unload
 [$cpp]       }
 [$pyc]       def unload${PropertyName}(self, $PYC_CURRENT_COLL):
 #if($property.deprecated)
-[$pyc]           import warnings
-[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+[$pyc]           ${PojoI}.warn_of_deprecation("$Pojo.$property.name")
 #end
 [$pyc]           self._${property.name}Loaded = False
 [$pyc]           self._${fieldName} = None;
@@ -1277,16 +1293,14 @@ It's unclear if these methods are useful at all, but for the moment lowering the
 
 [$pyc]       def ${pyaccess}get${property.nameCapped}(self, $PYC_CURRENT):
 #if($property.deprecated)
-[$pyc]           import warnings
-[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+[$pyc]           ${PojoI}.warn_of_deprecation("$Pojo.$property.name")
 #end
 [$pyc]           self.errorIfUnloaded()
 [$pyc]           return self._${fieldName}
 [$pyc]
 [$pyc]       def ${pyaccess}set${PropertyName}(self, _${property.name}, $PYC_CURRENT, wrap=False):
 #if($property.deprecated)
-[$pyc]           import warnings
-[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+[$pyc]           ${PojoI}.warn_of_deprecation("$Pojo.$property.name")
 #end
 [$pyc]           self.errorIfUnloaded()
 [$pyc]           if wrap and self._field_info.${fieldName}.wrapper is not None:
@@ -1298,8 +1312,7 @@ It's unclear if these methods are useful at all, but for the moment lowering the
 #if( $property.class.name == "ome.dsl.MapField" )
 [$pyc]       def ${pyaccess}get${property.nameCapped}AsMap(self, $PYC_CURRENT):
 #if($property.deprecated)
-[$pyc]           import warnings
-[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+[$pyc]           ${PojoI}.warn_of_deprecation("$Pojo.$property.name")
 #end
 [$pyc]           self.errorIfUnloaded()
 [$pyc]           rv = dict()
@@ -1352,8 +1365,7 @@ and instead sizeOf would suffice.
 [$cpp]       }
 [$pyc]       def is${PropertyName}Loaded(self):
 #if($property.deprecated)
-[$pyc]           import warnings
-[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+[$pyc]           ${PojoI}.warn_of_deprecation("$Pojo.$property.name")
 #end
 [$pyc]           return self._${propLoaded}
 [$pyc]
@@ -1380,8 +1392,7 @@ sizeOf ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 [$cpp]       }
 [$pyc]       def sizeOf${PropertyName}(self, $PYC_CURRENT):
 #if($property.deprecated)
-[$pyc]           import warnings
-[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+[$pyc]           ${PojoI}.warn_of_deprecation("$Pojo.$property.name")
 #end
 [$pyc]           self.errorIfUnloaded()
 [$pyc]           if not self._${propLoaded}: return -1
@@ -1405,8 +1416,7 @@ Copy ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 [$jav]       }
 [$pyc]       def copy${PropertyName}(self, $PYC_CURRENT):
 #if($property.deprecated)
-[$pyc]           import warnings
-[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+[$pyc]           ${PojoI}.warn_of_deprecation("$Pojo.$property.name")
 #end
 [$pyc]           self.errorIfUnloaded()
 [$pyc]           if not self._${propLoaded}: self.throwNullCollectionException("${fieldName}")
@@ -1450,8 +1460,7 @@ for them. Therefore, to use these, developers must down-cast.
 [$cpp]       }
 [$pyc]       def iterate${PropertyName}(self):
 #if($property.deprecated)
-[$pyc]           import warnings
-[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+[$pyc]           ${PojoI}.warn_of_deprecation("$Pojo.$property.name")
 #end
 [$pyc]           self.errorIfUnloaded()
 [$pyc]           if not self._${propLoaded}: self.throwNullCollectionException("${fieldName}")
@@ -1490,8 +1499,7 @@ add single
 [$jav]       }
 [$pyc]       def add${property.fieldName}(self, target, $PYC_CURRENT):
 #if($property.deprecated)
-[$pyc]           import warnings
-[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+[$pyc]           ${PojoI}.warn_of_deprecation("$Pojo.$property.name")
 #end
 [$pyc]           self.errorIfUnloaded()
 [$pyc]           if not self._${propLoaded}: self.throwNullCollectionException("${fieldName}")
@@ -1529,8 +1537,7 @@ addAll set
 [$jav]       }
 [$pyc]       def addAll${property.fieldName}Set(self, targets, $PYC_CURRENT):
 #if($property.deprecated)
-[$pyc]           import warnings
-[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+[$pyc]           ${PojoI}.warn_of_deprecation("$Pojo.$property.name")
 #end
 [$pyc]           self.errorIfUnloaded()
 [$pyc]           if  not self._${propLoaded}: self.throwNullCollectionException("${fieldName}")
@@ -1569,8 +1576,7 @@ remove single
 [$jav]       }
 [$pyc]       def remove${property.fieldName}(self, target, $PYC_CURRENT):
 #if($property.deprecated)
-[$pyc]           import warnings
-[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+[$pyc]           ${PojoI}.warn_of_deprecation("$Pojo.$property.name")
 #end
 [$pyc]           self.errorIfUnloaded()
 [$pyc]           if not self._${propLoaded}: self.throwNullCollectionException("${fieldName}")
@@ -1612,8 +1618,7 @@ removeAll multiple
 [$jav]       }
 [$pyc]       def removeAll${property.fieldName}Set(self, targets, $PYC_CURRENT):
 #if($property.deprecated)
-[$pyc]           import warnings
-[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+[$pyc]           ${PojoI}.warn_of_deprecation("$Pojo.$property.name")
 #end
 [$pyc]           self.errorIfUnloaded()
 [$pyc]           if not self._${propLoaded}: self.throwNullCollectionException("${fieldName}")
@@ -1655,8 +1660,7 @@ clear
 [$jav]       }
 [$pyc]       def clear${PropertyName}(self, $PYC_CURRENT):
 #if($property.deprecated)
-[$pyc]           import warnings
-[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+[$pyc]           ${PojoI}.warn_of_deprecation("$Pojo.$property.name")
 #end
 [$pyc]           self.errorIfUnloaded()
 [$pyc]           if not self._${propLoaded}: self.throwNullCollectionException("${fieldName}")
@@ -1725,8 +1729,7 @@ super class where the property was defined.
 [$jav]       }
 [$pyc]       def reload${PropertyName}(self, toCopy, $PYC_CURRENT):
 #if($property.deprecated)
-[$pyc]           import warnings
-[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+[$pyc]           ${PojoI}.warn_of_deprecation("$Pojo.$property.name")
 #end
 [$pyc]           self.errorIfUnloaded()
 [$pyc]           if self._${propLoaded}:
@@ -1882,8 +1885,7 @@ super class where the property was defined.
 
 [$pyc]       def get${property.shortType}(self, index, $PYC_CURRENT):
 #if($property.deprecated)
-[$pyc]           import warnings
-[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+[$pyc]           ${PojoI}.warn_of_deprecation("$Pojo.$property.name")
 #end
 [$pyc]           self.errorIfUnloaded()
 [$pyc]           if not self._${propLoaded}: self.throwNullCollectionException("${fieldName}")
@@ -1891,8 +1893,7 @@ super class where the property was defined.
 [$pyc]
 [$pyc]       def set${property.shortType}(self, index, element, $PYC_CURRENT, wrap=False):
 #if($property.deprecated)
-[$pyc]           import warnings
-[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+[$pyc]           ${PojoI}.warn_of_deprecation("$Pojo.$property.name")
 #end
 [$pyc]           self.errorIfUnloaded()
 [$pyc]           if not self._${propLoaded}: self.throwNullCollectionException("${fieldName}")
@@ -1907,8 +1908,7 @@ super class where the property was defined.
 [$pyc]
 [$pyc]       def getPrimary${property.shortType}(self, $PYC_CURRENT):
 #if($property.deprecated)
-[$pyc]           import warnings
-[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+[$pyc]           ${PojoI}.warn_of_deprecation("$Pojo.$property.name")
 #end
 [$pyc]           self.errorIfUnloaded()
 [$pyc]           if not self._${propLoaded}: self.throwNullCollectionException("${fieldName}")
@@ -1916,8 +1916,7 @@ super class where the property was defined.
 [$pyc]
 [$pyc]       def setPrimary${property.shortType}(self, element, $PYC_CURRENT):
 #if($property.deprecated)
-[$pyc]           import warnings
-[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+[$pyc]           ${PojoI}.warn_of_deprecation("$Pojo.$property.name")
 #end
 [$pyc]           self.errorIfUnloaded()
 [$pyc]           if not self._${propLoaded}: self.throwNullCollectionException("${fieldName}")
@@ -1972,8 +1971,7 @@ COUNTS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 [$cpp]       }
 [$pyc]       def $GETCOUNTMETHOD(self, $PYC_CURRENT):
 #if($property.deprecated)
-[$pyc]           import warnings
-[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+[$pyc]           ${PojoI}.warn_of_deprecation("$Pojo.$property.name")
 #end
 [$pyc]           return self._$GETCOUNTVALUE
 [$pyc]
@@ -2000,8 +1998,7 @@ ADD ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 [$jav]       }
 [$pyc]       def link${property.targetName}(self, addition, $PYC_CURRENT):
 #if($property.deprecated)
-[$pyc]           import warnings
-[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+[$pyc]           ${PojoI}.warn_of_deprecation("$Pojo.$property.name")
 #end
 [$pyc]           self.errorIfUnloaded()
 [$pyc]           if not self._${propLoaded}: self.throwNullCollectionException("${fieldName}")
@@ -2048,8 +2045,7 @@ TODO: Should we check for nulls in other?
 [$jav]       }
 [$pyc]       def $ADD2METHOD(self, link, bothSides):
 #if($property.deprecated)
-[$pyc]           import warnings
-[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+[$pyc]           ${PojoI}.warn_of_deprecation("$Pojo.$property.name")
 #end
 [$pyc]           self.errorIfUnloaded()
 [$pyc]           if not self._${propLoaded}: self.throwNullCollectionException("${fieldName}")
@@ -2097,8 +2093,7 @@ FIND
 [$jav]       }
 [$pyc]       def find${property.shortType}(self, removal, $PYC_CURRENT):
 #if($property.deprecated)
-[$pyc]           import warnings
-[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+[$pyc]           ${PojoI}.warn_of_deprecation("$Pojo.$property.name")
 #end
 [$pyc]           self.errorIfUnloaded()
 [$pyc]           if not self._${propLoaded}: self.throwNullCollectionException("${fieldName}")
@@ -2188,8 +2183,7 @@ REMOVE
 [$jav]       }
 [$pyc]       def unlink${property.targetName}(self, removal, $PYC_CURRENT):
 #if($property.deprecated)
-[$pyc]           import warnings
-[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+[$pyc]           ${PojoI}.warn_of_deprecation("$Pojo.$property.name")
 #end
 [$pyc]           self.errorIfUnloaded()
 [$pyc]           if not self._${propLoaded}: self.throwNullCollectionException("${fieldName}")
@@ -2199,8 +2193,7 @@ REMOVE
 [$pyc]
 [$pyc]       def $REMOVE2METHOD(self, link, bothSides, $PYC_CURRENT):
 #if($property.deprecated)
-[$pyc]           import warnings
-[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+[$pyc]           ${PojoI}.warn_of_deprecation("$Pojo.$property.name")
 #end
 [$pyc]           self.errorIfUnloaded()
 [$pyc]           if not self._${propLoaded}: self.throwNullCollectionException("${fieldName}")
@@ -2270,8 +2263,7 @@ Linked Lists
 
 [$pyc]       def linked${property.targetName}List(self, $PYC_CURRENT):
 #if($property.deprecated)
-[$pyc]           import warnings
-[$pyc]           warnings.warn("$property.name is deprecated", DeprecationWarning)
+[$pyc]           ${PojoI}.warn_of_deprecation("$Pojo.$property.name")
 #end
 [$pyc]           self.errorIfUnloaded()
 [$pyc]           if not self.${propLoaded}: self.throwNullCollectionException("${PropertyName}")
