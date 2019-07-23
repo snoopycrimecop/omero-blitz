@@ -213,8 +213,10 @@ Note how the whitespace for the python definitions is important.
 [$pyc]       def warn_of_deprecation(item):
 [$pyc]           if item not in ${PojoI}.deprecations_warned:
 [$pyc]               ${PojoI}.deprecations_warned.add(item)
-[$pyc]               from warnings import warn
-[$pyc]               warn(item + " is deprecated", DeprecationWarning)
+[$pyc]               import warnings
+[$pyc]               with warnings.catch_warnings():
+[$pyc]                   warnings.simplefilter("always")
+[$pyc]                   warnings.warn(item + " is deprecated", DeprecationWarning)
 #end
 [$pyc]
 [$pyc]       # Property Metadata
