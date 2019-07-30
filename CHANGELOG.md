@@ -1,4 +1,4 @@
-5.5.3 (Jule 2019)
+5.5.3 (July 2019)
 -----------------
 
 - Bump omero-server and omero-common-test version.
