@@ -30,11 +30,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import loci.common.Location;
 import loci.formats.FormatException;
@@ -45,6 +47,7 @@ import ome.formats.importer.targets.ImportTarget;
 import ome.formats.importer.transfers.FileTransfer;
 import ome.formats.importer.transfers.TransferState;
 import ome.formats.importer.transfers.UploadFileTransfer;
+import ome.formats.importer.util.ClientKeepAlive;
 import ome.formats.importer.util.ErrorHandler;
 import ome.formats.importer.util.ProportionalTimeEstimatorImpl;
 import ome.formats.importer.util.TimeEstimator;
@@ -153,6 +156,23 @@ public class ImportLibrary implements IObservable
      */
     private final String category;
 
+    /**
+     * {@link ExecutorService} used to process fileset imports.
+     */
+    private ExecutorService filesetThreadPool;
+
+    /**
+     * {@link ExecutorService} used to upload individual files.
+     */
+    private ExecutorService uploadThreadPool;
+
+    /**
+     * Flag stating that this instance has received an {@link ImportEvent.LOGGED_OUT} event.
+     */
+    private AtomicBoolean shutdown = new AtomicBoolean(false);
+
+    private ConcurrentLinkedQueue<ImportCallback> callbacks = new ConcurrentLinkedQueue();
+
     static {
         final Set<ChecksumType> availableTypes = checksumProviderFactory.getAvailableTypes();
         final ImmutableList.Builder<ChecksumAlgorithm> builder = ImmutableList.builder();
@@ -228,6 +248,28 @@ public class ImportLibrary implements IObservable
         oa = sf.ice_getConnection().getAdapter();
         final Ice.Communicator ic = oa.getCommunicator();
         category = omero.client.getRouter(ic).getCategoryForClient();
+
+        // Propagate a logout from the OMSC to this instances executors
+        ClientKeepAlive cka = store.getKeepAlive();
+        if (cka != null) {
+            cka.addObserver((observable, event) -> {
+                if (event instanceof ImportEvent.LOGGED_OUT) {
+                    log.info("Initializing log out");
+                    shutdown.set(true);
+                    for (ImportCallback cb : callbacks) {
+                        cb.shutdown();
+                    }
+                    if (filesetThreadPool != null) {
+                        log.debug("Shutting down fileset thread pool.");
+                        filesetThreadPool.shutdown();
+                    }
+                    if (uploadThreadPool != null) {
+                        log.debug("Shutting down upload thread pool.");
+                        uploadThreadPool.shutdown();
+                    }
+                }
+            });
+        }
     }
 
     //
@@ -270,7 +312,6 @@ public class ImportLibrary implements IObservable
         List<ImportContainer> containers = candidates.getContainers();
         if (containers != null) {
             final int count = containers.size();
-            ExecutorService filesetThreadPool, uploadThreadPool;
             filesetThreadPool = Executors.newFixedThreadPool(Math.min(count, config.parallelFileset.get()));
             uploadThreadPool  = Executors.newFixedThreadPool(config.parallelUpload.get());
             try {
@@ -521,11 +562,13 @@ public class ImportLibrary implements IObservable
     @SuppressWarnings("javadoc")
     @Deprecated
     public List<Pixels> importImage(final ImportContainer container, int index, int numDone, int total) throws Throwable {
-        final ExecutorService threadPool = Executors.newSingleThreadExecutor();
+        if (filesetThreadPool == null) {
+            filesetThreadPool = Executors.newSingleThreadExecutor();
+        }
         try {
-            return importImage(container, threadPool, index);
+            return importImage(container, filesetThreadPool, index);
         } finally {
-            threadPool.shutdown();
+            filesetThreadPool.shutdown();
         }
     }
 
@@ -643,7 +686,7 @@ public class ImportLibrary implements IObservable
             }
 
             if (minutesToWait < 0) {
-                while (true) {
+                while (!shutdown.get()) {
                     if (cb.block(5000)) {
                         break;
                     }
@@ -694,6 +737,7 @@ public class ImportLibrary implements IObservable
                 notifyObservers(new ImportEvent.IMPORT_STARTED(
                         0, this.container,
                         null, null, 0, null, 0, 0, logFileId));
+                callbacks.add(this);
         }
 
         protected Long loadLogFile() throws ServerError {
@@ -799,6 +843,15 @@ public class ImportLibrary implements IObservable
         {
             waitOnFinishedDone();
             return importResponse;
+        }
+
+        /**
+         * Trigger all latches to prevent blocking the shutdown of the executors. This may need to be
+         * moved into the superclass.
+         */
+        void shutdown() {
+            this.initializationDone();
+            this.onFinishedDone();
         }
     }
 

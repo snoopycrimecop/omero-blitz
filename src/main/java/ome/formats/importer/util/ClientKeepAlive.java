@@ -29,6 +29,7 @@
 package ome.formats.importer.util;
 
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import ome.formats.OMEROMetadataStoreClient;
@@ -53,9 +54,12 @@ public class ClientKeepAlive implements Runnable, IObservable
     private static Logger log = LoggerFactory.getLogger(ClientKeepAlive.class);
 
     /** The connector we're trying to keep alive. */
-    private AtomicReference<OMEROMetadataStoreClient> client;
+    private AtomicReference<OMEROMetadataStoreClient> client = new AtomicReference<OMEROMetadataStoreClient>();
 
     private final ArrayList<IObserver> observers = new ArrayList<IObserver>();
+
+    /** Whether or not observers have been notified of logout */
+    private AtomicBoolean notified = new AtomicBoolean(false);
 
     /* (non-Javadoc)
      * @see java.lang.Runnable#run()
@@ -77,15 +81,20 @@ public class ClientKeepAlive implements Runnable, IObservable
             log.error(
                 "Exception while executing ping(), logging Connector out: ", t);
             try {
+                notifyLogout();
                 client.logout();
-                notifyObservers(new ImportEvent.LOGGED_OUT());
             } catch (Exception e) {
                 log.error("Nested error on client.logout() " +
-				"while handling exception from ping()", e);
+                        "while handling exception from ping()", e);
             }
         }
     }
 
+    public void notifyLogout() {
+        if (notified.compareAndSet(false, true)) {
+            notifyObservers(new ImportEvent.LOGGED_OUT());
+        }
+    }
 
     /**
      * @return OMEROMetadataStoreClient

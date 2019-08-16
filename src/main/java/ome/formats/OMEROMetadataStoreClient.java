@@ -477,7 +477,7 @@ public class OMEROMetadataStoreClient
             keepAlive = new ClientKeepAlive();
             keepAlive.setClient(this); // This is used elsewhere.
             executor = new ScheduledThreadPoolExecutor(1);
-            executor.scheduleWithFixedDelay(keepAlive, 60, keepAliveRate, TimeUnit.SECONDS);
+            executor.scheduleWithFixedDelay(keepAlive, keepAliveRate, keepAliveRate, TimeUnit.SECONDS);
             log.info("Pinging session every {}s.", keepAliveRate);
         }
     }
@@ -1108,6 +1108,8 @@ public class OMEROMetadataStoreClient
                 prx.close();
             } catch (Ice.CommunicatorDestroyedException cde) {
                 log.debug("Communicator already closed; cannot close " + prx);
+            } catch (Ice.ConnectionLostException cle) {
+                log.debug("Connection lost; cannot close " + prx);
             } catch (Exception e) {
                 log.warn("Exception closing " + prx, e);
                 log.debug(e.toString()); // slf4j migration: toString()
@@ -1152,32 +1154,38 @@ public class OMEROMetadataStoreClient
      */
     public void logout()
     {
-        closeServices();
-        if (c != null)
-        {
-            try {
-                if (ownsSession) {
-                    log.debug("closing client session.");
-                    c.closeSession();
-                    log.debug("client closed.");
-                } else {
-                    log.debug("leaving client session open");
+        try {
+            // Giving background threads a chance to shutdown
+            if (executor != null) {
+                log.debug("Logout called, shutting keep alive down.");
+                try {
+                    executor.shutdown();
+                } finally {
+                    if (keepAlive != null) { // should be the case
+                        keepAlive.notifyLogout(); // in case called externally
+                        keepAlive = null;
+                    }
+                    executor = null;
                 }
-            } finally {
-                c.__del__();
-                c = null;
+                log.debug("keepalive shut down.");
             }
-        }
-        if (executor != null)
-        {
-            log.debug("Logout called, shutting keep alive down.");
-            try {
-                executor.shutdown();
-            } finally {
-                keepAlive = null;
-                executor = null;
+        } finally {
+            closeServices();
+            omero.client copy = c;
+            if (copy != null) {
+                try {
+                    if (ownsSession) {
+                        log.debug("closing client session.");
+                        copy.closeSession();
+                        log.debug("client closed.");
+                    } else {
+                        log.debug("leaving client session open");
+                    }
+                } finally {
+                    copy.__del__();
+                    c = null;
+                }
             }
-            log.debug("keepalive shut down.");
         }
     }
 

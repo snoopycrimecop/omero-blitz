@@ -424,7 +424,7 @@ public class CommandLineImporter {
             + "\n"
             + "  Background imports:\n"
             + "  -------------------\n\n"
-            + "    --keep-alive            \tFrequency in seconds for pinging the server.\n\n"
+            + "    --keep-alive=SECS       \tFrequency in seconds for pinging the server.\n\n"
             + "    --auto-close            \tClose completed imports immediately.\n\n"
             + "    --minutes-wait=ARG      \tChoose how long the importer will wait on server-side processing.\n"
             + "                            \tARG > 0 implies the number of minutes to wait.\n"
@@ -663,7 +663,7 @@ public class CommandLineImporter {
                                 noUpgradeCheck, qaBaseURL,
                                 outputFormat, encryptedConnection,
                                 parallelUpload, parallelFileset,
-                                readers,
+                                readers, keepAlive,
                                 plateName, plateName2,
                                 plateDescription, plateDescription2,
                                 noThumbnailsDeprecated,

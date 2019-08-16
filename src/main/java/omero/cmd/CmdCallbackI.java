@@ -351,9 +351,13 @@ public class CmdCallbackI extends _CmdCallbackDisp {
      * @param closeHandle if the handle should be closed
      */
     public void close(boolean closeHandle) {
-         adapter.remove(id); // OK ADAPTER USAGE
-         if (closeHandle) {
-             handle.close();
-         }
+        try {
+            adapter.remove(id); // OK ADAPTER USAGE
+            if (closeHandle) {
+                handle.close();
+            }
+        } catch (Ice.ObjectAdapterDeactivatedException oade) {
+            // Already shutdown.
+        }
     }
 }
