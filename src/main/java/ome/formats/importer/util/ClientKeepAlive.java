@@ -29,6 +29,7 @@
 package ome.formats.importer.util;
 
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicReference;
 
 import ome.formats.OMEROMetadataStoreClient;
 import ome.formats.importer.IObservable;
@@ -52,7 +53,7 @@ public class ClientKeepAlive implements Runnable, IObservable
     private static Logger log = LoggerFactory.getLogger(ClientKeepAlive.class);
 
     /** The connector we're trying to keep alive. */
-    private OMEROMetadataStoreClient client;
+    private AtomicReference<OMEROMetadataStoreClient> client;
 
     private final ArrayList<IObserver> observers = new ArrayList<IObserver>();
 
@@ -61,14 +62,15 @@ public class ClientKeepAlive implements Runnable, IObservable
      */
     public void run()
     {
+        OMEROMetadataStoreClient client = this.client.get();
+        if (client == null) {
+            log.warn("No client for keep alive");
+            return;
+        }
         try
         {
-            synchronized (client) {
-                if (client != null)
-                {
-                    client.ping();
-                }
-            }
+            log.debug("pinging");
+            client.ping(); // logs completion
         }
         catch (Throwable t)
         {
@@ -90,9 +92,7 @@ public class ClientKeepAlive implements Runnable, IObservable
      */
     public OMEROMetadataStoreClient getClient()
     {
-        synchronized (client) {
-            return client;
-        }
+        return this.client.get();
     }
 
 
@@ -101,9 +101,7 @@ public class ClientKeepAlive implements Runnable, IObservable
      */
     public void setClient(OMEROMetadataStoreClient client)
     {
-        synchronized (client) {
-            this.client = client;
-        }
+        this.client.set(client);
     }
 
     // Observable methods

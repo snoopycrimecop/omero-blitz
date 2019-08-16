@@ -424,6 +424,7 @@ public class CommandLineImporter {
             + "\n"
             + "  Background imports:\n"
             + "  -------------------\n\n"
+            + "    --keep-alive            \tFrequency in seconds for pinging the server.\n\n"
             + "    --auto-close            \tClose completed imports immediately.\n\n"
             + "    --minutes-wait=ARG      \tChoose how long the importer will wait on server-side processing.\n"
             + "                            \tARG > 0 implies the number of minutes to wait.\n"
@@ -620,6 +621,8 @@ public class CommandLineImporter {
 
         LongOpt readers =
                 new LongOpt("readers", LongOpt.REQUIRED_ARGUMENT, null, 29);
+        LongOpt keepAlive =
+                new LongOpt("keep-alive", LongOpt.REQUIRED_ARGUMENT, null, 30);
 
         // DEPRECATED OPTIONS
         LongOpt minutesWaitDeprecated =
@@ -835,6 +838,11 @@ public class CommandLineImporter {
                 String parallelUArg = g.getOptarg();
                 log.info("Setting parallel fileset: {}", parallelUArg);
                 config.parallelFileset.set(Integer.valueOf(parallelUArg));
+                break;
+            }
+            case 30: {
+                String keepAliveUArg = g.getOptarg();
+                config.keepAlive.set(Integer.valueOf(keepAliveUArg));
                 break;
             }
             // ADVANCED END ---------------------------------------------------

@@ -229,6 +229,8 @@ public class OMEROMetadataStoreClient
     implements MetadataStore, IMinMaxStore, IObjectContainerStore
 {
 
+    public static Integer DEFAULT_KEEP_ALIVE = 300;
+
     /** Logger for this class */
     private Logger log = LoggerFactory.getLogger(OMEROMetadataStoreClient.class);
 
@@ -341,7 +343,10 @@ public class OMEROMetadataStoreClient
     private static final int DEFAULT_INSIGHT_THUMBNAIL_LONGEST_SIDE = 96;
 
     /** Keep alive runnable, pings all services. */
-    private ClientKeepAlive keepAlive = new ClientKeepAlive();
+    private ClientKeepAlive keepAlive;
+
+    /** Whether or not the session in this instance should be closed on exit */
+    private boolean ownsSession = false;
 
     /**
      * Map of series vs. populated Image graph as set by <code>prepare</code>.
@@ -390,24 +395,33 @@ public class OMEROMetadataStoreClient
      *
      * @param manageLifecycle
      *
-     *            Whether or not to call the {@link Thread#start()} method on
-     *            the {@link #keepAlive} instance. This will be set to false
-     *            when an {@link omero.client} or a {@link ServiceFactoryPrx}
-     *            instance is provided to {@link #initialize(client)} since the
-     *            assumption is that the consumer will take care of the keep
-     *            alive. In that case, {@link #closeServices()} should be called
-     *            when importing is finished.
-     *
-     *  @param group
-     *
-     *            Value to pass set in {@link #callCtx}
+     *           Whether or not to call the {@link Thread#start()} method on
+     *           the {@link #keepAlive} instance. This will be set to false
+     *           when an {@link omero.client} or a {@link ServiceFactoryPrx}
+     *           instance is provided to {@link #initialize(client)} since the
+     *           assumption is that the consumer will take care of the keep
+     *           alive. In that case, {@link #closeServices()} should be called
+     *           when importing is finished.
      *
      * @throws ServerError
      */
     private void initializeServices(boolean manageLifecycle)
-        throws ServerError
-    {
+        throws ServerError {
+        initializeServices(DEFAULT_KEEP_ALIVE);
+    }
 
+    /**
+     * Initialize all services needed
+     *
+     * @param keepAliveRate
+     *
+     *           Schedule in seconds at which the background keep alive ping should be called.
+     *
+     * @throws ServerError
+     */
+    private void initializeServices(Integer keepAliveRate)
+            throws ServerError
+    {
         closeServices();
         Map<String, String> callCtx = new HashMap<String, String>();
         if (groupID != null) {
@@ -454,15 +468,18 @@ public class OMEROMetadataStoreClient
         //checkImmersions();
 
         // Start our keep alive executor
-        if (manageLifecycle)
+        if (keepAliveRate != null)
         {
-            if (executor == null)
-            {
-                executor = new ScheduledThreadPoolExecutor(1);
-                executor.scheduleWithFixedDelay(keepAlive, 60, 60, TimeUnit.SECONDS);
+            if (executor != null) {
+                log.error("Executor already set!");
+                executor.shutdown();
             }
+            keepAlive = new ClientKeepAlive();
+            keepAlive.setClient(this); // This is used elsewhere.
+            executor = new ScheduledThreadPoolExecutor(1);
+            executor.scheduleWithFixedDelay(keepAlive, 60, keepAliveRate, TimeUnit.SECONDS);
+            log.info("Pinging session every {}s.", keepAliveRate);
         }
-        keepAlive.setClient(this); // This is used elsewhere.
     }
 
     /**
@@ -549,7 +566,7 @@ public class OMEROMetadataStoreClient
         if (serviceFactory == null)
             throw new IllegalArgumentException("No factory.");
         this.serviceFactory = serviceFactory;
-        initializeServices(false);
+        initializeServices(false); // no c. not possible to call closeSession
     }
 
     /**
@@ -566,7 +583,7 @@ public class OMEROMetadataStoreClient
         this.c = c;
         c.setAgent("OMERO.importer");
         serviceFactory = c.getSession();
-        initializeServices(false);
+        initializeServices(false); // assume already keeping alive
     }
 
     /**
@@ -591,7 +608,7 @@ public class OMEROMetadataStoreClient
         throws CannotCreateSessionException, PermissionDeniedException, ServerError
     {
     // Always make this an unsecure session
-        initialize(username, password, server, port, false);
+        initialize(username, password, server, port, true);
     }
 
     /**
@@ -616,13 +633,7 @@ public class OMEROMetadataStoreClient
             String server, int port, boolean isSecure)
     throws CannotCreateSessionException, PermissionDeniedException, ServerError
     {
-        secure(server, port);
-        c.createSession(username, password);
-    if (!isSecure)
-    {
-        unsecure();
-    }
-        initializeServices(true);
+        initialize(username, password, server, port, null, isSecure);
     }
 
     /**
@@ -647,16 +658,48 @@ public class OMEROMetadataStoreClient
      */
     public void initialize(String username, String password,
             String server, int port, Long group, boolean isSecure)
-    throws CannotCreateSessionException, PermissionDeniedException, ServerError
+    throws CannotCreateSessionException, PermissionDeniedException, ServerError {
+        initialize(username, password, server, port, group, isSecure, null);
+    }
+
+    /**
+     * Initializes the MetadataStore taking string parameters to feed to the
+     * OMERO Blitz client object. Using this method to create either secure
+     * or unsecure sessions and sets the user's group to supplied group.
+     * When finished with this instance, close all resources via
+     * {@link #logout}
+     *
+     * @param username User's omename.
+     * @param password User's password.
+     * @param server Server hostname.
+     * @param port Server port.
+     * @param group User's current group.
+     * @param isSecure is this session secure
+     * @param keepAliveRate Seconds. If null, then pinging will be deactivated.
+     * @throws CannotCreateSessionException If there is a session error when
+     * creating the OMERO Blitz client object.
+     * @throws PermissionDeniedException If there is a problem logging the user
+     * in.
+     * @throws ServerError If there is a critical error communicating with the
+     * server.
+     */
+    public void initialize(String username, String password,
+                           String server, int port, Long group, boolean isSecure, Integer keepAliveRate)
+            throws CannotCreateSessionException, PermissionDeniedException, ServerError
     {
         secure(server, port);
         serviceFactory = c.createSession(username, password);
-    if (!isSecure)
-    {
-        unsecure();
-    }
-        setGroup(group);
-        initializeServices(true);
+        ownsSession = true;
+        if (!isSecure)
+        {
+            unsecure();
+        }
+
+        if (group != null) {
+            setGroup(group);
+        }
+
+        initializeServices(keepAliveRate);
     }
 
     /**
@@ -675,7 +718,7 @@ public class OMEROMetadataStoreClient
         throws CannotCreateSessionException, PermissionDeniedException, ServerError
     {
     // Always make this an 'unsecure' session
-        initialize(server, port, sessionKey, false);
+        initialize(server, port, sessionKey, true);
     }
 
     /**
@@ -692,10 +735,30 @@ public class OMEROMetadataStoreClient
      * @throws ServerError if the services could not be initialized
      */
     public void initialize(String server, int port, String sessionKey, boolean isSecure)
-        throws CannotCreateSessionException, PermissionDeniedException, ServerError
+        throws CannotCreateSessionException, PermissionDeniedException, ServerError {
+        initialize(server, port, sessionKey, isSecure, DEFAULT_KEEP_ALIVE);
+    }
+
+    /**
+     * Initializes the MetadataStore by joining an existing session.
+     * Use this method only with unsecure sessions. When finished with this
+     * instance, close all resources via {@link #logout}
+     *
+     * @param server Server hostname.
+     * @param port Server port.
+     * @param sessionKey Bind session key.
+     * @param isSecure if a secure session should be created
+     * @param keepAliveRate Seconds. If null, then pinging will be deactivated.
+     * @throws CannotCreateSessionException if a session could not be created
+     * @throws PermissionDeniedException if the services may not be initialized
+     * @throws ServerError if the services could not be initialized
+     */
+    public void initialize(String server, int port, String sessionKey, boolean isSecure, Integer keepAliveRate)
+            throws CannotCreateSessionException, PermissionDeniedException, ServerError
     {
         secure(server, port);
         serviceFactory = c.joinSession(sessionKey);
+        ownsSession = true;
         if (!isSecure)
         {
             try
@@ -707,7 +770,7 @@ public class OMEROMetadataStoreClient
             }
         }
 
-        initializeServices(true);
+        initializeServices(keepAliveRate);
     }
 
     /**
@@ -741,8 +804,13 @@ public class OMEROMetadataStoreClient
             PermissionDeniedException {
         log.info("Insecure connection requested, falling back");
         omero.client tmp = c.createClient(false);
-        logout();
-        c = tmp;
+        try {
+            // Not using logout() since services, etc. haven't been created.
+            // closeSession() is called, but tmp has already joined the session.
+            c.__del__();
+        } finally {
+            c = tmp;
+        }
         serviceFactory = c.getSession();
     }
 
@@ -1087,16 +1155,28 @@ public class OMEROMetadataStoreClient
         closeServices();
         if (c != null)
         {
-            log.debug("closing client session.");
-            c.closeSession();
-            c = null;
-            log.debug("client closed.");
+            try {
+                if (ownsSession) {
+                    log.debug("closing client session.");
+                    c.closeSession();
+                    log.debug("client closed.");
+                } else {
+                    log.debug("leaving client session open");
+                }
+            } finally {
+                c.__del__();
+                c = null;
+            }
         }
         if (executor != null)
         {
             log.debug("Logout called, shutting keep alive down.");
-            executor.shutdown();
-            executor = null;
+            try {
+                executor.shutdown();
+            } finally {
+                keepAlive = null;
+                executor = null;
+            }
             log.debug("keepalive shut down.");
         }
     }
