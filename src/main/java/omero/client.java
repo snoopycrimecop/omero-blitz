@@ -383,6 +383,7 @@ public class client {
         // This cipher specification includes the default ciphers + anon-DH
         // ciphers required by OMERO.server in its default configuration.
         optionallySetProperty(id, "IceSSL.Ciphers", "(DH_anon.*AES)");
+        optionallySetProperty(id, "IceSSL.VerifyDepthMax", "6");
         optionallySetProperty(id, "IceSSL.VerifyPeer", "0");
         optionallySetProperty(id, "omero.block_size", Integer
             .toString(omero.constants.DEFAULTBLOCKSIZE.value));
