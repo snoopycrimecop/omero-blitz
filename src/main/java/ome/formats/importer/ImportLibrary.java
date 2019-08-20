@@ -254,9 +254,10 @@ public class ImportLibrary implements IObservable
         if (cka != null) {
             cka.addObserver((observable, event) -> {
                 if (event instanceof ImportEvent.LOGGED_OUT) {
-                    log.info("Initializing log out");
+                    log.debug("Initializing log out");
                     shutdown.set(true);
                     for (ImportCallback cb : callbacks) {
+                        log.debug("Shutting down callback " + cb);
                         cb.shutdown();
                     }
                     if (filesetThreadPool != null) {
