@@ -54,7 +54,7 @@ public class ClientKeepAlive implements Runnable, IObservable
     private static Logger log = LoggerFactory.getLogger(ClientKeepAlive.class);
 
     /** The connector we're trying to keep alive. */
-    private AtomicReference<OMEROMetadataStoreClient> client = new AtomicReference<OMEROMetadataStoreClient>();
+    private AtomicReference<OMEROMetadataStoreClient> client = new AtomicReference<>();
 
     private final ArrayList<IObserver> observers = new ArrayList<IObserver>();
 
