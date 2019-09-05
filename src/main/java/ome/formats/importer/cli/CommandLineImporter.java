@@ -842,7 +842,7 @@ public class CommandLineImporter {
             }
             case 30: {
                 String keepAliveUArg = g.getOptarg();
-                config.keepAlive.set(Integer.valueOf(keepAliveUArg));
+                config.keepAlive.set(Integer.parseInt(keepAliveUArg));
                 break;
             }
             // ADVANCED END ---------------------------------------------------
