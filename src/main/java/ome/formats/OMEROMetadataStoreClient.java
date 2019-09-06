@@ -664,7 +664,7 @@ public class OMEROMetadataStoreClient
 
     /**
      * Initializes the MetadataStore taking string parameters to feed to the
-     * OMERO Blitz client object. Using this method to create either secure
+     * OMERO Blitz client object. Using this method creates either secure
      * or unsecure sessions and sets the user's group to supplied group.
      * When finished with this instance, close all resources via
      * {@link #logout}
