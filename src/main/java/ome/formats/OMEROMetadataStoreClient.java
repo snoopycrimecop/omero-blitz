@@ -229,6 +229,9 @@ public class OMEROMetadataStoreClient
     implements MetadataStore, IMinMaxStore, IObjectContainerStore
 {
 
+    /**
+     * Default time in seconds between calls of the keep alive thread.
+     */
     public static Integer DEFAULT_KEEP_ALIVE = 300;
 
     /** Logger for this class */
@@ -416,6 +419,7 @@ public class OMEROMetadataStoreClient
      * @param keepAliveRate
      *
      *           Schedule in seconds at which the background keep alive ping should be called.
+     *           If null, then no keep alive thread will be started.
      *
      * @throws ServerError
      */
