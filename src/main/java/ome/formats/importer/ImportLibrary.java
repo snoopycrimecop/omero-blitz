@@ -249,7 +249,7 @@ public class ImportLibrary implements IObservable
         final Ice.Communicator ic = oa.getCommunicator();
         category = omero.client.getRouter(ic).getCategoryForClient();
 
-        // Propagate a logout from the OMSC to this instances executors
+        // Propagate a logout from the OMSC to this instance's executors
         ClientKeepAlive cka = store.getKeepAlive();
         if (cka != null) {
             cka.addObserver((observable, event) -> {
