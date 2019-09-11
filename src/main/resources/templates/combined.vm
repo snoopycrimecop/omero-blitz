@@ -182,6 +182,11 @@ DECLARATION BLOCK:
 [$jav]    implements ome.model.ModelBased {
 
 Note how the whitespace for the python definitions is important.
+[$pyc] try:
+[$pyc]    unicode
+[$pyc] except NameError:
+[$pyc]    # Python 3: "unicode" is built-in
+[$pyc]    unicode = str
 [$pyc] import Ice
 [$pyc] import IceImport
 [$pyc] import omero
