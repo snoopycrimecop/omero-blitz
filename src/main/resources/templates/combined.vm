@@ -2410,7 +2410,6 @@ MISCELLANEOUS METHODS BLOCK:
 [$pyc]           pass # Currently unused
 [$pyc]
 [$pyc]       def __getattr__(self, name):
-[$pyc]           import __builtin__
 [$pyc]           """
 [$pyc]           Reroutes all access to object.field through object.getField() or object.isField()
 [$pyc]           """
