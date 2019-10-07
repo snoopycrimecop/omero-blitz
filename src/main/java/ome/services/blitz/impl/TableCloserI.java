@@ -44,6 +44,9 @@ public class TableCloserI extends AbstractCloseableAmdServant
             throws omero.ServerError {
         super(null, null);
         this.table = tablePrx;
+        if (this.table == null) {
+            throw new omero.InternalException(null, null, "null table as argument");
+        }
         this.tableId = id;
         this.statefulId = new Ice.Identity(id.name + "-closer", id.category);
         this.self = TablePrxHelper.uncheckedCast(
