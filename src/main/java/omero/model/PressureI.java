@@ -1444,13 +1444,17 @@ public class PressureI extends Pressure implements ModelBased {
                         value.getValue(), value.getUnit(), target));
             }
             double orig = value.getValue();
-            BigDecimal big = conversion.convert(orig);
-            double converted = big.doubleValue();
-            if (Double.isInfinite(converted)) {
-                throw new BigResult(big,
-                        "Failed to convert " + source + ":" + target);
+            double converted = orig;
+            if (Double.isInfinite(orig)) {
+                // Do nothing. Use orig
+            } else {
+                BigDecimal big = conversion.convert(orig);
+                converted = big.doubleValue();
+                if (Double.isInfinite(converted)) {
+                    throw new BigResult(big,
+                            "Failed to convert " + source + ":" + target);
+                }
             }
-
             setValue(converted);
             setUnit(targetUnit);
        }
