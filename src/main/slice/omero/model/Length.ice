@@ -34,13 +34,13 @@ module omero {
        * into the containing class, so that the value and unit rows
        * can be found on the table itself (e.g. pixels.physicalSizeX
        * and pixels.physicalSizeXUnit).
-       */
+       **/
     ["protected"] class Length
     {
 
       /**
        * PositiveFloat value
-       */
+       **/
       double value;
 
       omero::model::enums::UnitsLength unit;
@@ -49,7 +49,7 @@ module omero {
        * Actual value for this unit-based field. The interpretation of
        * the value is only possible along with the
        * {@link omero.model.enums.UnitsLength} enum.
-       */
+       **/
       double getValue();
 
       void setValue(double value);
@@ -58,7 +58,7 @@ module omero {
        * {@link omero.model.enums.UnitsLength} instance which is an
        * {@link omero.model.IObject}
        * meaning that its ID is sufficient for identifying equality.
-       */
+       **/
       omero::model::enums::UnitsLength getUnit();
 
       void setUnit(omero::model::enums::UnitsLength unit);
@@ -66,7 +66,7 @@ module omero {
       /**
        * Returns the possibly unicode representation of the ""unit""
        * value for display.
-       */
+       **/
       string getSymbol();
 
       Length copy();

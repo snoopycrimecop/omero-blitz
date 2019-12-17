@@ -40,7 +40,7 @@ module omero {
 
       /**
        * PositiveFloat value
-       */
+       **/
       double value;
 
       omero::model::enums::UnitsPressure unit;
