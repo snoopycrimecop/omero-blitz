@@ -32,8 +32,8 @@ module omero {
        * an {@link omero.model.IObject} implementation and as such does
        * not have an ID value. Instead, the entire object is embedded
        * into the containing class, so that the value and unit rows
-       * can be found on the table itself (e.g. detectorSettings.volatage
-       * and detectorSettings.volatageUnit).
+       * can be found on the table itself (e.g. detectorSettings.voltage
+       * and detectorSettings.voltageUnit).
        **/
     ["protected"] class ElectricPotential
     {
