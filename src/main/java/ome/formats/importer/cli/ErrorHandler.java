@@ -38,7 +38,11 @@ public class ErrorHandler extends ome.formats.importer.util.ErrorHandler {
     public void onUpdate(IObservable importLibrary, ImportEvent event) {
 
         if (event instanceof IMPORT_DONE) {
-            log.info("Number of errors: " + errors.size());
+            if (errors.size() == 0) {
+                log.debug("Number of errors: " + errors.size());
+            } else {
+                log.info("Number of errors: " + errors.size());
+            }
         }
 
         else if (event instanceof SCANNING) {

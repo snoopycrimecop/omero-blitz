@@ -146,6 +146,7 @@ public class ImportConfig {
 
     public final BoolValue encryptedConnection;
     public final BoolValue autoClose;
+    public final IntValue keepAlive;
 
     public final AnnotationListValue annotations;
     public final DoubleArrayValue userPixels;
@@ -286,6 +287,7 @@ public class ImportConfig {
 
         encryptedConnection = new BoolValue("encryptedConnection", this, true);
         autoClose = new BoolValue("autoClose", this, false);
+        keepAlive = new IntValue("keepAlive", this, 300);
 
         annotations = new AnnotationListValue(
                 "annotations", this, new ArrayList<Annotation>());
@@ -373,10 +375,10 @@ public class ImportConfig {
         OMEROMetadataStoreClient client = new OMEROMetadataStoreClient();
         if (sessionKey.empty()) {
             client.initialize(username.get(), password.get(), hostname.get(),
-                    port.get(), group.get(), encryptedConnection.get());
+                    port.get(), group.get(), encryptedConnection.get(), keepAlive.get());
 
         } else {
-            client.initialize(hostname.get(), port.get(), sessionKey.get(), encryptedConnection.get());
+            client.initialize(hostname.get(), port.get(), sessionKey.get(),encryptedConnection.get(), keepAlive.get());
         }
         return client;
     }

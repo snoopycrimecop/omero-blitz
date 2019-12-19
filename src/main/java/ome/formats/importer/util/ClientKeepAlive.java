@@ -29,6 +29,8 @@
 package ome.formats.importer.util;
 
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import ome.formats.OMEROMetadataStoreClient;
 import ome.formats.importer.IObservable;
@@ -52,47 +54,54 @@ public class ClientKeepAlive implements Runnable, IObservable
     private static Logger log = LoggerFactory.getLogger(ClientKeepAlive.class);
 
     /** The connector we're trying to keep alive. */
-    private OMEROMetadataStoreClient client;
+    private AtomicReference<OMEROMetadataStoreClient> client = new AtomicReference<>();
 
     private final ArrayList<IObserver> observers = new ArrayList<IObserver>();
+
+    /** Whether or not observers have been notified of logout */
+    private AtomicBoolean notified = new AtomicBoolean(false);
 
     /* (non-Javadoc)
      * @see java.lang.Runnable#run()
      */
     public void run()
     {
+        OMEROMetadataStoreClient client = this.client.get();
+        if (client == null) {
+            log.warn("No client for keep alive");
+            return;
+        }
         try
         {
-            synchronized (client) {
-                if (client != null)
-                {
-                    client.ping();
-                }
-            }
+            log.debug("pinging");
+            client.ping(); // logs completion
         }
         catch (Throwable t)
         {
             log.error(
                 "Exception while executing ping(), logging Connector out: ", t);
             try {
+                notifyLogout();
                 client.logout();
-                notifyObservers(new ImportEvent.LOGGED_OUT());
             } catch (Exception e) {
                 log.error("Nested error on client.logout() " +
-				"while handling exception from ping()", e);
+                        "while handling exception from ping()", e);
             }
         }
     }
 
+    public void notifyLogout() {
+        if (notified.compareAndSet(false, true)) {
+            notifyObservers(new ImportEvent.LOGGED_OUT());
+        }
+    }
 
     /**
      * @return OMEROMetadataStoreClient
      */
     public OMEROMetadataStoreClient getClient()
     {
-        synchronized (client) {
-            return client;
-        }
+        return this.client.get();
     }
 
 
@@ -101,9 +110,7 @@ public class ClientKeepAlive implements Runnable, IObservable
      */
     public void setClient(OMEROMetadataStoreClient client)
     {
-        synchronized (client) {
-            this.client = client;
-        }
+        this.client.set(client);
     }
 
     // Observable methods
