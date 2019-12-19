@@ -1428,18 +1428,36 @@ public class PressureI extends Pressure implements ModelBased {
     * Copy constructor that converts the given {@link omero.model.Pressure}
     * based on the given enum string.
     *
+    * If either the source or the target unit is null or if no conversion
+    * is possible between the two types (e.g. PIXELS), an
+    * {@link IllegalArgumentException} will be thrown. If the conversion
+    * results in an overflow, a {@link BigResult} will be thrown, unless
+    * the input value was already Infinite or NaN, in which case that will
+    * be the return value.
+    *
     * @param target String representation of the CODE enum
+    * @throws IllegalArgumentException if the source or target unit
+    *         is null or an unconvertible type (e.g. PIXELS)
+    * @throws BigResult if the conversion leads to an infinite or NaN result
     */
     public PressureI(Pressure value, String target) throws BigResult {
-       String source = value.getUnit().toString();
+
+       final UnitsPressure sourceUnit = value.getUnit();
+       final UnitsPressure targetUnit = UnitsPressure.valueOf(target);
+       if (sourceUnit == null || targetUnit == null) {
+           throw new IllegalArgumentException(String.format(
+                       "conversion impossible from %s to %s",
+                       sourceUnit, targetUnit));
+       }
+
+       final String source = value.getUnit().toString();
        if (target.equals(source)) {
            setValue(value.getValue());
            setUnit(value.getUnit());
-        } else {
-            UnitsPressure targetUnit = UnitsPressure.valueOf(target);
-            Conversion conversion = conversions.get(value.getUnit()).get(targetUnit);
+       } else {
+            final Conversion conversion = conversions.get(sourceUnit).get(targetUnit);
             if (conversion == null) {
-                throw new RuntimeException(String.format(
+                throw new IllegalArgumentException(String.format(
                     "%f %s cannot be converted to %s",
                         value.getValue(), value.getUnit(), target));
             }
