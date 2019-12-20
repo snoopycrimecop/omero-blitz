@@ -1,3 +1,11 @@
+5.5.5 (Dec 2019)
+----------------
+
+- Better handle import keep-alives (#65)
+- Better handle the closing of Table proxies (#72)
+- Better handle unit conversion (#76)
+- Remove references to bin/omero from docs (#75)
+
 5.5.4 (Sep 2019)
 ----------------
 

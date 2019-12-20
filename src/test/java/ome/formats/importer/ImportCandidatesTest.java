@@ -197,7 +197,7 @@ public class ImportCandidatesTest {
         FileUtils.deleteQuietly(fakeFolder);
     }
 
-    @Test
+    @Test(timeOut=3000)
     /**
      * Tests two fake/pattern filesets where the files of one fileset are fully
      * included in the other fileset.
