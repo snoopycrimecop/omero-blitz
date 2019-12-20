@@ -34,13 +34,13 @@ module omero {
        * into the containing class, so that the value and unit rows
        * can be found on the table itself (e.g. detectorSettings.readOutRate
        * and detectorSettings.readOutRateUnit).
-       */
+       **/
     ["protected"] class Frequency
     {
 
       /**
        * PositiveFloat value
-       */
+       **/
       double value;
 
       omero::model::enums::UnitsFrequency unit;
@@ -49,7 +49,7 @@ module omero {
        * Actual value for this unit-based field. The interpretation of
        * the value is only possible along with the
        * {@link omero.model.enums.UnitsFrequency} enum.
-       */
+       **/
       double getValue();
 
       void setValue(double value);
@@ -58,7 +58,7 @@ module omero {
        * {@link omero.model.enums.UnitsFrequency} instance which is an
        * {@link omero.model.IObject}
        * meaning that its ID is sufficient for identifying equality.
-       */
+       **/
       omero::model::enums::UnitsFrequency getUnit();
 
       void setUnit(omero::model::enums::UnitsFrequency unit);
@@ -66,7 +66,7 @@ module omero {
       /**
        * Returns the possibly unicode representation of the ""unit""
        * value for display.
-       */
+       **/
       string getSymbol();
 
       Frequency copy();
