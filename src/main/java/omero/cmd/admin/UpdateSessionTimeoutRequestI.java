@@ -153,12 +153,13 @@ public class UpdateSessionTimeoutRequestI extends UpdateSessionTimeoutRequest
         }
 
         boolean isAdmin = current.getCurrentEventContext().isCurrentUserAdmin();
-        if (!isAdmin && maxUserTimeToLive != 0
+        if (!isAdmin && maxUserTimeToLive != 0 && timeToLive != null
                 && timeToLive.getValue() > maxUserTimeToLive) {
             timeToLive = omero.rtypes.rlong(maxUserTimeToLive);
             helper.info("Attempt to modify timeToLive beyond maximum");
         }
-        if (!isAdmin && timeToIdle.getValue() > maxUserTimeToIdle) {
+        if (!isAdmin && timeToIdle != null
+                && timeToIdle.getValue() > maxUserTimeToIdle) {
             timeToIdle = omero.rtypes.rlong(maxUserTimeToIdle);
             helper.info("Attempt to modify timeToIdle beyond maximum");
         }
