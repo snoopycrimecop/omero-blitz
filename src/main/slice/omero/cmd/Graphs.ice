@@ -136,7 +136,8 @@ module omero {
          * The user must be an administrator with the {@code ModifyGroup}
          * {@link omero.model.AdminPrivilege}, the owner of the objects,
          * or an owner of the objects' group.
-         * The only permitted target object type is ExperimenterGroup.
+         * The only permitted target object type is
+         * {@link omero.model.ExperimenterGroup}.
          */
         class Chmod2 extends GraphModify2 {
 
