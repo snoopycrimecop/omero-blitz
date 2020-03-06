@@ -101,7 +101,8 @@ module omero {
 
         /**
          * Move model objects into a different experimenter group.
-         * The user must be either an administrator,
+         * The user must be either an administrator with the
+         * {@code Chgrp} {@link omero.model.AdminPrivilege},
          * or the owner of the objects and a member of the target group.
          */
         class Chgrp2 extends GraphModify2 {
@@ -132,9 +133,11 @@ module omero {
 
         /**
          * Change the permissions on model objects.
-         * The user must be an administrator, the owner of the objects,
+         * The user must be an administrator with the {@code ModifyGroup}
+         * {@link omero.model.AdminPrivilege}, the owner of the objects,
          * or an owner of the objects' group.
-         * The only permitted target object type is ExperimenterGroup.
+         * The only permitted target object type is
+         * {@link omero.model.ExperimenterGroup}.
          */
         class Chmod2 extends GraphModify2 {
 
@@ -162,7 +165,8 @@ module omero {
 
         /**
          * Change the ownership of model objects.
-         * The user must be an administrator, or they
+         * The user must be an administrator with the {@code Chown}
+         * {@link omero.model.AdminPrivilege}, or they
          * must be an owner of the objects' group, with
          * the target user a member of the objects' group.
          */
