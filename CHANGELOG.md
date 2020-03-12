@@ -1,3 +1,12 @@
+5.5.6 (March 2020)
+------------------
+
+- Display unit test output instead of caching it
+  ([#81](https://github.com/ome/omero-blitz/pull/81))
+- Expand documentation of API for Chgrp2, Chmod2, Chown2
+  ([#82](https://github.com/ome/omero-blitz/pull/82))
+- Bump omero-server version to 5.5.6
+
 5.5.5 (Dec 2019)
 ----------------
 
