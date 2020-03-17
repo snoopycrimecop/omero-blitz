@@ -231,7 +231,7 @@ public class ImportConfig {
 
         // Various startup requirements
         omeroVersion = ImportConfig.class.getPackage().getImplementationVersion();
-        log.info("OMERO Version: " + omeroVersion);
+        log.info("OMERO.blitz Version: " + omeroVersion);
 
         if (ini != null) {
             ini.updateFlexReaderServerMaps();
