@@ -1,6 +1,8 @@
 5.5.6 (March 2020)
 ------------------
 
+- Make the OMERO.blitz component name explicit in the log
+  ([#78](https://github.com/ome/omero-blitz/pull/78))
 - Display unit test output instead of caching it
   ([#81](https://github.com/ome/omero-blitz/pull/81))
 - Expand documentation of API for Chgrp2, Chmod2, Chown2
