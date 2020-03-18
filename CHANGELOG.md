@@ -3,6 +3,8 @@
 
 - Make the OMERO.blitz component name explicit in the log
   ([#78](https://github.com/ome/omero-blitz/pull/78))
+- Expand user session creation abilities
+  ([#80](https://github.com/ome/omero-blitz/pull/80))
 - Display unit test output instead of caching it
   ([#81](https://github.com/ome/omero-blitz/pull/81))
 - Expand documentation of API for Chgrp2, Chmod2, Chown2
