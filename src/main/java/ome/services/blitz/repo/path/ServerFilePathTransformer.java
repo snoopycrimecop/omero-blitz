@@ -51,9 +51,8 @@ public class ServerFilePathTransformer {
      * Must be executed server-side.
      * @param serverFile a server-local {@link File} within the repository
      * @return the corresponding repository path
-     * @throws IOException if the absolute path of the {@link File} could not be found
      */
-    public FsFile getFsFileFromServerFile(File serverFile) throws IOException {
+    public FsFile getFsFileFromServerFile(File serverFile) {
         final FsFile fullFsFile = new FsFile(serverFile);
         final FsFile childFsFile = fullFsFile.getPathFrom(this.baseDirFsFile);
         if (childFsFile == null)

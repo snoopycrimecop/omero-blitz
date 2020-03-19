@@ -391,6 +391,22 @@
      <constructor-arg ref="/OMERO/Pixels"/>
      <property name="iceCommunicator" ref="Ice.Communicator"/>
      <constructor-arg ref="resources"/>
+     <constructor-arg ref="managedReaderSecurityCheck"/>
+  </bean>
+
+  <bean id="managedReaderSecurityCheck" class="ome.services.blitz.repo.ManagedReaderSecurityCheck">
+    <constructor-arg ref="internal-ome.api.IQuery"/>
+    <constructor-arg ref="managedRepoUuids"/>
+  </bean>
+
+  <bean class="org.springframework.beans.factory.config.MethodInvokingBean" lazy-init="false">
+    <property name="targetObject" ref="/OMERO/Pixels"/>
+    <property name="targetMethod" value="setReaderSecurityCheck"/>
+    <property name="arguments">
+      <list>
+        <ref bean="managedReaderSecurityCheck"/>
+      </list>
+    </property>
   </bean>
 
   <!-- "Self"-factories -->

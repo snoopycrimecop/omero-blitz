@@ -1,6 +1,6 @@
 /*
  *------------------------------------------------------------------------------
- *  Copyright (C) 2006-2015 University of Dundee. All rights reserved.
+ *  Copyright (C) 2006-2019 University of Dundee. All rights reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -49,6 +49,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ome.formats.OMEXMLModelComparator;
+import ome.io.nio.ReaderSecurityCheck;
 import ome.util.PixelData;
 
 import omero.model.Channel;
@@ -89,8 +90,17 @@ public class OMEROWrapper extends MinMaxCalculator {
         this(config, -1, null); // Disabled memoization
     }
 
+    @Deprecated
     public OMEROWrapper(ImportConfig config, long elapsedTime, File cacheDirectory) {
-        super(createReader(config));
+        this(config, elapsedTime, cacheDirectory, new ReaderSecurityCheck() {
+            @Override
+            public void assertUsedFilesReadable(IFormatReader reader) {
+            }
+        });
+    }
+
+    public OMEROWrapper(ImportConfig config, long elapsedTime, File cacheDirectory, ReaderSecurityCheck readerSecurityCheck) {
+        super(createReader(config, readerSecurityCheck));
         this.config = config;
         this.iReader = (ImageReader) reader; // Save old value
         this.reader = null;
@@ -114,7 +124,7 @@ public class OMEROWrapper extends MinMaxCalculator {
         iReader.setFlattenedResolutions(false);
     };
 
-    private static ImageReader createReader(ImportConfig config)
+    private static ImageReader createReader(ImportConfig config, ReaderSecurityCheck readerSecurityCheck)
     {
         if (config == null) {
             throw new IllegalArgumentException(
@@ -139,13 +149,25 @@ public class OMEROWrapper extends MinMaxCalculator {
             try
             {
                 return new ImageReader(new ClassList<IFormatReader>(
-                    readersPath, IFormatReader.class, k));
+                    readersPath, IFormatReader.class, k)) {
+                    @Override
+                    public void setId(String id) throws FormatException, IOException {
+                        super.setId(id);
+                        readerSecurityCheck.assertUsedFilesReadable(this);
+                    }
+                };
             } catch (IOException e)
             {
                 throw new RuntimeException("Unable to load readers.txt.");
             }
         }
-        return new ImageReader();
+        return new ImageReader() {
+            @Override
+            public void setId(String id) throws FormatException, IOException {
+                super.setId(id);
+                readerSecurityCheck.assertUsedFilesReadable(this);
+            }
+        };
     }
 
     public ImportConfig getConfig() {

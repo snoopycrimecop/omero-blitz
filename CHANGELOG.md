@@ -9,6 +9,8 @@
   ([#81](https://github.com/ome/omero-blitz/pull/81))
 - Expand documentation of API for Chgrp2, Chmod2, Chown2
   ([#82](https://github.com/ome/omero-blitz/pull/82))
+- Security vulnerability fix for
+  [2019-SV1](https://www.openmicroscopy.org/security/advisories/2019-SV1-reader-used-files/)
 - Bump omero-server version to 5.5.6
 
 5.5.5 (Dec 2019)

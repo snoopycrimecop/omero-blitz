@@ -24,12 +24,13 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
+import loci.formats.IFormatReader;
 import ome.io.nio.PixelsService;
+import ome.io.nio.ReaderSecurityCheck;
 import ome.io.nio.TileSizes;
 import ome.services.blitz.fire.Registry;
 import ome.services.blitz.fire.Ring;
 import ome.system.OmeroContext;
-
 import ome.formats.importer.ImportConfig;
 import ome.formats.importer.OMEROWrapper;
 
@@ -54,22 +55,39 @@ public class RequestObjectFactoryRegistry extends
 
     private final Resources resources;
 
+    private final ReaderSecurityCheck readerSecurityCheck;
+
     private/* final */OmeroContext ctx;
 
+    @Deprecated
     public RequestObjectFactoryRegistry(Registry reg, TileSizes sizes,
             RepositoryDao repositoryDao, Ring ring,
             PixelsService pixels) {
         this(reg, sizes, repositoryDao, ring, pixels, null);
     }
+
+    @Deprecated
     public RequestObjectFactoryRegistry(Registry reg, TileSizes sizes,
             RepositoryDao repositoryDao, Ring ring,
             PixelsService pixels, Resources resources) {
+        this(reg, sizes, repositoryDao, ring, pixels, resources,
+                new ReaderSecurityCheck() {
+                    @Override
+                    public void assertUsedFilesReadable(IFormatReader reader) {
+                    }
+        });
+    }
+
+    public RequestObjectFactoryRegistry(Registry reg, TileSizes sizes,
+            RepositoryDao repositoryDao, Ring ring,
+            PixelsService pixels, Resources resources, ReaderSecurityCheck readerSecurityCheck) {
         this.reg = reg;
         this.sizes = sizes;
         this.dao = repositoryDao;
         this.ring = ring;
         this.pixels = pixels;
         this.resources = resources;
+        this.readerSecurityCheck = readerSecurityCheck;
     }
 
     public void setApplicationContext(ApplicationContext ctx)
@@ -87,7 +105,8 @@ public class RequestObjectFactoryRegistry extends
                         new OMEROWrapper(
                                 new ImportConfig(),
                                 pixels.getMemoizerWait(),
-                                pixels.getMemoizerDirectory()),
+                                pixels.getMemoizerDirectory(),
+                                readerSecurityCheck),
                         ring.uuid);
                 mir.setResources(resources);
                 return mir;
