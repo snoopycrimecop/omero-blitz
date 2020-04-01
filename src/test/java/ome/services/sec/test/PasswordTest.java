@@ -14,6 +14,7 @@ import static omero.rtypes.*;
 import omero.model.Experimenter;
 import omero.api.IAdminPrx;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 @Test(enabled=false, groups = { "broken", "client", "integration", "security", "ticket:181",
@@ -204,25 +205,25 @@ public class PasswordTest extends AbstractAccountTest {
     @Test(enabled=false, groups = "special")
     public void testSpecialCaseOfSudosOldPassword() throws Exception {
         resetPasswordTo_ome(sudo);
-        assertTrue(OME_HASH.equals(getPasswordFromDb(sudo)));
+        Assert.assertTrue(OME_HASH.equals(getPasswordFromDb(sudo)));
 
         assertCanLogin(sudo_name, "ome");
         assertCannotLogin(sudo_name, "bob");
         assertCannotLogin(sudo_name, "");
 
-        assertTrue(OME_HASH.equals(getPasswordFromDb(sudo)));
+        Assert.assertTrue(OME_HASH.equals(getPasswordFromDb(sudo)));
 
         removePasswordEntry(sudo);
-        assertNull(getPasswordFromDb(sudo));
+        Assert.assertNull(getPasswordFromDb(sudo));
 
         assertCannotLogin(sudo_name, "");
         assertCannotLogin(sudo_name, "bob");
 
-        assertNull(getPasswordFromDb(sudo));
+        Assert.assertNull(getPasswordFromDb(sudo));
 
         assertCannotLogin(sudo_name, "ome");
 
-        assertNull(getPasswordFromDb(sudo));
+        Assert.assertNull(getPasswordFromDb(sudo));
 
     }
 

@@ -8,7 +8,6 @@ package ome.services.blitz.test.old;
 
 import java.io.File;
 
-import junit.framework.TestCase;
 import ome.system.Login;
 import ome.system.OmeroContext;
 import omero.api.IUpdatePrx;
@@ -17,6 +16,7 @@ import omero.constants.UPDATESERVICE;
 import omero.model.ImageI;
 
 import org.springframework.util.ResourceUtils;
+
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -24,14 +24,13 @@ import org.testng.annotations.Test;
 import Ice.RouterPrx;
 
 @Test(groups = { "integration", "blitz" })
-public abstract class IceTest extends TestCase {
+public abstract class IceTest {
 
     protected OmeroContext context;
     protected Login rootLogin;
     protected omero.client ice = null, root = null;
     protected Ice.Communicator ic = null;
 
-    @Override
     @BeforeMethod
     public void setUp() throws Exception {
         context = OmeroContext.getInstance("ome.client.test");
@@ -45,7 +44,6 @@ public abstract class IceTest extends TestCase {
         ic = ice.getCommunicator();
     }
 
-    @Override
     @AfterMethod
     public void tearDown() throws Exception {
         ice.closeSession();

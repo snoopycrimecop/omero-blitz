@@ -8,12 +8,12 @@ package ome.services.blitz.test;
 
 import java.util.Properties;
 
-import junit.framework.TestCase;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 @Test(groups = { "integration", "blitz", "client" })
-public class ClientConstructorsTest extends TestCase {
+public class ClientConstructorsTest {
 
     public void testHostConstructor() throws Exception {
         omero.client c = new omero.client("localhost");
@@ -61,7 +61,7 @@ public class ClientConstructorsTest extends TestCase {
         String[] args = new String[] {"--Ice.MessageSizeMax=10","--omero.host=localhost","--omero.user=root", "--omero.pass=ome"};
         omero.client c = new omero.client(args);
         c.createSession();
-        assertEquals("10", c.getProperty("Ice.MessageSizeMax"));
+        Assert.assertEquals("10", c.getProperty("Ice.MessageSizeMax"));
         c.closeSession();
     }
 

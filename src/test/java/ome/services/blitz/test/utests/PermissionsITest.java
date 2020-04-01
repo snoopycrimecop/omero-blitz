@@ -10,17 +10,17 @@ import static ome.model.internal.Permissions.Role.*;
 import static ome.model.internal.Permissions.Right.*;
 import static ome.model.internal.Permissions.Flag.*;
 
-import junit.framework.TestCase;
 
 import ome.model.internal.Permissions;
 import ome.util.Utils;
 import omero.model.PermissionsI;
 
+import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 @Test(groups = "ticket:685")
-public class PermissionsITest extends TestCase {
+public class PermissionsITest  {
 
     Permissions p;
     PermissionsI pI;
@@ -35,15 +35,15 @@ public class PermissionsITest extends TestCase {
 
     public void testPermissionsDefault() throws Exception {
         pI = new PermissionsI();
-        assertFalse(pI.isUserRead());
-        assertFalse(pI.isUserAnnotate());
-        assertFalse(pI.isUserWrite());
-        assertFalse(pI.isGroupRead());
-        assertFalse(pI.isGroupAnnotate());
-        assertFalse(pI.isGroupWrite());
-        assertFalse(pI.isWorldRead());
-        assertFalse(pI.isWorldAnnotate());
-        assertFalse(pI.isWorldWrite());
+        Assert.assertFalse(pI.isUserRead());
+        Assert.assertFalse(pI.isUserAnnotate());
+        Assert.assertFalse(pI.isUserWrite());
+        Assert.assertFalse(pI.isGroupRead());
+        Assert.assertFalse(pI.isGroupAnnotate());
+        Assert.assertFalse(pI.isGroupWrite());
+        Assert.assertFalse(pI.isWorldRead());
+        Assert.assertFalse(pI.isWorldAnnotate());
+        Assert.assertFalse(pI.isWorldWrite());
     }
     
     public void testPermissionsUserRead() throws Exception {
@@ -128,15 +128,15 @@ public class PermissionsITest extends TestCase {
     }
 
     void verify(Permissions p, PermissionsI pI) {
-        assertEquals(p.isGranted(USER, READ), pI.isUserRead());
-        assertEquals(p.isGranted(USER, ANNOTATE), pI.isUserAnnotate());
-        assertEquals(p.isGranted(USER, WRITE), pI.isUserWrite());
-        assertEquals(p.isGranted(GROUP, READ), pI.isGroupRead());
-        assertEquals(p.isGranted(GROUP, ANNOTATE), pI.isGroupAnnotate());
-        assertEquals(p.isGranted(GROUP, WRITE), pI.isGroupWrite());
-        assertEquals(p.isGranted(WORLD, READ), pI.isWorldRead());
-        assertEquals(p.isGranted(WORLD, ANNOTATE), pI.isWorldAnnotate());
-        assertEquals(p.isGranted(WORLD, WRITE), pI.isWorldWrite());
+        Assert.assertEquals(p.isGranted(USER, READ), pI.isUserRead());
+        Assert.assertEquals(p.isGranted(USER, ANNOTATE), pI.isUserAnnotate());
+        Assert.assertEquals(p.isGranted(USER, WRITE), pI.isUserWrite());
+        Assert.assertEquals(p.isGranted(GROUP, READ), pI.isGroupRead());
+        Assert.assertEquals(p.isGranted(GROUP, ANNOTATE), pI.isGroupAnnotate());
+        Assert.assertEquals(p.isGranted(GROUP, WRITE), pI.isGroupWrite());
+        Assert.assertEquals(p.isGranted(WORLD, READ), pI.isWorldRead());
+        Assert.assertEquals(p.isGranted(WORLD, ANNOTATE), pI.isWorldAnnotate());
+        Assert.assertEquals(p.isGranted(WORLD, WRITE), pI.isWorldWrite());
     }
 
 }

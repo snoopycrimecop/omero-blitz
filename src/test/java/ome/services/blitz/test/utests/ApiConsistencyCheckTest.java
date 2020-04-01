@@ -6,22 +6,23 @@
  */
 package ome.services.blitz.test.utests;
 
-import junit.framework.TestCase;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
  * @author Josh Moore, josh at glencoesoftware.com
  * @since 3.0-Beta2
  */
-public class ApiConsistencyCheckTest extends TestCase {
+public class ApiConsistencyCheckTest {
 
     @Test
     public void testCreateContextAndHopeItDoesntExplode() {
-        new ome.system.OmeroContext(new String[]{
+        ome.system.OmeroContext ctx = new ome.system.OmeroContext(new String[]{
                 "classpath:omero/test.xml",
                 "classpath:ome/services/blitz-servantDefinitions.xml",
                 "classpath:ome/services/blitz-graph-rules.xml"});
+        Assert.assertNotNull(ctx);
     }
 
 }

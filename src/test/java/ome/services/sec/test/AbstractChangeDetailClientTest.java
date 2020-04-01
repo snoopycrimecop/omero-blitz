@@ -24,6 +24,7 @@ import omero.model.Image;
 import omero.model.ImageI;
 import omero.sys.Roles;
 
+import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -120,7 +121,7 @@ public class AbstractChangeDetailClientTest extends AbstractSecurityTest {
             i.setName(rstring("test"));
             i = (Image) services.getUpdateService().saveAndReturnObject(i);
             // They need to actual belong to the right people
-            assertEquals(rootAdmin.lookupExperimenter(login.getName()).getId(),
+            Assert.assertEquals(rootAdmin.lookupExperimenter(login.getName()).getId(),
                     rootQuery.get("Image", i.getId().getValue()).getDetails().getOwner()
                             .getId());
             return i.getId().getValue();

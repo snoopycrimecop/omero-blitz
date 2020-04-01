@@ -21,6 +21,7 @@ import omero.model.ExperimenterGroup;
 import omero.model.ExperimenterGroupI;
 
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -146,7 +147,7 @@ public class AbstractAccountTest extends AbstractSecurityTest {
 
             count = jdbc.update("insert into password values (?,?)", id,
                     AbstractAccountTest.OME_HASH);
-            assertTrue(count == 1);
+            Assert.assertEquals(count, 1);
         }
         dataSource.getConnection().commit();
     }
@@ -197,7 +198,7 @@ public class AbstractAccountTest extends AbstractSecurityTest {
         try {
             c.createSession(name, password).getQueryService().get("Experimenter", 0L);
             if (!works) {
-                fail("Login should not have succeeded:" + name + ":" + password);
+                Assert.fail("Login should not have succeeded:" + name + ":" + password);
             }
         } catch (Exception e) {
             if (works) {

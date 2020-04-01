@@ -12,7 +12,6 @@ import static omero.rtypes.rtime;
 
 import java.util.List;
 
-import junit.framework.TestCase;
 
 import ome.api.IPixels;
 import ome.io.nio.PixelsService;
@@ -24,11 +23,12 @@ import ome.tools.hibernate.SessionFactory;
 import ome.util.SqlAction;
 import omero.model.Shape;
 
+import org.testng.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 @Test(groups = "integration")
-public class GeomToolTest extends TestCase {
+public class GeomToolTest{
 
     protected OmeroContext ctx;
 
@@ -66,7 +66,7 @@ public class GeomToolTest extends TestCase {
         List<Shape> shapes = geomTool.random(50000);
         for (Shape shape : shapes) {
             String path = geomTool.dbPath(shape);
-            assertNotNull(path);
+            Assert.assertNotNull(path);
         }
     }
 

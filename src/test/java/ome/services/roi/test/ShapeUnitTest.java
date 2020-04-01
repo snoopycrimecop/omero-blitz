@@ -7,48 +7,48 @@
 
 package ome.services.roi.test;
 
-import junit.framework.TestCase;
 import ome.services.roi.GeomTool;
 import omero.model.SmartLineI;
 import omero.model.SmartShape.Util;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
  *
  */
 @Test(groups = { "rois" })
-public class ShapeUnitTest extends TestCase {
+public class ShapeUnitTest {
 
     GeomTool geomTool = new GeomTool(null, null, null);
 
     @Test
     public void testDiscriminators() throws Exception {
-        assertEquals("text", geomTool.discriminator("Text"));
-        assertEquals("text", geomTool.discriminator("TextI"));
-        assertEquals("text", geomTool.discriminator("omero.model.Text"));
-        assertEquals("text", geomTool.discriminator("omero.model.TextI"));
-        assertEquals("text", geomTool.discriminator("omero::model::Text"));
-        assertEquals("text", geomTool.discriminator("::omero::model::Text"));
-        assertEquals("mask", geomTool.discriminator("Mask"));
-        assertEquals("mask", geomTool.discriminator("MaskI"));
-        assertEquals("mask", geomTool.discriminator("omero.model.Mask"));
-        assertEquals("mask", geomTool.discriminator("omero.model.MaskI"));
-        assertEquals("mask", geomTool.discriminator("omero::model::Mask"));
-        assertEquals("mask", geomTool.discriminator("::omero::model::Mask"));
+        Assert.assertEquals("text", geomTool.discriminator("Text"));
+        Assert.assertEquals("text", geomTool.discriminator("TextI"));
+        Assert.assertEquals("text", geomTool.discriminator("omero.model.Text"));
+        Assert.assertEquals("text", geomTool.discriminator("omero.model.TextI"));
+        Assert.assertEquals("text", geomTool.discriminator("omero::model::Text"));
+        Assert.assertEquals("text", geomTool.discriminator("::omero::model::Text"));
+        Assert.assertEquals("mask", geomTool.discriminator("Mask"));
+        Assert.assertEquals("mask", geomTool.discriminator("MaskI"));
+        Assert.assertEquals("mask", geomTool.discriminator("omero.model.Mask"));
+        Assert.assertEquals("mask", geomTool.discriminator("omero.model.MaskI"));
+        Assert.assertEquals("mask", geomTool.discriminator("omero::model::Mask"));
+        Assert.assertEquals("mask", geomTool.discriminator("::omero::model::Mask"));
     }
 
     
     @Test
     public void testGeometryOfLineGood() throws Exception {
         SmartLineI l = (SmartLineI) geomTool.ln(0, 0, 1, 1);
-        assertTrue(Util.checkNonNull(l.asPoints()));
+        Assert.assertTrue(Util.checkNonNull(l.asPoints()));
     }
 
     @Test(expectedExceptions = AssertionError.class)
     public void testGeometryOfLineBad() throws Exception {
         SmartLineI l = (SmartLineI) geomTool.ln(0, 0, 1, 1);
         l.setY2(null);
-        assertFalse(Util.checkNonNull(l.asPoints()));
+        Assert.assertFalse(Util.checkNonNull(l.asPoints()));
     }
 }

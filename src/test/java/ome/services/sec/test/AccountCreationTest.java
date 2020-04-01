@@ -17,6 +17,7 @@ import omero.model.ExperimenterGroup;
 import omero.model.ExperimenterGroupI;
 import omero.api.ServiceFactoryPrx;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import Glacier2.CannotCreateSessionException;
@@ -32,7 +33,7 @@ public class AccountCreationTest extends AbstractAccountTest {
 
         // passwords are no longer null by default
         removePasswordEntry(e);
-        assertNull(getPasswordFromDb(e));
+        Assert.assertNull(getPasswordFromDb(e));
 
         assertCannotLogin(e.getOmeName().getValue(), "ome");
         assertCannotLogin(e.getOmeName().getValue(), "");
@@ -156,7 +157,7 @@ public class AccountCreationTest extends AbstractAccountTest {
     private void doesNotHaveSystemPrivileges(Experimenter e) {
         try {
             hasSystemPrivileges(e);
-            fail("Should be security violation");
+            Assert.fail("Should be security violation");
         } catch (Exception ex) {
             // ok.
         }

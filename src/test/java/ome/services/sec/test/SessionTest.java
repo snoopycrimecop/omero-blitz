@@ -6,7 +6,6 @@
  */
 package ome.services.sec.test;
 
-import junit.framework.TestCase;
 import ome.api.IConfig;
 import ome.api.ISession;
 import ome.conditions.RemovedSessionException;
@@ -17,6 +16,7 @@ import ome.system.OmeroContext;
 import ome.system.Principal;
 import ome.system.ServiceFactory;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
@@ -24,7 +24,7 @@ import org.testng.annotations.Test;
  * @since 3.0-Beta2
  */
 @Test(enabled=false, groups = { "broken" })
-public class SessionTest extends TestCase {
+public class SessionTest {
 
     Login rootLogin = null; // (Login) OmeroContext.getInstance("ome.client.test") .getBean("rootLogin");
     Principal rootPrincipal = null; // new Principal(rootLogin.getName(), "system", "Test");
@@ -42,7 +42,7 @@ public class SessionTest extends TestCase {
         sf.closeSession();
         try {
             c1.getServerTime();
-            fail("should fail since session closed");
+            Assert.fail("should fail since session closed");
         } catch (Exception e) {
             // ok
         }
@@ -54,7 +54,7 @@ public class SessionTest extends TestCase {
         sf.getSessionService().closeSession(sf.getSession());
         try {
             sf.getQueryService().get(Experimenter.class, 0L);
-            fail("Shouldn't be logged in");
+            Assert.fail("Shouldn't be logged in");
         } catch (Exception e) {
             // ok
         }
@@ -70,7 +70,7 @@ public class SessionTest extends TestCase {
                 .getPassword());
         sf.setSession(s);
         Session s2 = sf.getSession();
-        assertEquals(s, s2);
+        Assert.assertEquals(s, s2);
         service.closeSession(s);
     }
 

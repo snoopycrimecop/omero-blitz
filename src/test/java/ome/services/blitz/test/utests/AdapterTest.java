@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import junit.framework.TestCase;
+import org.testng.Assert;
 import ome.model.annotations.AnnotationAnnotationLink;
 import ome.model.annotations.CommentAnnotation;
 import ome.model.containers.Dataset;
@@ -64,10 +64,11 @@ import omero.model.ReverseIntensityContextI;
 import omero.sys.ParametersI;
 import omero.util.IceMapper;
 
+import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-public class AdapterTest extends TestCase {
+public class AdapterTest {
 
     Project p;
 
@@ -77,7 +78,6 @@ public class AdapterTest extends TestCase {
 
     Pixels pix;
 
-    @Override
     @BeforeMethod
     protected void setUp() throws Exception {
         p = new Project();
@@ -99,8 +99,8 @@ public class AdapterTest extends TestCase {
         IceMapper mapper = new IceMapper();
         ProjectI p_remote = (ProjectI) mapper.map(p);
         Project p_test = (Project) mapper.reverse(p_remote);
-        assertTrue("test".equals(p_remote.getName()));
-        assertTrue("test".equals(p_test.getName()));
+        Assert.assertTrue("test".equals(p_remote.getName()));
+        Assert.assertTrue("test".equals(p_test.getName()));
     }
 
     @Test
@@ -109,8 +109,8 @@ public class AdapterTest extends TestCase {
         IceMapper mapper = new IceMapper();
         ProjectI p_remote = (ProjectI) mapper.map(p);
         Project p_test = (Project) mapper.reverse(p_remote);
-        assertTrue(p_remote.copyDatasetLinks().size() == 1);
-        assertTrue(p_test.sizeOfDatasetLinks() == 1);
+        Assert.assertTrue(p_remote.copyDatasetLinks().size() == 1);
+        Assert.assertTrue(p_test.sizeOfDatasetLinks() == 1);
     }
 
     @Test
@@ -121,24 +121,24 @@ public class AdapterTest extends TestCase {
         IceMapper mapper = new IceMapper();
         ProjectI p_remote = (ProjectI) mapper.map(p);
         Project p_test = (Project) mapper.reverse(p_remote);
-        assertTrue(p_remote.copyDatasetLinks().size() == 1);
-        assertTrue(p_test.sizeOfDatasetLinks() == 1);
+        Assert.assertTrue(p_remote.copyDatasetLinks().size() == 1);
+        Assert.assertTrue(p_test.sizeOfDatasetLinks() == 1);
         ProjectDatasetLinkI pdl_remote = (ProjectDatasetLinkI) p_remote
                 .copyDatasetLinks().get(0);
         ProjectDatasetLink pdl_test = (ProjectDatasetLink) mapper
                 .reverse(pdl_remote);
-        assertTrue(pdl_remote.getParent() == p_remote);
-        assertTrue(pdl_test.parent() != p.collectDatasetLinks(null).get(0));
+        Assert.assertTrue(pdl_remote.getParent() == p_remote);
+        Assert.assertTrue(pdl_test.parent() != p.collectDatasetLinks(null).get(0));
 
         omero.model.Dataset d_remote = pdl_remote.getChild();
-        assertTrue(d_remote.sizeOfImageLinks() == 1);
+        Assert.assertTrue(d_remote.sizeOfImageLinks() == 1);
         omero.model.DatasetImageLink dil_remote = d_remote.copyImageLinks()
                 .get(0);
-        assertTrue(dil_remote.getParent() == d_remote);
+        Assert.assertTrue(dil_remote.getParent() == d_remote);
         omero.model.Image i_remote = dil_remote.getChild();
-        assertTrue(i_remote.sizeOfPixels() == 1);
+        Assert.assertTrue(i_remote.sizeOfPixels() == 1);
         omero.model.Pixels pix_remote = i_remote.copyPixels().get(0);
-        assertTrue(pix_remote.getImage() == i_remote);
+        Assert.assertTrue(pix_remote.getImage() == i_remote);
     }
 
     @Test
@@ -163,10 +163,10 @@ public class AdapterTest extends TestCase {
 
         Project p = new Project();
         p.putAt(Project.DATASETLINKS, null);
-        assertTrue(p.sizeOfDatasetLinks() < 0);
+        Assert.assertTrue(p.sizeOfDatasetLinks() < 0);
 
         ProjectI p_remote = (ProjectI) mapper.map(p);
-        assert (p_remote.sizeOfDatasetLinks() > 0);
+        Assert.assertTrue(p_remote.sizeOfDatasetLinks() > 0);
     }
 
     @Test
@@ -179,7 +179,7 @@ public class AdapterTest extends TestCase {
 
         Project p = (Project) mapper.reverse(p_remote);
 
-        assert (p.sizeOfDatasetLinks() < 0);
+        Assert.assertTrue(p.sizeOfDatasetLinks() < 0);
 
     }
 
@@ -192,7 +192,7 @@ public class AdapterTest extends TestCase {
         pa.addAnnotationAnnotationLink(new AnnotationAnnotationLink(1L, false));
 
         CommentAnnotationI pa_remote = (CommentAnnotationI) mapper.map(pa);
-        assertFalse(pa_remote.copyAnnotationLinks().get(0).isLoaded());
+        Assert.assertFalse(pa_remote.copyAnnotationLinks().get(0).isLoaded());
 
     }
 
@@ -207,7 +207,7 @@ public class AdapterTest extends TestCase {
         pa_remote.addAnnotationAnnotationLink(p_remote);
 
         CommentAnnotation pa = (CommentAnnotation) mapper.reverse(pa_remote);
-        assertFalse(pa.iterateAnnotationLinks().next().isLoaded());
+        Assert.assertFalse(pa.iterateAnnotationLinks().next().isLoaded());
     }
 
     @Test(groups = "ticket:684")
@@ -220,25 +220,25 @@ public class AdapterTest extends TestCase {
         long p_sz = p_remote.sizeOfDatasetLinks();
         long d_sz = d_remote.sizeOfProjectLinks();
 
-        assertTrue(d_sz + "!=1", d_sz == 1L);
-        assertTrue(p_sz + "!=1", p_sz == 1L);
+        Assert.assertTrue(d_sz == 1L, d_sz + "!=1");
+        Assert.assertTrue(p_sz == 1L, p_sz + "!=1");
     }
 
     @Test
     public void testUnloadedCollectionsRemainUnloaded() throws Exception {
         p.putAt(Project.DATASETLINKS, null);
-        assertTrue(p.sizeOfDatasetLinks() < 0);
+        Assert.assertTrue(p.sizeOfDatasetLinks() < 0);
         IceMapper mapper = new IceMapper();
         ProjectI p_remote = (ProjectI) mapper.map(p);
-        assertFalse(p_remote.sizeOfDatasetLinks() > 0);
+        Assert.assertFalse(p_remote.sizeOfDatasetLinks() > 0);
 
         // reverse
         p_remote = new ProjectI();
         p_remote.unloadDatasetLinks();
-        assertFalse(p_remote.sizeOfDatasetLinks() > 0);
+        Assert.assertFalse(p_remote.sizeOfDatasetLinks() > 0);
         mapper = new IceMapper();
         p = (Project) mapper.reverse(p_remote);
-        assertTrue(p.sizeOfDatasetLinks() < 0);
+        Assert.assertTrue(p.sizeOfDatasetLinks() < 0);
 
     }
 
@@ -261,50 +261,50 @@ public class AdapterTest extends TestCase {
         IceMapper mapper = new IceMapper();
         Map reversed = mapper.reverse(map);
         Long l = (Long) reversed.get("d");
-        assertEquals(l, po.getExperimenter());
+        Assert.assertEquals(l, po.getExperimenter());
         Boolean b = (Boolean) reversed.get("c");
-        assertEquals(b, Boolean.valueOf(po.isLeaves()));
+        Assert.assertEquals(b, Boolean.valueOf(po.isLeaves()));
     }
 
     @Test
     public void testRTypes() throws Exception {
         IceMapper mapper = new IceMapper();
         // Nulls
-        assertNull(mapper.fromRType((RString) null));
-        assertNull(mapper.fromRType((RBool) null));
-        assertNull(mapper.fromRType((RInt) null));
-        assertNull(mapper.fromRType((RLong) null));
-        assertNull(mapper.fromRType((RDouble) null));
-        assertNull(mapper.fromRType((RClass) null));
-        assertNull(mapper.fromRType((RFloat) null));
-        assertNull(mapper.fromRType((RObject) null));
-        assertNull(mapper.convert((RTime) null));
-        assertNull(mapper.fromRType((RList) null));
-        assertNull(mapper.fromRType((RSet) null));
+        Assert.assertNull(mapper.fromRType((RString) null));
+        Assert.assertNull(mapper.fromRType((RBool) null));
+        Assert.assertNull(mapper.fromRType((RInt) null));
+        Assert.assertNull(mapper.fromRType((RLong) null));
+        Assert.assertNull(mapper.fromRType((RDouble) null));
+        Assert.assertNull(mapper.fromRType((RClass) null));
+        Assert.assertNull(mapper.fromRType((RFloat) null));
+        Assert.assertNull(mapper.fromRType((RObject) null));
+        Assert.assertNull(mapper.convert((RTime) null));
+        Assert.assertNull(mapper.fromRType((RList) null));
+        Assert.assertNull(mapper.fromRType((RSet) null));
         //
-        assertEquals("a", mapper.fromRType(rstring("a")));
-        assertEquals(1L, mapper.fromRType(rlong(1L)));
-        assertEquals(1, mapper.fromRType(rint(1)));
-        assertEquals(1.0, mapper.fromRType(rdouble(1.0)));
-        assertEquals(1.0f, mapper.fromRType(rfloat(1.0f)));
-        assertEquals(true, mapper.fromRType(rbool(true)));
-        assertEquals(Image.class, mapper.fromRType(rclass("Image")));
+        Assert.assertEquals("a", mapper.fromRType(rstring("a")));
+        Assert.assertEquals(1L, mapper.fromRType(rlong(1L)));
+        Assert.assertEquals(1, mapper.fromRType(rint(1)));
+        Assert.assertEquals(1.0, mapper.fromRType(rdouble(1.0)));
+        Assert.assertEquals(1.0f, mapper.fromRType(rfloat(1.0f)));
+        Assert.assertEquals(true, mapper.fromRType(rbool(true)));
+        Assert.assertEquals(Image.class, mapper.fromRType(rclass("Image")));
         IObject obj = new ImageI(1L, false);
         Image img = (Image) mapper.fromRType(robject(obj));
-        assertEquals(img.getId(), Long.valueOf(obj.getId().getValue()));
+        Assert.assertEquals(img.getId(), Long.valueOf(obj.getId().getValue()));
         RTime time = rtime(1L);
         Timestamp ts = mapper.convert(time);
-        assertEquals(ts.getTime(), time.getValue());
+        Assert.assertEquals(ts.getTime(), time.getValue());
         RArray jarr = rarray(rstring("A"));
         String[] strings = (String[]) mapper.fromRType(jarr);
-        assertTrue(strings[0].equals("A"));
+        Assert.assertTrue(strings[0].equals("A"));
         RList jlist = rlist(Arrays.<RType> asList(rstring("L")));
         List stringList = (List) mapper.fromRType(jlist);
-        assertTrue(stringList.contains("L"));
+        Assert.assertTrue(stringList.contains("L"));
         RSet jset = rset(new HashSet<RType>(Arrays
                 .<RType> asList(rstring("S"))));
         Set stringSet = (Set) mapper.fromRType(jset);
-        assertTrue(stringSet.contains("S"));
+        Assert.assertTrue(stringSet.contains("S"));
     }
 
     @Test
@@ -313,7 +313,7 @@ public class AdapterTest extends TestCase {
         Map m = new HashMap();
         m.put("a", rstring("a"));
         Map reversed = mapper.reverse(m);
-        assertTrue(reversed.get("a").equals("a"));
+        Assert.assertTrue(reversed.get("a").equals("a"));
     }
 
     @Test(groups = "ticket:737")
@@ -323,6 +323,6 @@ public class AdapterTest extends TestCase {
         e.setTime(t);
         IceMapper mapper = new IceMapper();
         EventI ei = (EventI) mapper.map(e);
-        assertNotNull(ei.getTime());
+        Assert.assertNotNull(ei.getTime());
     }
 }
