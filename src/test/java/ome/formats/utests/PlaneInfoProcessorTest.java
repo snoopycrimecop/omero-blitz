@@ -30,8 +30,11 @@ import omero.api.ServiceFactoryPrx;
 import omero.model.PlaneInfo;
 
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import java.io.IOException;
 
 
 public class PlaneInfoProcessorTest
@@ -62,6 +65,12 @@ public class PlaneInfoProcessorTest
         store.setPlaneTheZ(new NonNegativeInteger(2), IMAGE_INDEX, PLANE_INFO_INDEX + 2);
         store.setPlaneTheT(new NonNegativeInteger(2), IMAGE_INDEX, PLANE_INFO_INDEX + 2);
         store.setPlaneDeltaT(onesec, IMAGE_INDEX, PLANE_INFO_INDEX +2);
+    }
+
+    @AfterMethod
+    protected void tearDown()
+            throws IOException {
+        store.logout();
     }
 
     @Test

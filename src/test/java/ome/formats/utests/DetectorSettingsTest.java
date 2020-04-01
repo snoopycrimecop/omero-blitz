@@ -34,8 +34,11 @@ import omero.model.Instrument;
 import omero.model.Pixels;
 
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import java.io.IOException;
 
 public class DetectorSettingsTest
 {
@@ -87,6 +90,13 @@ public class DetectorSettingsTest
 			"Detector:0", IMAGE_INDEX + 1, CHANNEL_INDEX);
         store.setDetectorSettingsID(
 			"Detector:0", IMAGE_INDEX + 2, CHANNEL_INDEX);
+	}
+
+	@AfterMethod
+	protected void tearDown()
+			throws IOException {
+		wrapper.close();
+		store.logout();
 	}
 
 	@Test

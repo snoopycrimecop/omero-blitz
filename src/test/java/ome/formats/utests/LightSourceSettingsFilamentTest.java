@@ -34,8 +34,11 @@ import omero.model.LightSettings;
 import omero.model.Pixels;
 
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import java.io.IOException;
 
 public class LightSourceSettingsFilamentTest
 {
@@ -85,6 +88,13 @@ public class LightSourceSettingsFilamentTest
 				"Filament:1", IMAGE_INDEX, CHANNEL_INDEX + 1);
 		store.setChannelLightSourceSettingsAttenuation(
 				new PercentFraction(1f), IMAGE_INDEX, CHANNEL_INDEX + 1);
+	}
+
+	@AfterMethod
+	protected void tearDown()
+			throws IOException {
+		wrapper.close();
+		store.logout();
 	}
 
 	@Test

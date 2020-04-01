@@ -20,6 +20,7 @@
  */
 package ome.formats.utests;
 
+import java.io.IOException;
 import java.util.Map;
 
 import ome.formats.OMEROMetadataStoreClient;
@@ -40,6 +41,7 @@ import omero.model.Plate;
 import omero.model.PowerI;
 
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -145,6 +147,13 @@ public class ContainerCacheOrderTest
 
 		// A Plate
 		store.setPlateName("Plate", 0);
+	}
+
+	@AfterMethod
+	protected void tearDown()
+			throws IOException {
+		wrapper.close();
+		store.logout();
 	}
 
 	@Test

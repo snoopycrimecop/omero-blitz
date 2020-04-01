@@ -35,8 +35,11 @@ import omero.model.ObjectiveSettings;
 import omero.model.Pixels;
 
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import java.io.IOException;
 
 public class ObjectiveSettingsTest
 {
@@ -85,6 +88,13 @@ public class ObjectiveSettingsTest
         store.setObjectiveSettingsID("Objective:0", IMAGE_INDEX);
         store.setObjectiveSettingsID("Objective:0", IMAGE_INDEX + 1);
         store.setObjectiveSettingsID("Objective:0", IMAGE_INDEX + 2);
+	}
+
+	@AfterMethod
+	protected void tearDown()
+			throws IOException {
+		wrapper.close();
+		store.logout();
 	}
 
 	@Test

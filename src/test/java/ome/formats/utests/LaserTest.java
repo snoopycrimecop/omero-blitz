@@ -20,6 +20,7 @@
  */
 package ome.formats.utests;
 
+import java.io.IOException;
 import java.util.LinkedHashMap;
 
 import ome.formats.Index;
@@ -38,6 +39,7 @@ import omero.model.Laser;
 import omero.model.LengthI;
 
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -68,6 +70,12 @@ public class LaserTest
         store.setEnumerationProvider(new TestEnumerationProvider());
         store.setInstanceProvider(
 			new BlitzInstanceProvider(store.getEnumerationProvider()));
+	}
+
+	@AfterMethod
+	protected void tearDown()
+			throws IOException {
+		store.logout();
 	}
 
 	@Test
