@@ -1,5 +1,5 @@
 /*
- *   Copyright 2014-2018 University of Dundee. All rights reserved.
+ *   Copyright 2014-2020 University of Dundee. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  */
 
@@ -19,6 +19,7 @@ import ome.security.auth.PasswordChangeException;
 import ome.security.auth.PasswordProvider;
 import ome.security.auth.PasswordUtil;
 import ome.services.mail.MailUtil;
+import ome.util.SqlAction;
 import omero.cmd.HandleI.Cancel;
 import omero.cmd.ERR;
 import omero.cmd.Helper;
@@ -118,11 +119,13 @@ public class ResetPasswordRequestI extends ResetPasswordRequest implements
             throw helper.cancel(new ERR(), null, "unknown-user",
                     "ApiUsageException", ex.getMessage());
         }
-        if (e.getEmail() == null)
+        final SqlAction sql = helper.getSql();
+        final String emailFromDb = sql.getUserEmailByOmeName(omename);
+        if (emailFromDb == null)
             throw helper.cancel(new ERR(), null, "unknown-email",
                     "ApiUsageException",
                     String.format("User has no email address."));
-        else if (!e.getEmail().equals(email))
+        else if (!emailFromDb.equals(email))
             throw helper.cancel(new ERR(), null, "not-match",
                     "ApiUsageException",
                     String.format("Email address does not match."));
@@ -144,11 +147,11 @@ public class ResetPasswordRequestI extends ResetPasswordRequest implements
             // FIXME
             // workaround as sec.runAsAdmin doesn't execute with the root
             // context
-            // helper.getServiceFactory().getAdminService().changeUserPassword(e.getOmeName(),
+            // helper.getServiceFactory().getAdminService().changeUserPassword(omename,
             // newPassword);
             try {
-                passwordProvider.changePassword(e.getOmeName(), newPassword);
-                log.info("Changed password for user: " + e.getOmeName());
+                passwordProvider.changePassword(omename, newPassword);
+                log.info("Changed password for user: " + omename);
             } catch (PasswordChangeException pce) {
                 log.error(pce.getMessage());
                 throw helper.cancel(new ERR(), null, "password-change-failed",
@@ -156,15 +159,16 @@ public class ResetPasswordRequestI extends ResetPasswordRequest implements
                         String.format(pce.getMessage()));
             }
 
+            final String prettyName = sql.getUserPrettyNameByOmeName(omename);
             String subject = "OMERO - Reset password";
-            String body = "Dear " + e.getFirstName() + " " + e.getLastName()
-                    + " (" + e.getOmeName() + ")" + " your new password is: "
+            String body = "Dear " + prettyName
+                    + " (" + omename + ")" + " your new password is: "
                     + newPassword;
 
             try {
-                mailUtil.sendEmail(sender, e.getEmail(), subject, body, false,
+                mailUtil.sendEmail(sender, email, subject, body, false,
                         null, null);
-                log.info("sent new password for {} to {}", e.getOmeName(), e.getEmail());
+                log.info("sent new password for {} to {}", omename, email);
             } catch (MailException me) {
                 log.error(me.getMessage());
                 throw helper.cancel(new ERR(), null, "mail-send-failed",
