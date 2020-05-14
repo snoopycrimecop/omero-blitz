@@ -158,7 +158,7 @@ public class ManagedReaderSecurityCheck implements ReaderSecurityCheck  {
         final Map.Entry<String, String> repoPathExample = repoPaths.entries().iterator().next();
         final long filesetId = getFilesetId(repoPathExample.getKey(), repoPathExample.getValue());
         final String hql =
-                "SELECT COUNT(o) FROM FilesetEntry AS e LEFT JOIN e.originalFile AS o " +
+                "SELECT COUNT(DISTINCT o) FROM FilesetEntry AS e LEFT JOIN e.originalFile AS o " +
                 "WHERE e.fileset.id = :fileset AND o.repo = :repo AND o.path || o.name IN (:paths)";
         for (final Map.Entry<String, Collection<String>> pathsOneRepo : repoPaths.asMap().entrySet()) {
             final String repo = pathsOneRepo.getKey();
