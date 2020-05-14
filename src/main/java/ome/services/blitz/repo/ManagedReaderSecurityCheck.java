@@ -94,8 +94,8 @@ public class ManagedReaderSecurityCheck implements ReaderSecurityCheck  {
                 .addString("path", serverPathHead)
                 .addString("name", serverPathTail);
         final List<Object[]> results = iQuery.projection(hql, parameters);
-        if (results.isEmpty()) {
-            final String error = "fileset for file " + serverPath + " is not readable from database";
+        if (results.size() != 1) {
+            final String error = "file " + serverPath + " does not have a unique readable fileset";
             LOGGER.warn(error);
             throw new SecurityViolation(error);
         }
