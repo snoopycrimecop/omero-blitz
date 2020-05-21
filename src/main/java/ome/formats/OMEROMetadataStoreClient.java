@@ -6685,7 +6685,8 @@ public class OMEROMetadataStoreClient
     @Override
     public void setROIName(String name, int ROIIndex)
     {
-        ignoreMissing("setROIName", name, ROIIndex);
+        Roi o = getROI(ROIIndex);
+        o.setName(toRType(name));
     }
 
     //////// Reagent /////////
