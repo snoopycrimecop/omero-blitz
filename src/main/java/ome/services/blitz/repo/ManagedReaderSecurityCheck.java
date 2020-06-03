@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 University of Dundee & Open Microscopy Environment.
+ * Copyright (C) 2019-2020 University of Dundee & Open Microscopy Environment.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -70,6 +70,38 @@ public class ManagedReaderSecurityCheck implements ReaderSecurityCheck  {
        this.repoUuids = managedRepoUuids;
     }
 
+    /**
+     * Find the fileset ID for the given file in the managed repository.
+     * @param repository the UUID of a file's repository
+     * @param serverPath the file's path within the repository
+     * @return the ID of the file's fileset, never {@code null}
+     */
+    private long getFilesetId(String repository, String serverPath) {
+        final int lastSeparator = serverPath.lastIndexOf(FsFile.separatorChar);
+        final String serverPathHead, serverPathTail;
+        if (lastSeparator == -1) {
+            serverPathHead = String.valueOf(FsFile.separatorChar);
+            serverPathTail = serverPath;
+        } else {
+            serverPathHead = serverPath.substring(0, lastSeparator + 1);
+            serverPathTail = serverPath.substring(serverPathHead.length());
+        }
+        final String hql =
+                "SELECT e.fileset.id FROM FilesetEntry AS e LEFT JOIN e.originalFile AS o " +
+                "WHERE o.repo = :repo AND o.path = :path AND o.name = :name";
+        final Parameters parameters = new Parameters()
+                .addString("repo", repository)
+                .addString("path", serverPathHead)
+                .addString("name", serverPathTail);
+        final List<Object[]> results = iQuery.projection(hql, parameters);
+        if (results.size() != 1) {
+            final String error = "file " + serverPath + " does not have a unique readable fileset";
+            LOGGER.warn(error);
+            throw new SecurityViolation(error);
+        }
+        return (Long) results.get(0)[0];
+    }
+
     @Override
     public void assertUsedFilesReadable(IFormatReader reader) throws SecurityViolation {
         /* Check that we know all the managed repository roots.*/
@@ -123,11 +155,18 @@ public class ManagedReaderSecurityCheck implements ReaderSecurityCheck  {
             throw new SecurityViolation(error);
         }
         /* Check that all the used files' OMERO permissions have them readable by the current user. */
-        final String hql = "SELECT COUNT(*) FROM OriginalFile WHERE repo = :repo AND path || name IN (:paths)";
+        final Map.Entry<String, String> repoPathExample = repoPaths.entries().iterator().next();
+        final long filesetId = getFilesetId(repoPathExample.getKey(), repoPathExample.getValue());
+        final String hql =
+                "SELECT COUNT(DISTINCT o) FROM FilesetEntry AS e LEFT JOIN e.originalFile AS o " +
+                "WHERE e.fileset.id = :fileset AND o.repo = :repo AND o.path || o.name IN (:paths)";
         for (final Map.Entry<String, Collection<String>> pathsOneRepo : repoPaths.asMap().entrySet()) {
             final String repo = pathsOneRepo.getKey();
             for (final List<String> paths : Iterables.partition(pathsOneRepo.getValue(), BATCH_SIZE)) {
-                final Parameters parameters = new Parameters().addString("repo", repo).addList("paths", new ArrayList<>(paths));
+                final Parameters parameters = new Parameters()
+                        .addLong("fileset", filesetId)
+                        .addString("repo", repo)
+                        .addList("paths", new ArrayList<>(paths));
                 final Object[] result = iQuery.projection(hql, parameters).get(0);
                 if (paths.size() != (Long) result[0]) {
                     final String error = "reader for " + reader.getCurrentFile() + " uses file from repository " + repo +
