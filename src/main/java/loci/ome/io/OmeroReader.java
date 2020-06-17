@@ -220,7 +220,7 @@ public class OmeroReader extends FormatReader {
 
     @Override
     protected void initFile(String id) throws FormatException, IOException {
-        LOGGER.debug("OmeroReader.initFile({})", id);
+        LOGGER.debug("OmeroReader.initFile()");
 
         super.initFile(id);
 
