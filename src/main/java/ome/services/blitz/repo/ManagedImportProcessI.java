@@ -336,7 +336,7 @@ public class ManagedImportProcessI extends AbstractCloseableAmdServant
             }
 
             Map<Integer, String> failingChecksums = new HashMap<Integer, String>();
-            final Map<String, String> allGroupsContext = ImmutableMap.of(Login.OMERO_GROUP, "-1");
+            Map<String, String> groupContext = ImmutableMap.of(Login.OMERO_GROUP, "-1");
             final IQueryPrx iQuery = sf.getQueryService(__current);
             final String hql = "SELECT originalFile.hash FROM FilesetEntry "
                     + "WHERE fileset.id = :id AND originalFile.path || originalFile.name = :usedfile";
@@ -349,11 +349,12 @@ public class ManagedImportProcessI extends AbstractCloseableAmdServant
                 try {
                     RString result;
                     try {
-                        result = (RString) iQuery.projection(hql, params, allGroupsContext).get(0).get(0);
+                        result = (RString) iQuery.projection(hql, params, groupContext).get(0).get(0);
                     } catch (SecurityViolation sv) {
                         /* The permissions context probably locks us to only certain groups. */
                         log.debug("all-groups query for file checksum failed, retrying with current group context", sv);
                         result = (RString) iQuery.projection(hql, params).get(0).get(0);
+                        groupContext = null;
                     }
                     serverHash = result.getValue();
                 } catch (IndexOutOfBoundsException | NullPointerException e) {
