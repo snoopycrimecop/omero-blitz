@@ -44,6 +44,7 @@ import ome.services.blitz.util.ServiceFactoryAware;
 import ome.services.util.Executor;
 import ome.system.Login;
 import omero.RString;
+import omero.SecurityViolation;
 import omero.ServerError;
 import omero.api.IQueryPrx;
 import omero.api.RawFileStorePrx;
@@ -346,7 +347,14 @@ public class ManagedImportProcessI extends AbstractCloseableAmdServant
                 final String clientHash = hashes.get(i);
                 String serverHash = "";
                 try {
-                    final RString result = (RString) iQuery.projection(hql, params, allGroupsContext).get(0).get(0);
+                    RString result;
+                    try {
+                        result = (RString) iQuery.projection(hql, params, allGroupsContext).get(0).get(0);
+                    } catch (SecurityViolation sv) {
+                        /* The permissions context probably locks us to only certain groups. */
+                        log.debug("all-groups query for file checksum failed, retrying with current group context", sv);
+                        result = (RString) iQuery.projection(hql, params).get(0).get(0);
+                    }
                     serverHash = result.getValue();
                 } catch (IndexOutOfBoundsException | NullPointerException e) {
                     log.error("no server checksum on uploaded file {}", usedFile, e);
