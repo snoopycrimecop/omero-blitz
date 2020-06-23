@@ -30,12 +30,8 @@ import static ome.formats.model.UnitsFactory.convertTime;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.*;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.StringTokenizer;
 
 import loci.common.Constants;
 import loci.common.DateTools;
@@ -122,6 +118,20 @@ public class OmeroReader extends FormatReader {
     private ServiceFactoryPrx serviceFactory;
     private Image img;
     private Pixels pix;
+
+    private String formatId(String id) {
+        String separator = "\n";
+        StringBuilder buffer = new StringBuilder();
+        Iterable<String> sc = () -> new Scanner(id).useDelimiter(separator);
+        for (String line: sc) {
+            if (line.startsWith("pass=")) {
+                line = "pass=****";
+            }
+            buffer.append(line);
+            buffer.append(separator);
+        }
+        return buffer.toString();
+    }
 
     // -- Constructors --
 
@@ -220,12 +230,12 @@ public class OmeroReader extends FormatReader {
 
     @Override
     protected void initFile(String id) throws FormatException, IOException {
-        LOGGER.debug("OmeroReader.initFile()");
+        String formattedId = formatId(id);
 
-        super.initFile(id);
+        super.initFile(formattedId);
 
         if (!id.startsWith("omero:")) {
-            throw new IllegalArgumentException("Not an OMERO id: " + id);
+            throw new IllegalArgumentException("Not an OMERO id: " + formattedId);
         }
 
         // parse credentials from id string
