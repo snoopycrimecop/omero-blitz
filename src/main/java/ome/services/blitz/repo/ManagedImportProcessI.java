@@ -351,6 +351,10 @@ public class ManagedImportProcessI extends AbstractCloseableAmdServant
                     try {
                         result = (RString) iQuery.projection(hql, params, groupContext).get(0).get(0);
                     } catch (SecurityViolation sv) {
+                        if (groupContext == null) {
+                            /* No other workaround to try. */
+                            throw sv;
+                        }
                         /* The permissions context probably locks us to only certain groups. */
                         log.debug("all-groups query for file checksum failed, retrying with current group context", sv);
                         result = (RString) iQuery.projection(hql, params).get(0).get(0);
