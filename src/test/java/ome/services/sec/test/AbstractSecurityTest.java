@@ -6,7 +6,6 @@ package ome.services.sec.test;
 
 import javax.sql.DataSource;
 
-import junit.framework.TestCase;
 
 import ome.system.Login;
 import ome.system.OmeroContext;
@@ -17,10 +16,11 @@ import omero.api.IUpdatePrx;
 import omero.api.ServiceFactoryPrx;
 
 import org.springframework.jdbc.core.JdbcTemplate;
+
 import org.testng.annotations.Test;
 
 @Test(enabled = false, groups = { "broken", "client", "integration", "security" })
-public class AbstractSecurityTest extends TestCase {
+public class AbstractSecurityTest {
 
     protected OmeroContext context = null;
 

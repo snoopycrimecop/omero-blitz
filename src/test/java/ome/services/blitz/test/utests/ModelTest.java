@@ -13,7 +13,6 @@ import static ome.formats.model.UnitsFactory.makePower;
 import java.util.HashMap;
 import java.util.Map;
 
-import junit.framework.TestCase;
 
 import ome.model.containers.Dataset;
 import ome.model.containers.Project;
@@ -34,9 +33,10 @@ import omero.model.PixelsI;
 import omero.model.ProjectI;
 import omero.util.IceMapper;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class ModelTest extends TestCase {
+public class ModelTest {
 
     @Test(groups = "ticket:636")
     public void testInheritanceInConcreteClasses() throws Exception {
@@ -55,7 +55,7 @@ public class ModelTest extends TestCase {
 
         IceMapper mapper = new IceMapper();
         ExperimenterI ei = (ExperimenterI) mapper.map(e);
-        assertEquals(new Integer(1), new Integer(ei
+        Assert.assertEquals(new Integer(1), new Integer(ei
                 .sizeOfGroupExperimenterMap()));
 
     }
@@ -87,7 +87,7 @@ public class ModelTest extends TestCase {
         ei.setOmeName(rstring("name"));
         ei.linkExperimenterGroup(new ExperimenterGroupI());
         Experimenter e = (Experimenter) ei.fillObject(new IceMapper());
-        assertEquals(new Integer(1),
+        Assert.assertEquals(new Integer(1),
                 new Integer(e.sizeOfGroupExperimenterMap()));
 
         PixelsI p = new PixelsI();
@@ -111,7 +111,7 @@ public class ModelTest extends TestCase {
         ExperimenterI ei = new ExperimenterI();
         ei.copyObject(e, new IceMapper());
         Map<Long, Long> countsi = ei.getAnnotationLinksCountPerOwner();
-        assertEquals(new Long(1L), countsi.get(1L));
+        Assert.assertEquals(new Long(1L), countsi.get(1L));
     }
 
     @Test
@@ -121,12 +121,12 @@ public class ModelTest extends TestCase {
         Project p = new Project();
         p.getDetails().setOwner(e);
         e.linkExperimenterGroup(g);
-        assertEquals(1, e.sizeOfGroupExperimenterMap());
+        Assert.assertEquals(1, e.sizeOfGroupExperimenterMap());
 
         IceMapper mapper = new IceMapper();
         ProjectI pi = (ProjectI) mapper.handleOutput(Project.class, p);
         ExperimenterI ei = (ExperimenterI) pi.getDetails().getOwner();
-        assertEquals(1, e.sizeOfGroupExperimenterMap());
+        Assert.assertEquals(1, e.sizeOfGroupExperimenterMap());
 
     }
 
@@ -146,14 +146,14 @@ public class ModelTest extends TestCase {
 
         p.linkDataset(d); // Adding an extra object
 
-        assertEquals(1, e.sizeOfGroupExperimenterMap());
+        Assert.assertEquals(1, e.sizeOfGroupExperimenterMap());
 
         IceMapper mapper = new IceMapper();
         ProjectI pi = (ProjectI) mapper.handleOutput(Project.class, p);
         ExperimenterI ei = (ExperimenterI) pi.getDetails().getOwner();
         ExperimenterGroupI gi = (ExperimenterGroupI) pi.getDetails().getGroup();
-        assertEquals(1, ei.sizeOfGroupExperimenterMap());
-        assertEquals(1, gi.sizeOfGroupExperimenterMap());
+        Assert.assertEquals(1, ei.sizeOfGroupExperimenterMap());
+        Assert.assertEquals(1, gi.sizeOfGroupExperimenterMap());
 
     }
 
@@ -165,34 +165,34 @@ public class ModelTest extends TestCase {
         Project p = new Project();
         p.getDetails().setOwner(e);
 
-        assertEquals(-1, e.sizeOfGroupExperimenterMap());
+        Assert.assertEquals(-1, e.sizeOfGroupExperimenterMap());
 
         IceMapper mapper = new IceMapper();
         ProjectI pi = (ProjectI) mapper.handleOutput(Project.class, p);
         ExperimenterI ei = (ExperimenterI) pi.getDetails().getOwner();
-        assertEquals(-1, ei.sizeOfGroupExperimenterMap());
+        Assert.assertEquals(-1, ei.sizeOfGroupExperimenterMap());
 
     }
 
     @Test
     public void testRemoval() throws Exception {
         omero.model.Image i = new ImageI();
-        assertEquals(0, i.sizeOfDatasetLinks());
+        Assert.assertEquals(0, i.sizeOfDatasetLinks());
         DatasetImageLink link = i.linkDataset(new DatasetI());
-        assertEquals(1, i.sizeOfDatasetLinks());
+        Assert.assertEquals(1, i.sizeOfDatasetLinks());
         i.removeDatasetImageLink(link);
-        assertEquals(0, i.sizeOfDatasetLinks());
+        Assert.assertEquals(0, i.sizeOfDatasetLinks());
         
         link = i.linkDataset(new DatasetI());
-        assertEquals(1, i.sizeOfDatasetLinks());
+        Assert.assertEquals(1, i.sizeOfDatasetLinks());
         i.removeDatasetImageLinkFromBoth(link, true);
-        assertEquals(0, i.sizeOfDatasetLinks());
+        Assert.assertEquals(0, i.sizeOfDatasetLinks());
         
         omero.model.Dataset d = new DatasetI();
         i.linkDataset(d);
-        assertEquals(1, i.sizeOfDatasetLinks());
+        Assert.assertEquals(1, i.sizeOfDatasetLinks());
         i.unlinkDataset(d);
-        assertEquals(0, i.sizeOfDatasetLinks());
+        Assert.assertEquals(0, i.sizeOfDatasetLinks());
     }
     
     @Test
@@ -204,9 +204,9 @@ public class ModelTest extends TestCase {
         omero.model.Dataset d = new DatasetI(1L, true);
         d.getDetails().setUpdateEvent(new EventI(1L, false));
         i.linkDataset(d);
-        assertEquals(1, i.sizeOfDatasetLinks());
+        Assert.assertEquals(1, i.sizeOfDatasetLinks());
         i.unloadDatasetLinks();
-        assertEquals(-1, i.sizeOfDatasetLinks());
+        Assert.assertEquals(-1, i.sizeOfDatasetLinks());
         
         // We shouldn't be able to reload from just any image
         omero.model.Image badId = new ImageI(666L, true);
@@ -216,14 +216,14 @@ public class ModelTest extends TestCase {
         
         try {
             i.reloadDatasetLinks(badId);
-            fail();
+            Assert.fail();
         } catch (omero.ClientError ce) {
             // good
         }
         
         try {
             i.reloadDatasetLinks(badUp);
-            fail();
+            Assert.fail();
         } catch (omero.ClientError ce) {
             // good
         }
@@ -233,10 +233,10 @@ public class ModelTest extends TestCase {
         i2.getDetails().setUpdateEvent(new EventI(1L, false));
         omero.model.Dataset d2 = new DatasetI(1L, true);
         i2.linkDataset(d2);
-        assertEquals(1, i2.sizeOfDatasetLinks());
+        Assert.assertEquals(1, i2.sizeOfDatasetLinks());
         i.reloadDatasetLinks(i2);
-        assertEquals(1, i.sizeOfDatasetLinks());
-        assertEquals(-1, i2.sizeOfDatasetLinks());
+        Assert.assertEquals(1, i.sizeOfDatasetLinks());
+        Assert.assertEquals(-1, i2.sizeOfDatasetLinks());
         
     }
 
@@ -246,9 +246,9 @@ public class ModelTest extends TestCase {
         ChannelI channel0 = new ChannelI();
         ChannelI channel1 = new ChannelI();
         pixels.addChannel(channel0);
-        assertEquals(1, pixels.sizeOfChannels());
+        Assert.assertEquals(1, pixels.sizeOfChannels());
         ChannelI old = (ChannelI) pixels.setChannel(0, channel1);
-        assertEquals(old, channel0);
-        assertEquals(1, pixels.sizeOfChannels());
+        Assert.assertEquals(old, channel0);
+        Assert.assertEquals(1, pixels.sizeOfChannels());
     }
 }

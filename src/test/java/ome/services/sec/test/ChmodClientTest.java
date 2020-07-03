@@ -6,6 +6,8 @@
  */
 package ome.services.sec.test;
 
+
+import org.testng.Assert;
 import org.testng.annotations.*;
 
 import ome.conditions.SecurityViolation;
@@ -59,7 +61,7 @@ public class ChmodClientTest extends AbstractChangeDetailClientTest {
 
     @Test(enabled=false, groups = { "ticket:397", "broken" })
     public void testCheckInitialParameters() throws Exception {
-        fail("USER CAN CURRENTLY JUST PASS IN WHATEVER OWNER THEY WANT.");
+        Assert.fail("USER CAN CURRENTLY JUST PASS IN WHATEVER OWNER THEY WANT.");
         // UNTAINT
     }
 
@@ -83,7 +85,7 @@ public class ChmodClientTest extends AbstractChangeDetailClientTest {
 
             factory2.getAdminService().changePermissions(i, target);
             if (!ok) {
-                fail("secvio!");
+                Assert.fail("secvio!");
             }
         } catch (SecurityViolation sv) {
             if (ok) {
@@ -101,7 +103,7 @@ public class ChmodClientTest extends AbstractChangeDetailClientTest {
             i.getDetails().setPermissions(target);
             factory2.getUpdateService().saveObject(i);
             if (!ok) {
-                fail("secvio!");
+                Assert.fail("secvio!");
             }
         } catch (SecurityViolation sv) {
             if (ok) {

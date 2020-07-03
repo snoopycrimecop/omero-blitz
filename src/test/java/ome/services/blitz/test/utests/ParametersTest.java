@@ -14,14 +14,14 @@ import static omero.rtypes.rtime;
 
 import java.util.Arrays;
 
-import junit.framework.TestCase;
 import omero.RList;
 import omero.sys.ParametersI;
 
+import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-public class ParametersTest extends TestCase {
+public class ParametersTest {
 
     ParametersI p;
 
@@ -44,29 +44,29 @@ public class ParametersTest extends TestCase {
     @Test
     public void testDefaults() throws Exception {
         // Removed to prevent confusion. assertFalse(p.isLeaves());
-        assertFalse(p.isGroup());
-        assertFalse(p.isExperimenter());
-        assertFalse(p.isEndTime());
-        assertFalse(p.isStartTime());
-        assertFalse(p.isPagination());
+        Assert.assertFalse(p.isGroup());
+        Assert.assertFalse(p.isExperimenter());
+        Assert.assertFalse(p.isEndTime());
+        Assert.assertFalse(p.isStartTime());
+        Assert.assertFalse(p.isPagination());
     }
 
     @Test
     public void testExperimenter() throws Exception {
         p.exp(rlong(1));
-        assertTrue(p.isExperimenter());
-        assertEquals(p.getExperimenter().getValue(), 1L);
+        Assert.assertTrue(p.isExperimenter());
+        Assert.assertEquals(p.getExperimenter().getValue(), 1L);
         p.allExps();
-        assertFalse(p.isExperimenter());
+        Assert.assertFalse(p.isExperimenter());
     }
 
     @Test
     public void testGroup() throws Exception {
         p.grp(rlong(1));
-        assertTrue(p.isGroup());
-        assertEquals(p.getGroup().getValue(), 1L);
+        Assert.assertTrue(p.isGroup());
+        Assert.assertEquals(p.getGroup().getValue(), 1L);
         p.allGrps();
-        assertFalse(p.isGroup());
+        Assert.assertFalse(p.isGroup());
     }
 
     //
@@ -76,15 +76,15 @@ public class ParametersTest extends TestCase {
     @Test
     public void testFilter() throws Exception {
         p.noPage();
-        assertNull(p.theFilter);
+        Assert.assertNull(p.theFilter);
         p.page(2, 3);
-        assertEquals(rint(2), p.theFilter.offset);
-        assertEquals(rint(3), p.theFilter.limit);
+        Assert.assertEquals(rint(2), p.theFilter.offset);
+        Assert.assertEquals(rint(3), p.theFilter.limit);
         p.noPage();
-        assertNull(p.theFilter.offset);
-        assertNull(p.getOffset());
-        assertNull(p.theFilter.limit);
-        assertNull(p.getLimit());
+        Assert.assertNull(p.theFilter.offset);
+        Assert.assertNull(p.getOffset());
+        Assert.assertNull(p.theFilter.limit);
+        Assert.assertNull(p.getLimit());
     }
 
     //
@@ -93,24 +93,24 @@ public class ParametersTest extends TestCase {
 
     @Test
     public void testOwnerId() throws Exception {
-        assertNull(p.theFilter);
+        Assert.assertNull(p.theFilter);
         p.exp(rlong(1));
-        assertNotNull(p.theFilter);
-        assertNotNull(p.theFilter.ownerId);
-        assertEquals(rlong(1), p.getExperimenter());
-        assertNull(p.allExps().getExperimenter());
-        assertNotNull(p.theFilter);
+        Assert.assertNotNull(p.theFilter);
+        Assert.assertNotNull(p.theFilter.ownerId);
+        Assert.assertEquals(rlong(1), p.getExperimenter());
+        Assert.assertNull(p.allExps().getExperimenter());
+        Assert.assertNotNull(p.theFilter);
     }
 
     @Test
     public void testGroupId() throws Exception {
-        assertNull(p.theFilter);
+        Assert.assertNull(p.theFilter);
         p.grp(rlong(1));
-        assertNotNull(p.theFilter);
-        assertNotNull(p.theFilter.groupId);
-        assertEquals(rlong(1), p.getGroup());
-        assertNull(p.allGrps().getGroup());
-        assertNotNull(p.theFilter);
+        Assert.assertNotNull(p.theFilter);
+        Assert.assertNotNull(p.theFilter.groupId);
+        Assert.assertEquals(rlong(1), p.getGroup());
+        Assert.assertNull(p.allGrps().getGroup());
+        Assert.assertNotNull(p.theFilter);
     }
 
     //
@@ -119,16 +119,16 @@ public class ParametersTest extends TestCase {
 
     @Test
     public void testTimes() throws Exception {
-        assertNull(p.theFilter);
+        Assert.assertNull(p.theFilter);
         p.startTime(rtime(0));
-        assertNotNull(p.theFilter);
-        assertNotNull(p.theFilter.startTime);
+        Assert.assertNotNull(p.theFilter);
+        Assert.assertNotNull(p.theFilter.startTime);
         p.endTime(rtime(1));
-        assertNotNull(p.theFilter.endTime);
+        Assert.assertNotNull(p.theFilter.endTime);
         p.allTimes();
-        assertNotNull(p.theFilter);
-        assertNull(p.theFilter.startTime);
-        assertNull(p.theFilter.endTime);
+        Assert.assertNotNull(p.theFilter);
+        Assert.assertNull(p.theFilter.startTime);
+        Assert.assertNull(p.theFilter.endTime);
     }
 
     //
@@ -137,26 +137,26 @@ public class ParametersTest extends TestCase {
 
     @Test
     public void testOptionsAcquisitionData() throws Exception {
-        assertNull(p.getAcquisitionData());
-        assertEquals(rbool(true), p.acquisitionData().getAcquisitionData());
-        assertEquals(rbool(false), p.noAcquisitionData().getAcquisitionData());
-        assertNotNull(p.getAcquisitionData());
+        Assert.assertNull(p.getAcquisitionData());
+        Assert.assertEquals(rbool(true), p.acquisitionData().getAcquisitionData());
+        Assert.assertEquals(rbool(false), p.noAcquisitionData().getAcquisitionData());
+        Assert.assertNotNull(p.getAcquisitionData());
     }
 
     @Test
     public void testOptionsOrphan() throws Exception {
-        assertNull(p.getOrphan());
-        assertEquals(rbool(true), p.orphan().getOrphan());
-        assertEquals(rbool(false), p.noOrphan().getOrphan());
-        assertNotNull(p.getOrphan());
+        Assert.assertNull(p.getOrphan());
+        Assert.assertEquals(rbool(true), p.orphan().getOrphan());
+        Assert.assertEquals(rbool(false), p.noOrphan().getOrphan());
+        Assert.assertNotNull(p.getOrphan());
     }
 
     @Test
     public void testOptionsUnique() throws Exception {
-        assertNull(p.getLeaves());
-        assertEquals(rbool(true), p.leaves().getLeaves());
-        assertEquals(rbool(false), p.noLeaves().getLeaves());
-        assertNotNull(p.getLeaves());
+        Assert.assertNull(p.getLeaves());
+        Assert.assertEquals(rbool(true), p.leaves().getLeaves());
+        Assert.assertEquals(rbool(false), p.noLeaves().getLeaves());
+        Assert.assertNotNull(p.getLeaves());
     }
 
     //
@@ -166,53 +166,53 @@ public class ParametersTest extends TestCase {
     @Test
     public void testAddBasicString() throws Exception {
         p.add("string", rstring("a"));
-        assertEquals(rstring("a"), p.map.get("string"));
+        Assert.assertEquals(rstring("a"), p.map.get("string"));
     }
 
     @Test
     public void testAddBasicInt() throws Exception {
         p.add("int", rint(1));
-        assertEquals(rint(1), p.map.get("int"));
+        Assert.assertEquals(rint(1), p.map.get("int"));
     }
 
     @Test
     public void testAddIdRaw() throws Exception {
         p.addId(1);
-        assertEquals(rlong(1), p.map.get("id"));
+        Assert.assertEquals(rlong(1), p.map.get("id"));
     }
 
     @Test
     public void testAddIdRType() throws Exception {
         p.addId(rlong(1));
-        assertEquals(rlong(1), p.map.get("id"));
+        Assert.assertEquals(rlong(1), p.map.get("id"));
     }
 
     @Test
     public void testAddLongRaw() throws Exception {
         p.addLong("long", 1L);
-        assertEquals(rlong(1), p.map.get("long"));
+        Assert.assertEquals(rlong(1), p.map.get("long"));
     }
 
     @Test
     public void testAddLongRType() throws Exception {
         p.addLong("long", rlong(1L));
-        assertEquals(rlong(1), p.map.get("long"));
+        Assert.assertEquals(rlong(1), p.map.get("long"));
     }
 
     @Test
     public void testAddIds() throws Exception {
         p.addIds(Arrays.asList(1L, 2L));
         RList list = (RList) p.map.get("ids");
-        assertTrue(list.getValue().contains(rlong(1)));
-        assertTrue(list.getValue().contains(rlong(2)));
+        Assert.assertTrue(list.getValue().contains(rlong(1)));
+        Assert.assertTrue(list.getValue().contains(rlong(2)));
     }
 
     @Test
     public void testAddLongs() throws Exception {
         p.addLongs("longs", Arrays.asList(1L, 2L));
         RList list = (RList) p.map.get("longs");
-        assertTrue(list.getValue().contains(rlong(1)));
-        assertTrue(list.getValue().contains(rlong(2)));
+        Assert.assertTrue(list.getValue().contains(rlong(1)));
+        Assert.assertTrue(list.getValue().contains(rlong(2)));
     }
 
 }

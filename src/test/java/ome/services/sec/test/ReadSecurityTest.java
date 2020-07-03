@@ -24,6 +24,7 @@ import omero.model.Image;
 
 import static omero.rtypes.rstring;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 @Test(enabled=false, groups = { "broken", "ticket:200", "security", "integration" })
@@ -186,7 +187,7 @@ public class ReadSecurityTest extends AbstractPermissionsTest {
         Project t;
         try {
             t = (Project) sf.getQueryService().find("Project", prj.getId().getValue());
-            assertNotNull(t);
+            Assert.assertNotNull(t);
         } catch (SecurityViolation e) {
             if (ok) {
                 throw e;
@@ -198,9 +199,9 @@ public class ReadSecurityTest extends AbstractPermissionsTest {
 
         t = (Project) sf.getQueryService().findByQuery(q, param);
         if (ok) {
-            assertNotNull(t);
+            Assert.assertNotNull(t);
         } else {
-            assertNull(t);
+            Assert.assertNull(t);
         }
 
     }
@@ -479,7 +480,7 @@ public class ReadSecurityTest extends AbstractPermissionsTest {
             createThumbnail(ownsfB, groupB, permsB, pix);
             verifyDetails(tb, ownerB, groupB, permsB);
             if (!canCreate) {
-                fail("secvio!");
+                Assert.fail("secvio!");
             }
 
             pix = tb.getPixels();
@@ -490,16 +491,16 @@ public class ReadSecurityTest extends AbstractPermissionsTest {
 
             Pixels test = (Pixels) sf.getQueryService().findByQuery(outerJoin, params);
             if (pix_ok) {
-                assertNotNull(test);
+                Assert.assertNotNull(test);
                 if (tb_ok) {
-                    assertTrue(test.sizeOfThumbnails() > 0);
+                    Assert.assertTrue(test.sizeOfThumbnails() > 0);
                 } else {
-                    assertTrue(test.sizeOfThumbnails() == 0); // TODO should
+                    Assert.assertTrue(test.sizeOfThumbnails() == 0); // TODO should
                     // it be null?
                 }
 
             } else {
-                assertNull(test);
+                Assert.assertNull(test);
             }
 
             outerJoin = "select t from Thumbnail t left outer join fetch t.pixels where t.id = :id";
@@ -508,15 +509,15 @@ public class ReadSecurityTest extends AbstractPermissionsTest {
 
             Thumbnail test2 = (Thumbnail) sf.getQueryService().findByQuery(outerJoin, params);
             if (tb_ok) {
-                assertNotNull(test2);
+                Assert.assertNotNull(test2);
                 if (pix_ok) {
-                    assertNotNull(test2.getPixels());
+                    Assert.assertNotNull(test2.getPixels());
                 } else {
-                    fail("should not be possible (null)");
+                    Assert.fail("should not be possible (null)");
                 }
 
             } else {
-                assertNull(test2);
+                Assert.assertNull(test2);
             }
 
         } catch (SecurityViolation sv) {
@@ -642,7 +643,7 @@ public class ReadSecurityTest extends AbstractPermissionsTest {
             createThumbnail(ownsfA, groupA, permsA, pix);
             verifyDetails(tb, ownerA, groupA, permsA);
             if (!canCreate) {
-                fail("secvio!");
+                Assert.fail("secvio!");
             }
 
             pix = tb.getPixels();
@@ -654,16 +655,16 @@ public class ReadSecurityTest extends AbstractPermissionsTest {
             try {
                 Thumbnail test = (Thumbnail) sf.getQueryService().findByQuery(outerJoin, params);
                 if (tb_ok) {
-                    assertNotNull(test);
+                    Assert.assertNotNull(test);
                     if (pix_ok) {
-                        assertNotNull(test.getPixels());
+                        Assert.assertNotNull(test.getPixels());
                     } else {
-                        assertNull(test.getPixels()); // TODO should it be
+                        Assert.assertNull(test.getPixels()); // TODO should it be
                         // null?
                     }
 
                 } else {
-                    assertNull(test);
+                    Assert.assertNull(test);
                 }
             } catch (SecurityViolation sv) {
                 if (tb_ok && pix_ok) {
@@ -704,7 +705,7 @@ public class ReadSecurityTest extends AbstractPermissionsTest {
             createInstrument(ownsfA, groupA, permsA, micro);
             verifyDetails(instr, ownerA, groupA, permsA);
             if (!canCreate) {
-                fail("secvio!");
+                Assert.fail("secvio!");
             }
         } catch (SecurityViolation sv) {
             if (canCreate) {
@@ -718,14 +719,14 @@ public class ReadSecurityTest extends AbstractPermissionsTest {
 
         Instrument test = (Instrument) sf.getQueryService().findByQuery(outerJoin, params);
         if (instr_ok) {
-            assertNotNull(test);
+            Assert.assertNotNull(test);
             if (micro_ok) {
-                assertNotNull(test.getMicroscope());
+                Assert.assertNotNull(test.getMicroscope());
             } else {
-                fail("should not be possibe (null)");
+                Assert.fail("should not be possibe (null)");
             }
         } else {
-            assertNull(test);
+            Assert.assertNull(test);
         }
     }
 
@@ -811,18 +812,18 @@ public class ReadSecurityTest extends AbstractPermissionsTest {
         try {
             Project test = (Project) sf.getQueryService().findByQuery(outerJoin, params);
             if (prj_ok) {
-                assertNotNull(test);
+                Assert.assertNotNull(test);
                 if (ds_ok) {
-                    assertNotNull(test.linkedDatasetList().size() == 1);
+                    Assert.assertNotNull(test.linkedDatasetList().size() == 1);
                 } else {
-                    assertTrue(test.linkedDatasetList().size() == 0); // TODO
+                    Assert.assertTrue(test.linkedDatasetList().size() == 0); // TODO
                     // should
                     // it be
                     // null?
                 }
 
             } else {
-                assertNull(test);
+                Assert.assertNull(test);
             }
         } catch (SecurityViolation sv) {
             if (prj_ok && ds_ok) {
@@ -885,17 +886,17 @@ public class ReadSecurityTest extends AbstractPermissionsTest {
 
         Image test = (Image) sf.getQueryService().findByQuery(outerJoin, params);
         if (img_ok) {
-            assertNotNull(test);
+            Assert.assertNotNull(test);
             if (pix_ok) {
-                assertNotNull(test.getPrimaryPixels());
-                assertTrue(test.sizeOfPixels() > 0);
+                Assert.assertNotNull(test.getPrimaryPixels());
+                Assert.assertTrue(test.sizeOfPixels() > 0);
             } else {
-                assertTrue(test.sizeOfPixels() == 0); // TODO should it be
+                Assert.assertTrue(test.sizeOfPixels() == 0); // TODO should it be
                 // null?
             }
 
         } else {
-            assertNull(test);
+            Assert.assertNull(test);
         }
 
     }

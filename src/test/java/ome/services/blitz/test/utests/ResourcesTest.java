@@ -12,14 +12,15 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import junit.framework.TestCase;
+
 import omero.util.Resources;
 
+import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-public class ResourcesTest extends TestCase {
+public class ResourcesTest {
 
     int MAX_WAIT = 3;
 
@@ -60,7 +61,7 @@ public class ResourcesTest extends TestCase {
 
             }
         });
-        assertTrue(entered.await(10, TimeUnit.SECONDS));
+        Assert.assertTrue(entered.await(10, TimeUnit.SECONDS));
         return exit;
     }
 
@@ -101,60 +102,60 @@ public class ResourcesTest extends TestCase {
     public void testSimple() throws Exception {
         e = new TestEntry();
         r.add(e);
-        assertTrue(e.checkWait());
+        Assert.assertTrue(e.checkWait());
     }
 
     @Test
     public void testShouldBeRemoved() throws Exception {
         e = new TestEntry();
         r.add(e);
-        assertEquals(1, r.size());
-        assertTrue(e.checkWait());
+        Assert.assertEquals(1, r.size());
+        Assert.assertTrue(e.checkWait());
         CountDownLatch resume = pause();
         e.checkValue = false;
         resume.countDown();
-        assertTrue(e.cleanWait());
-        assertEquals(0, r.size());
+        Assert.assertTrue(e.cleanWait());
+        Assert.assertEquals(0, r.size());
     }
 
     @Test
     public void testCheckFalseLeadsToRemove() throws Exception {
         e = new TestEntry();
         r.add(e);
-        assertEquals(1, r.size());
-        assertTrue(e.checkWait());
+        Assert.assertEquals(1, r.size());
+        Assert.assertTrue(e.checkWait());
         CountDownLatch resume = pause();
         e.checkValue = false;
         resume.countDown();
-        assertTrue(e.cleanWait());
-        assertEquals(0, r.size());
+        Assert.assertTrue(e.cleanWait());
+        Assert.assertEquals(0, r.size());
     }
 
     @Test
     public void testCheckThrowsLeadsToRemove() throws Exception {
         e = new TestEntry();
         r.add(e);
-        assertEquals(1, r.size());
-        assertTrue(e.checkWait());
+        Assert.assertEquals(1, r.size());
+        Assert.assertTrue(e.checkWait());
         CountDownLatch resume = pause();
         e.throwOnCheck = true;
         resume.countDown();
-        assertTrue(e.cleanWait());
-        assertEquals(0, r.size());
+        Assert.assertTrue(e.cleanWait());
+        Assert.assertEquals(0, r.size());
     }
 
     @Test
     public void testCleanupThrowsIsCaught() throws Exception {
         e = new TestEntry();
         r.add(e);
-        assertEquals(1, r.size());
-        assertTrue(e.checkWait());
+        Assert.assertEquals(1, r.size());
+        Assert.assertTrue(e.checkWait());
         CountDownLatch resume = pause();
         e.checkValue = false; // Force cleanup.
         e.throwOnCleanup = true;
         resume.countDown();
-        assertTrue(e.cleanWait());
-        assertEquals(0, r.size());
+        Assert.assertTrue(e.cleanWait());
+        Assert.assertEquals(0, r.size());
     }
 
 }

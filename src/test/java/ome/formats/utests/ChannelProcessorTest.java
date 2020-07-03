@@ -38,8 +38,11 @@ import omero.model.LengthI;
 import omero.model.enums.UnitsLength;
 
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import java.io.IOException;
 
 /**
  * Tests the creation of channel objects.
@@ -181,6 +184,13 @@ public class ChannelProcessorTest
         CHANNEL_INDEX + 1, CHANNEL_INDEX + 1);
 		store.setLightPathExcitationFilterRef("Filter:5", IMAGE_INDEX,
         CHANNEL_INDEX + 1, CHANNEL_INDEX + 1);
+	}
+
+	@AfterMethod
+	protected void tearDown()
+			throws IOException {
+		wrapper.close();
+		store.logout();
 	}
 
     private void checkChannelColor(Channel channel, int r, int g, int b)

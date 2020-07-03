@@ -28,6 +28,7 @@ import omero.model.Project;
 import omero.model.ProjectDatasetLinkI;
 import omero.model.ProjectI;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 @Test(enabled=false, groups = { "broken", "ticket:337", "security", "integration" })
@@ -511,7 +512,7 @@ public class UseSecurityTest extends AbstractPermissionsTest {
         link.link(prj, ds);
         try {
             w.getUpdateService().saveObject(link);
-            fail("secvio!: A user should not be able to pass in an unreadable, unloaded"
+            Assert.fail("secvio!: A user should not be able to pass in an unreadable, unloaded"
                     + " proxy and have it linked. This would allow RW to suffice"
                     + " for RW*U*");
         } catch (SecurityViolation sv) {
@@ -546,7 +547,7 @@ public class UseSecurityTest extends AbstractPermissionsTest {
     private void assertFails(ServiceFactoryPrx sf) throws ServerError {
         try {
             assertSucceeds(sf);
-            fail("secvio!");
+            Assert.fail("secvio!");
         } catch (SecurityViolation sv) {
             // ok
         }
@@ -560,7 +561,7 @@ public class UseSecurityTest extends AbstractPermissionsTest {
     }
 
     protected Details d(IObject _i, Object _o) {
-        fail("IMPLEMENT: ticket:1478");
+        Assert.fail("IMPLEMENT: ticket:1478");
         // Details retVal = _i.getDetails().copy();
         Details retVal = new DetailsI();
         // prevent error on different update event versions.

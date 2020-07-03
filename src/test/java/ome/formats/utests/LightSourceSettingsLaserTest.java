@@ -38,8 +38,11 @@ import omero.model.Pixels;
 import omero.model.PowerI;
 
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import java.io.IOException;
 
 public class LightSourceSettingsLaserTest
 {
@@ -105,6 +108,13 @@ public class LightSourceSettingsLaserTest
 				"Laser:2", IMAGE_INDEX, CHANNEL_INDEX + 2);
 		store.setChannelLightSourceSettingsAttenuation(
 				new PercentFraction(1f), IMAGE_INDEX, CHANNEL_INDEX + 2);
+	}
+
+	@AfterMethod
+	protected void tearDown()
+			throws IOException {
+		wrapper.close();
+		store.logout();
 	}
 
 	@Test

@@ -6,13 +6,13 @@
  */
 package ome.services.blitz.test.utests;
 
-import junit.framework.TestCase;
 import omero.model.ProjectDatasetLinkI;
 import omero.model.ProjectI;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class AccessorsTest extends TestCase {
+public class AccessorsTest {
 
     @Test
     public void test_simple() throws Exception {
@@ -20,7 +20,7 @@ public class AccessorsTest extends TestCase {
         ProjectDatasetLinkI pdl_remote = new ProjectDatasetLinkI();
         p_remote.clearDatasetLinks();
         p_remote.addProjectDatasetLink(pdl_remote);
-        assertTrue(p_remote.iterateDatasetLinks().next() == pdl_remote);
+        Assert.assertTrue(p_remote.iterateDatasetLinks().next() == pdl_remote);
     }
 
 }

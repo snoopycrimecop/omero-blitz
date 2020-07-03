@@ -47,6 +47,7 @@ import omero.model.ProjectI;
 import omero.model.Thumbnail;
 import omero.util.IceMapper;
 
+import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -239,9 +240,9 @@ public abstract class AbstractPermissionsTest extends AbstractSecurityTest {
         {
             v = (IObject) rootQuery.get(_i.getClass().getName(), _i.getId().getValue());
             Details d = v.getDetails();
-            assertEquals(d.getOwner().getId(), _user.getId());
-            assertEquals(d.getGroup().getId(), _group.getId());
-            assertTrue(_perms.equals(v.getDetails().getPermissions()));
+            Assert.assertEquals(d.getOwner().getId(), _user.getId());
+            Assert.assertEquals(d.getGroup().getId(), _group.getId());
+            Assert.assertTrue(_perms.equals(v.getDetails().getPermissions()));
         } catch (ServerError e)
         {
             // TODO Auto-generated catch block
@@ -346,6 +347,6 @@ public abstract class AbstractPermissionsTest extends AbstractSecurityTest {
         IceMapper mapper = new IceMapper();
         ome.model.internal.Permissions _p1 = mapper.convert(p1);
         ome.model.internal.Permissions _p2 = mapper.convert(p2);
-        assertTrue(p1 + "!=" + p2, _p1.sameRights(_p2));
+        Assert.assertTrue(_p1.sameRights(_p2), p1 + "!=" + p2);
     }
 }

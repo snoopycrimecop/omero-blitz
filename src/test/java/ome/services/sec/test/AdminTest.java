@@ -30,6 +30,7 @@ import ome.conditions.ApiUsageException;
 import ome.conditions.SecurityViolation;
 import ome.system.Login;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import Glacier2.CannotCreateSessionException;
@@ -59,7 +60,7 @@ public class AdminTest extends AbstractAccountTest {
         test.getDetails().setOwner(target);
         rootUpdate.saveObject(test);
         test = (Image) rootQuery.get("Image", i.getId().getValue());
-        assertEquals(test.getDetails().getOwner().getId(), target.getId());
+        Assert.assertEquals(test.getDetails().getOwner().getId(), target.getId());
     }
 
     @Test(enabled=false, groups = "ticket:397")
@@ -80,7 +81,7 @@ public class AdminTest extends AbstractAccountTest {
         i.getDetails().setOwner(new ExperimenterI(0L, false));
         u.getAdminService().changePermissions(i, perms);
         i = (Image) u.getQueryService().get(i.getClass().getName(), i.getId().getValue());
-        assertFalse(i.getDetails().getOwner().getId().equals(0L));
+        Assert.assertFalse(i.getDetails().getOwner().getId().equals(0L));
 
     }
 
@@ -132,7 +133,7 @@ public class AdminTest extends AbstractAccountTest {
         ServiceFactoryPrx asf =c.createSession(al.getName(), al.getPassword());
         IAdminPrx aa = asf.getAdminService();
         ExperimenterGroup currgrp = aa.getDefaultGroup(user.getId().getValue());
-        assertEquals(oldgrp.getName(), currgrp.getName());
+        Assert.assertEquals(oldgrp.getName(), currgrp.getName());
         aa.setDefaultGroup(user, newgrp);
 
         // And now let's see what a user can do
@@ -206,16 +207,16 @@ public class AdminTest extends AbstractAccountTest {
         self = ua.getExperimenter(id);
 
         // Should be changed
-        assertEquals(id, self.getId());
-        assertEquals(name, self.getOmeName());
-        assertFalse(fn.equals(self.getFirstName()));
-        assertNull(mn);
-        assertNotNull(self.getMiddleName());
-        assertFalse(ln.equals(self.getLastName()));
-        assertNull(em);
-        assertNotNull(self.getEmail());
-        assertNull(in);
-        assertNotNull(self.getInstitution());
+        Assert.assertEquals(id, self.getId());
+        Assert.assertEquals(name, self.getOmeName());
+        Assert.assertFalse(fn.equals(self.getFirstName()));
+        Assert.assertNull(mn);
+        Assert.assertNotNull(self.getMiddleName());
+        Assert.assertFalse(ln.equals(self.getLastName()));
+        Assert.assertNull(em);
+        Assert.assertNotNull(self.getEmail());
+        Assert.assertNull(in);
+        Assert.assertNotNull(self.getInstitution());
 
         // Should not be changed
         List<ExperimenterGroup> check = rootAdmin.containedGroups(id);
@@ -223,8 +224,8 @@ public class AdminTest extends AbstractAccountTest {
         for (ExperimenterGroup g : check) {
             s2.add(g.getId().getValue());
         }
-        assertEquals(s.size(), s2.size());
-        assertEquals(dfault.getId(), rootAdmin.getDefaultGroup(id).getId());
+        Assert.assertEquals(s.size(), s2.size());
+        Assert.assertEquals(dfault.getId(), rootAdmin.getDefaultGroup(id).getId());
     }
     
     @Test(enabled=false, groups = "ticket:1104")

@@ -33,8 +33,11 @@ import omero.model.Laser;
 import omero.model.Pixels;
 
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import java.io.IOException;
 
 public class InstrumentTest
 {
@@ -76,6 +79,13 @@ public class InstrumentTest
         store.setImageInstrumentRef("Instrument:0", IMAGE_INDEX);
         store.setImageInstrumentRef("Instrument:0", IMAGE_INDEX + 1);
         store.setImageInstrumentRef("Instrument:0", IMAGE_INDEX + 2);
+	}
+
+	@AfterMethod
+	protected void tearDown()
+			throws IOException {
+		wrapper.close();
+		store.logout();
 	}
 
 	@Test

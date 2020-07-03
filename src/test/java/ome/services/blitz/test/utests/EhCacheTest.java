@@ -6,26 +6,27 @@
  */
 package ome.services.blitz.test.utests;
 
-import junit.framework.TestCase;
+
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 
 import org.springframework.cache.ehcache.EhCacheFactoryBean;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class EhCacheTest extends TestCase {
+public class EhCacheTest{
 
     @Test
     public void testFactoryBean() throws Exception {
 
         EhCacheFactoryBean fb = new EhCacheFactoryBean();
         fb.setBeanName("test");
-        fb.setOverflowToDisk(false);
+        fb.setOverflowToOffHeap(false);
         fb.afterPropertiesSet();
         Ehcache cache = (Ehcache) fb.getObject();
         cache.put(new Element("foo","bar"));
         String test = (String) cache.get("foo").getObjectValue();
-        assertTrue("bar".equals(test));
+        Assert.assertTrue("bar".equals(test));
         
     }
 }

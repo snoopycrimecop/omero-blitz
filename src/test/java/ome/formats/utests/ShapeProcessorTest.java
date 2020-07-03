@@ -28,8 +28,11 @@ import omero.model.Rectangle;
 import omero.model.Roi;
 
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import java.io.IOException;
 
 public class ShapeProcessorTest
 {
@@ -50,6 +53,12 @@ public class ShapeProcessorTest
 			new BlitzInstanceProvider(store.getEnumerationProvider()));
         store.setROIDescription("Foobar", ROI_INDEX);
         store.setRectangleX(25.0, ROI_INDEX + 1, SHAPE_INDEX);
+	}
+
+	@AfterMethod
+	protected void tearDown()
+			throws IOException {
+		store.logout();
 	}
 
 	@Test

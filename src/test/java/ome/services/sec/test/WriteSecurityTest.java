@@ -34,6 +34,7 @@ import omero.sys.ParametersI;
 
 import static omero.rtypes.rstring;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 @Test(enabled=false, groups = { "broken", "ticket:236", "security", "integration" })
@@ -242,9 +243,9 @@ public class WriteSecurityTest extends AbstractPermissionsTest {
         try {
             t = (Project) u.getUpdateService().saveAndReturnObject(prj);
             if (!ok) {
-                fail("Secvio!");
+                Assert.fail("Secvio!");
             }
-            assertTrue(MSG.equals(t.getName()));
+            Assert.assertTrue(MSG.equals(t.getName()));
         } catch (SecurityViolation sv) {
             if (ok) {
                 throw sv;
@@ -254,7 +255,7 @@ public class WriteSecurityTest extends AbstractPermissionsTest {
         try {
             u.getUpdateService().deleteObject(prj);
             if (!ok) {
-                fail("secvio!");
+                Assert.fail("secvio!");
             }
         } catch (SecurityViolation sv) {
             if (ok) {
@@ -629,9 +630,9 @@ public class WriteSecurityTest extends AbstractPermissionsTest {
             t = (Pixels) u.getUpdateService().saveAndReturnObject(pix);
             t.addThumbnail(tb); // used to update the pixel version in tb
             if (!pix_ok) {
-                fail("secvio!");
+                Assert.fail("secvio!");
             }
-            assertTrue(MSG.equals(t.getSha1()));
+            Assert.assertTrue(MSG.equals(t.getSha1()));
         } catch (SecurityViolation sv) {
             // rollback
             pix.setSha1(oldMsg);
@@ -645,9 +646,9 @@ public class WriteSecurityTest extends AbstractPermissionsTest {
         try {
             tB = (Thumbnail) u.getUpdateService().saveAndReturnObject(tb);
             if (!tb_ok) {
-                fail("secvio!");
+                Assert.fail("secvio!");
             }
-            assertTrue(MSG.equals(tB.getRef()));
+            Assert.assertTrue(MSG.equals(tB.getRef()));
         } catch (SecurityViolation sv) {
             if (tb_ok) {
                 throw sv;
@@ -657,7 +658,7 @@ public class WriteSecurityTest extends AbstractPermissionsTest {
         try {
             u.getUpdateService().deleteObject(tb);
             if (!tb_ok) {
-                fail("secvio!");
+                Assert.fail("secvio!");
             }
 
             // done for later recursive delete.
@@ -666,7 +667,7 @@ public class WriteSecurityTest extends AbstractPermissionsTest {
             // since tb still references the pix.
             deleteRecurisvely(u, pix);
             if (!pix_ok) {
-                fail("secvio!");
+                Assert.fail("secvio!");
             }
 
         } catch (SecurityViolation sv) {
@@ -819,9 +820,9 @@ public class WriteSecurityTest extends AbstractPermissionsTest {
         try {
             tM = (Microscope) u.getUpdateService().saveAndReturnObject(micro);
             if (!micro_ok) {
-                fail("secvio!");
+                Assert.fail("secvio!");
             }
-            assertTrue(MSG.equals(tM.getModel()));
+            Assert.assertTrue(MSG.equals(tM.getModel()));
             instr.setMicroscope(tM); // resetting to prevent version errors.
         } catch (SecurityViolation sv) {
             // rollback
@@ -837,9 +838,9 @@ public class WriteSecurityTest extends AbstractPermissionsTest {
         try {
             tI = (Instrument) u.getUpdateService().saveAndReturnObject(instr);
             if (!instr_ok) {
-                fail("secvio!");
+                Assert.fail("secvio!");
             }
-            assertTrue(tI.sizeOfFilter() == 1);
+            Assert. assertTrue(tI.sizeOfFilter() == 1);
         } catch (SecurityViolation sv) {
             if (instr_ok) {
                 throw sv;
@@ -853,12 +854,12 @@ public class WriteSecurityTest extends AbstractPermissionsTest {
             tI.setMicroscope(null);
             deleteRecurisvely(u, tI);
             if (!instr_ok) {
-                fail("secvio!");
+                Assert.fail("secvio!");
             }
 
             u.getUpdateService().deleteObject(micro);
             if (!micro_ok) {
-                fail("secvio!");
+                Assert.fail("secvio!");
             }
 
         } catch (SecurityViolation sv) {
@@ -932,9 +933,9 @@ public class WriteSecurityTest extends AbstractPermissionsTest {
             ds.unloadProjectLinks();
             testB = (Dataset) u.getUpdateService().saveAndReturnObject(ds);
             if (!ds_ok) {
-                fail("secvio!");
+                Assert.fail("secvio!");
             }
-            assertTrue(MSG.equals(testB.getName()));
+            Assert.assertTrue(MSG.equals(testB.getName()));
         } catch (SecurityViolation sv) {
             if (ds_ok) {
                 throw sv;
@@ -947,9 +948,9 @@ public class WriteSecurityTest extends AbstractPermissionsTest {
             prj.unloadDatasetLinks();
             test = (Project) u.getUpdateService().saveAndReturnObject(prj);
             if (!prj_ok) {
-                fail("secvio!");
+                Assert.fail("secvio!");
             }
-            assertTrue(MSG.equals(test.getName()));
+            Assert.assertTrue(MSG.equals(test.getName()));
         } catch (SecurityViolation sv) {
             if (prj_ok) {
                 throw sv;
@@ -963,7 +964,7 @@ public class WriteSecurityTest extends AbstractPermissionsTest {
             u.getUpdateService().deleteObject( // proxy needed
                     new ProjectDatasetLinkI(link.getId(), false));
             if (!link_ok) {
-                fail("secvio!");
+                Assert.fail("secvio!");
             }
             prj.unloadDatasetLinks();
             ds.unloadProjectLinks();
@@ -977,7 +978,7 @@ public class WriteSecurityTest extends AbstractPermissionsTest {
         try {
             deleteRecurisvely(u, ds);
             if (!ds_ok) {
-                fail("secvio!");
+                Assert.fail("secvio!");
             }
         } catch (SecurityViolation sv) {
             if (ds_ok) {
@@ -988,7 +989,7 @@ public class WriteSecurityTest extends AbstractPermissionsTest {
         try {
             deleteRecurisvely(u, prj);
             if (!prj_ok) {
-                fail("secvio!");
+                Assert.fail("secvio!");
             }
         } catch (SecurityViolation sv) {
             if (prj_ok) {
@@ -1049,17 +1050,17 @@ public class WriteSecurityTest extends AbstractPermissionsTest {
 
         Image test = (Image) w.getQueryService().findByQuery(outerJoin, params);
         if (img_ok) {
-            assertNotNull(test);
+            Assert.assertNotNull(test);
             if (pix_ok) {
-                assertNotNull(test.getPrimaryPixels());
-                assertTrue(test.sizeOfPixels() > 0);
+                Assert.assertNotNull(test.getPrimaryPixels());
+                Assert.assertTrue(test.sizeOfPixels() > 0);
             } else {
-                assertTrue(test.sizeOfPixels() == 0); // TODO should it be
+                Assert.assertTrue(test.sizeOfPixels() == 0); // TODO should it be
                 // null?
             }
 
         } else {
-            assertNull(test);
+            Assert.assertNull(test);
         }
 
     }
@@ -1078,7 +1079,7 @@ public class WriteSecurityTest extends AbstractPermissionsTest {
     @Test(enabled = false)
     public static void deleteRecurisvely(ServiceFactoryPrx u, IObject target) {
         // Deleting all links to target
-        fail("IMPLEMENT: ticket:1478");
+        Assert.fail("IMPLEMENT: ticket:1478");
         /*
         Set<String> fields = target.fields();
         for (String field : fields) {

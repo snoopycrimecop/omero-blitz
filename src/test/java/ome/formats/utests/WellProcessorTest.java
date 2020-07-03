@@ -29,8 +29,11 @@ import omero.model.Plate;
 import omero.model.Well;
 
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import java.io.IOException;
 
 public class WellProcessorTest
 {
@@ -53,6 +56,12 @@ public class WellProcessorTest
         store.setWellColumn(new NonNegativeInteger(1), PLATE_INDEX, WELL_INDEX + 1);
         store.setWellColumn(new NonNegativeInteger(0), PLATE_INDEX + 1, WELL_INDEX);
         store.setPlateName("setUp Plate", PLATE_INDEX + 1);
+	}
+
+	@AfterMethod
+	protected void tearDown()
+			throws IOException {
+		store.logout();
 	}
 
 	@Test

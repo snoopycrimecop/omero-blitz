@@ -27,12 +27,12 @@ import ome.formats.enums.handler.EnumerationHandler;
 import omero.model.CorrectionI;
 import omero.model.IObject;
 import omero.model.Correction;
-import junit.framework.TestCase;
 
+import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-public class CorrectionEnumTest extends TestCase
+public class CorrectionEnumTest
 {
 	private EnumerationHandler handler;
 
@@ -49,16 +49,16 @@ public class CorrectionEnumTest extends TestCase
 		HashMap<String, IObject> enumerations = new HashMap<String, IObject>();
 		enumerations.put("PlanApo", new CorrectionI());
 		IObject enumeration = handler.findEnumeration(enumerations, "PlApo");
-		assertNotNull(enumeration);
+		Assert.assertNotNull(enumeration);
 		enumeration = handler.findEnumeration(enumerations, "PlApo");
-		assertNotNull(enumeration);
+		Assert.assertNotNull(enumeration);
 		enumeration = handler.findEnumeration(enumerations, "  PlApo");
-		assertNotNull(enumeration);
+		Assert.assertNotNull(enumeration);
 		enumeration = handler.findEnumeration(enumerations, "PlApo   ");
-		assertNotNull(enumeration);
+		Assert.assertNotNull(enumeration);
 		enumeration = handler.findEnumeration(enumerations, "PlanApochromat");
-		assertNotNull(enumeration);
+		Assert.assertNotNull(enumeration);
 		enumeration = handler.findEnumeration(enumerations, "PlanApo");
-		assertNotNull(enumeration);
+		Assert.assertNotNull(enumeration);
 	}
 }

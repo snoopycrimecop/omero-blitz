@@ -31,13 +31,13 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
+import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.google.common.collect.Collections2;
 
-import junit.framework.Assert;
 import omero.util.TempFileManager;
 
 /**
@@ -105,12 +105,11 @@ public class ImportCandidatesTest {
 
             List<ImportContainer> cons = createImportCandidates(f);
 
-            Assert.assertEquals(info(f, cons), expectedFilesets.size(),
-                    cons.size());
+            Assert.assertEquals(expectedFilesets.size(), cons.size(), info(f, cons));
 
             for (ImportContainer con : cons) {
-                Assert.assertTrue(info(f, cons), expectedFilesets
-                        .contains(con.getFile().getAbsolutePath()));
+                Assert.assertTrue(expectedFilesets
+                        .contains(con.getFile().getAbsolutePath()), info(f, cons));
             }
         }
     }
@@ -126,12 +125,12 @@ public class ImportCandidatesTest {
 
         List<ImportContainer> cons = createImportCandidates(f);
 
-        Assert.assertEquals(info(f, cons), expectedFilesets.size(),
-                cons.size());
+        Assert.assertEquals(expectedFilesets.size(),
+                cons.size(), info(f, cons));
 
         for (ImportContainer con : cons) {
-            Assert.assertTrue(info(f, cons),
-                    expectedFilesets.contains(con.getFile().getAbsolutePath()));
+            Assert.assertTrue(
+                    expectedFilesets.contains(con.getFile().getAbsolutePath()), info(f, cons));
         }
     }
 
@@ -153,10 +152,10 @@ public class ImportCandidatesTest {
 
         List<ImportContainer> cons = createImportCandidates(files);
 
-        Assert.assertEquals(info(files, cons), 1, cons.size());
+        Assert.assertEquals(1, cons.size(), info(files, cons));
 
-        Assert.assertTrue(info(files, cons), f.getAbsolutePath()
-                .equals(cons.iterator().next().getFile().getAbsolutePath()));
+        Assert.assertTrue(f.getAbsolutePath()
+                .equals(cons.iterator().next().getFile().getAbsolutePath()), info(files, cons));
 
         FileUtils.deleteQuietly(fakeFolder);
     }
@@ -185,13 +184,13 @@ public class ImportCandidatesTest {
 
         List<ImportContainer> cons = createImportCandidates(files);
 
-        Assert.assertEquals(info(files, cons), 2, cons.size());
+        Assert.assertEquals(2, cons.size(), info(files, cons));
 
         for (ImportContainer con : cons) {
-            Assert.assertTrue(info(files, cons),
+            Assert.assertTrue(
                     f1.getAbsolutePath().equals(con.getFile().getAbsolutePath())
                             || f2.getAbsolutePath()
-                                    .equals(con.getFile().getAbsolutePath()));
+                                    .equals(con.getFile().getAbsolutePath()), info(files, cons));
         }
 
         FileUtils.deleteQuietly(fakeFolder);
@@ -222,13 +221,13 @@ public class ImportCandidatesTest {
 
         List<ImportContainer> cons = createImportCandidates(files);
 
-        Assert.assertEquals(info(files, cons), 2, cons.size());
+        Assert.assertEquals(2, cons.size(), info(files, cons));
 
         for (ImportContainer con : cons) {
-            Assert.assertTrue(info(files, cons),
+            Assert.assertTrue(
                     f1.getAbsolutePath().equals(con.getFile().getAbsolutePath())
                             || f2.getAbsolutePath()
-                                    .equals(con.getFile().getAbsolutePath()));
+                                    .equals(con.getFile().getAbsolutePath()), info(files, cons));
         }
 
         FileUtils.deleteQuietly(fakeFolder);
@@ -258,13 +257,13 @@ public class ImportCandidatesTest {
 
         List<ImportContainer> cons = createImportCandidates(files);
 
-        Assert.assertEquals(info(files, cons), 2, cons.size());
+        Assert.assertEquals(2, cons.size(), info(files, cons));
 
         for (ImportContainer con : cons) {
-            Assert.assertTrue(info(files, cons),
+            Assert.assertTrue(
                     f1.getAbsolutePath().equals(con.getFile().getAbsolutePath())
                             || f2.getAbsolutePath()
-                                    .equals(con.getFile().getAbsolutePath()));
+                                    .equals(con.getFile().getAbsolutePath()), info(files, cons));
         }
 
         FileUtils.deleteQuietly(fakeFolder);
