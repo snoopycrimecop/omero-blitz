@@ -1,3 +1,13 @@
+5.5.7 (July 2020)
+-----------------
+
+- Have reset password use SQL to bypass 2019-SV3 restrictions ([#85](https://github.com/ome/omero-blitz/pull/85))
+- Remove junit dependency ([#86](https://github.com/ome/omero-blitz/pull/86))
+- Implement setROIName in OMEROMetadataStoreClient ([#90](https://github.com/ome/omero-blitz/pull/90))
+- info in log ([#93](https://github.com/ome/omero-blitz/pull/93))
+- Fix import-as by group owners ([#94](https://github.com/ome/omero-blitz/pull/94))
+- Bump omero-server version to 5.6.0
+
 5.5.6 (March 2020)
 ------------------
 
