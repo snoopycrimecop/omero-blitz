@@ -1,5 +1,5 @@
 /*
- *   Copyright (C) 2009-2018 University of Dundee & Open Microscopy Environment.
+ *   Copyright (C) 2009-2020 University of Dundee & Open Microscopy Environment.
  *   All rights reserved.
  *
  *   Use is subject to license terms supplied in LICENSE.txt
@@ -391,7 +391,7 @@ public class CommandLineImporter {
             + "\n"
             + "For additional information, see:\n"
             + "https://docs.openmicroscopy.org/latest/omero/users/cli/import.html\n"
-            + "Report bugs to <ome-users@lists.openmicroscopy.org.uk>",
+            + "Report bugs at https://forum.image.sc/tags/c/data-management/omero",
             APP_NAME, APP_NAME, APP_NAME, APP_NAME, APP_NAME, APP_NAME));
         System.exit(1);
     }
@@ -474,7 +474,7 @@ public class CommandLineImporter {
             + " --email EMAIL --report --upload --logs"
             + " --qa-baseurl=http://qa.openmicroscopy.org.uk/qa\n"
             + "\n"
-            + "Report bugs to <ome-users@lists.openmicroscopy.org.uk>");
+            + "Report bugs at https://forum.image.sc/tags/c/data-management/omero");
         System.exit(1);
     }
 
