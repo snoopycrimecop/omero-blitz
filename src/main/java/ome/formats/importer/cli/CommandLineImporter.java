@@ -391,7 +391,7 @@ public class CommandLineImporter {
             + "\n"
             + "For additional information, see:\n"
             + "https://docs.openmicroscopy.org/latest/omero/users/cli/import.html\n"
-            + "Report bugs at https://forum.image.sc/tags/c/data-management/omero",
+            + "Report bugs at https://www.openmicroscopy.org/forums",
             APP_NAME, APP_NAME, APP_NAME, APP_NAME, APP_NAME, APP_NAME));
         System.exit(1);
     }
@@ -474,7 +474,7 @@ public class CommandLineImporter {
             + " --email EMAIL --report --upload --logs"
             + " --qa-baseurl=http://qa.openmicroscopy.org.uk/qa\n"
             + "\n"
-            + "Report bugs at https://forum.image.sc/tags/c/data-management/omero");
+            + "Report bugs at https://www.openmicroscopy.org/forums");
         System.exit(1);
     }
 
