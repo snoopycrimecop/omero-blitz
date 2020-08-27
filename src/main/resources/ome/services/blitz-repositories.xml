@@ -53,6 +53,17 @@
     <property name="repeatInterval" value="60000" /><!-- millis -->
   </bean>
 
+  <bean id="managedRepositoryServant" class="ome.services.blitz.repo.ManagedRepositoryI">
+      <constructor-arg value="${omero.fs.repo.path}"/>
+      <constructor-arg ref="repositoryDao"/>
+      <constructor-arg ref="processContainer"/>
+      <constructor-arg ref="checksumProviderFactory"/>
+      <constructor-arg value="${omero.checksum.supported}"/>
+      <constructor-arg value="${omero.fs.repo.path_rules}"/>
+      <constructor-arg ref="uuid"/>
+      <constructor-arg ref="roles"/>
+      <constructor-arg ref="managedRepoUuids"/>
+  </bean>
   <bean id="managedRepository" class="ome.services.blitz.repo.LegacyRepositoryI" destroy-method="close">
       <constructor-arg ref="BlitzAdapter"/>
       <constructor-arg ref="Registry"/>
@@ -60,18 +71,7 @@
       <constructor-arg ref="repoPrincipal"/>
       <constructor-arg value="${omero.managed.dir}"/>
       <constructor-arg ref="readOnlyStatus"/>
-      <constructor-arg>
-          <bean class="ome.services.blitz.repo.ManagedRepositoryI">
-              <constructor-arg value="${omero.fs.repo.path}"/>
-              <constructor-arg ref="repositoryDao"/>
-              <constructor-arg ref="processContainer"/>
-              <constructor-arg ref="checksumProviderFactory"/>
-              <constructor-arg value="${omero.checksum.supported}"/>
-              <constructor-arg value="${omero.fs.repo.path_rules}"/>
-              <constructor-arg ref="uuid"/>
-              <constructor-arg ref="roles"/>
-              <constructor-arg ref="managedRepoUuids"/>
-          </bean>
+      <constructor-arg ref="managedRepositoryServant">
       </constructor-arg>
   </bean>
   <bean id="managedRepositoryTakeoverRun" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
