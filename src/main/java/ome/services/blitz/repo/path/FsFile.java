@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2019 University of Dundee & Open Microscopy Environment.
+ * Copyright (C) 2012-2020 University of Dundee & Open Microscopy Environment.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -20,6 +20,8 @@
 package ome.services.blitz.repo.path;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -134,7 +136,15 @@ public class FsFile {
     public FsFile(File file) {
         this(splitComponents(file.getAbsolutePath(), File.separatorChar));
     }
-    
+
+    /**
+     * Construct an instance.
+     * @param path the path to whose absolute path this instance corresponds
+     */
+    public FsFile(Path path) {
+        this(path.toFile());
+    }
+
     /**
      * Construct an instance.
      * @param path the path that this instance's string representation must match
@@ -214,7 +224,23 @@ public class FsFile {
             file = new File(file, component);
         return file;
     }
-    
+
+    /**
+     * Convert this instance to a {@link Path}
+     * relative to the given {@link Path}.
+     * @param path parent directory, may be null for a relative return value,
+     * but actually expected to be the repository's root directory
+     * @return where this instance should be located in the server-side filesystem
+     */
+    public Path toPath(Path path) {
+        if (path == null) {
+            path = Paths.get("");
+        }
+        for (final String component : this.components)
+            path = path.resolve(component);
+        return path;
+    }
+
     /** 
      * {@inheritDoc}
      * Provides repository path with components separated by {@link #separatorChar}.
