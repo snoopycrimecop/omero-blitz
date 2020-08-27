@@ -57,6 +57,7 @@
       <constructor-arg value="${omero.fs.repo.path}"/>
       <constructor-arg ref="repositoryDao"/>
       <constructor-arg ref="processContainer"/>
+      <constructor-arg ref="securitySystem"/>
       <constructor-arg ref="checksumProviderFactory"/>
       <constructor-arg value="${omero.checksum.supported}"/>
       <constructor-arg value="${omero.fs.repo.path_rules}"/>

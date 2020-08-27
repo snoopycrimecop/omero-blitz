@@ -50,6 +50,7 @@ import ome.formats.importer.ImportConfig;
 import ome.formats.importer.ImportContainer;
 import ome.model.core.OriginalFile;
 import ome.model.meta.Experimenter;
+import ome.security.SecuritySystem;
 import ome.services.blitz.repo.path.ClientFilePathTransformer;
 import ome.services.blitz.repo.path.FilePathRestrictionInstance;
 import ome.services.blitz.repo.path.FsFile;
@@ -143,6 +144,8 @@ public class ManagedRepositoryI extends PublicRepositoryI
 
     private final ProcessContainer processes;
 
+    private final SecuritySystem securitySystem;
+
     private final String rootSessionUuid;
 
     private final long userGroupId;
@@ -156,12 +159,13 @@ public class ManagedRepositoryI extends PublicRepositoryI
      * @param dao
      */
     public ManagedRepositoryI(String template, RepositoryDao dao) throws Exception {
-        this(template, dao, new ProcessContainer(), new ChecksumProviderFactoryImpl(),
+        this(template, dao, new ProcessContainer(), null, new ChecksumProviderFactoryImpl(),
                 ALL_CHECKSUM_ALGORITHMS, FilePathRestrictionInstance.UNIX_REQUIRED.name, null, new Roles(), new HashSet<String>());
     }
 
     public ManagedRepositoryI(String template, RepositoryDao dao,
             ProcessContainer processes,
+            SecuritySystem securitySystem,
             ChecksumProviderFactory checksumProviderFactory,
             String checksumAlgorithmSupported,
             String pathRules,
@@ -185,6 +189,7 @@ public class ManagedRepositoryI extends PublicRepositoryI
         }
 
         this.processes = processes;
+        this.securitySystem = securitySystem;
         this.rootSessionUuid = rootSessionUuid;
         this.userGroupId = roles.getUserGroupId();
         log.info("Repository template: " + template);
