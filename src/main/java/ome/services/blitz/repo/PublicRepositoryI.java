@@ -53,6 +53,7 @@ import Ice.Current;
 
 import ome.api.IQuery;
 import ome.api.RawFileStore;
+import ome.parameters.Parameters;
 import ome.services.blitz.impl.AbstractAmdServant;
 import ome.services.blitz.impl.ServiceFactoryI;
 import ome.services.blitz.repo.path.FilePathRestrictionInstance;
@@ -258,6 +259,19 @@ public class PublicRepositoryI implements _RepositoryOperations, ApplicationCont
         return repositoryDao.treeList(repoUuid, checked, __current);
     }
 
+    /**
+     * @param session the Hibernate session
+     * @param serviceFactory the service factory
+     * @return the filesystem path set for this repository's root directory
+     * @throws ServerError if the root path could not be retrieved
+     */
+    public String rootPath(Session session, ServiceFactory serviceFactory) throws ServerError {
+        final IQuery iQuery = serviceFactory.getQueryService();
+        final String hql = "SELECT path || name FROM OriginalFile WHERE id = :id";
+        final Parameters params = new Parameters().addId(id);
+        final List<Object[]> results = iQuery.projection(hql, params);
+        return (String) results.get(0)[0];
+    }
 
     /**
      * Register an OriginalFile using its path
