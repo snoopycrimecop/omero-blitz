@@ -238,7 +238,12 @@ public class RequestObjectFactoryRegistry extends
                 new ObjectFactory(DuplicateI.ice_staticId()) {
                     @Override
                     public Ice.Object create(String name) {
-                        return graphRequestFactory.getRequest(DuplicateI.class);
+                        final DuplicateI request = graphRequestFactory.getRequest(DuplicateI.class);
+                        request.setOriginalFilesService(filesService);
+                        request.setPixelsService(pixelsService);
+                        request.setThumbnailService(thumbnailService);
+                        request.setManagedRepository(managedRepository);
+                        return request;
                     }
                 });
         factories.put(SendEmailRequestI.ice_staticId(),

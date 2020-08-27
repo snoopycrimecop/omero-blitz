@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2019 University of Dundee & Open Microscopy Environment.
+ * Copyright (C) 2014-2020 University of Dundee & Open Microscopy Environment.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -51,9 +51,16 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.SetMultimap;
 
+import ome.io.nio.OriginalFilesService;
+import ome.io.nio.PixelsService;
+import ome.io.nio.ThumbnailService;
 import ome.model.IObject;
+import ome.model.core.OriginalFile;
+import ome.model.core.Pixels;
+import ome.model.display.Thumbnail;
 import ome.security.ACLVoter;
 import ome.security.basic.LightAdminPrivileges;
+import ome.services.blitz.repo.ManagedRepositoryI;
 import ome.services.delete.Deletion;
 import ome.services.graphs.GraphException;
 import ome.services.graphs.GraphPathBean;
@@ -98,6 +105,8 @@ public class DuplicateI extends Duplicate implements IRequest, ReadOnlyStatus.Is
     private final Set<Class<? extends IObject>> targetClasses;
     private GraphPolicy graphPolicy;  /* not final because of adjustGraphPolicy */
     private final SetMultimap<String, String> unnullable;
+    private final Map<Class<? extends IObject>, Function<Long, String>> pathServices = new HashMap<>();
+    private ManagedRepositoryI managedRepository;
 
     /* a taxonomy based on the class hierarchy of model objects in Java */
     private SpecificityClassifier<Class<? extends IObject>, Inclusion> classifier;
@@ -137,6 +146,37 @@ public class DuplicateI extends Duplicate implements IRequest, ReadOnlyStatus.Is
         this.targetClasses = targetClasses;
         this.graphPolicy = graphPolicy;
         this.unnullable = unnullable;
+    }
+
+    /**
+     * @param service the original files service to use as a source of file paths for duplicating the underlying storage of
+     * {@link OriginalFile} instances
+     */
+    public void setOriginalFilesService(OriginalFilesService service) {
+        pathServices.put(OriginalFile.class, service::getFilesPath);
+    }
+
+    /**
+     * @param service the pixels service to use as a source of file paths for duplicating the underlying storage of
+     * {@link Pixels} instances
+     */
+    public void setPixelsService(PixelsService service) {
+        pathServices.put(Pixels.class, service::getPixelsPath);
+    }
+
+    /**
+     * @param service the thumbnail service to use as a source of file paths for duplicating the underlying storage of
+     * {@link Thumbnail} instances
+     */
+    public void setThumbnailService(ThumbnailService service) {
+        pathServices.put(Thumbnail.class, service::getThumbnailPath);
+    }
+
+    /**
+     * @param managedRepository the managed repository to be used by this duplication process
+     */
+    public void setManagedRepository(ManagedRepositoryI managedRepository) {
+        this.managedRepository = managedRepository;
     }
 
     @Override
