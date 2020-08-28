@@ -40,7 +40,7 @@ import org.apache.commons.lang.StringUtils;
  * @author m.t.b.carroll@dundee.ac.uk
  * @since 5.0
  */
-public class FsFile {
+public class FsFile implements Comparable<FsFile> {
     /** the separator character for delimiting repository path components */
     public static char separatorChar = '/';
 
@@ -270,5 +270,10 @@ public class FsFile {
     @Override
     public int hashCode() {
         return this.path.hashCode() * 97;
+    }
+
+    @Override
+    public int compareTo(FsFile other) {
+        return path.compareTo(other.path);
     }
 }
