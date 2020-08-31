@@ -22,6 +22,7 @@ import static omero.rtypes.rstring;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.DateFormatSymbols;
@@ -36,6 +37,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -50,6 +52,8 @@ import ome.formats.importer.ImportConfig;
 import ome.formats.importer.ImportContainer;
 import ome.model.core.OriginalFile;
 import ome.model.meta.Experimenter;
+import ome.model.meta.ExperimenterGroup;
+import ome.security.AdminAction;
 import ome.security.SecuritySystem;
 import ome.services.blitz.repo.path.ClientFilePathTransformer;
 import ome.services.blitz.repo.path.FilePathRestrictionInstance;
@@ -117,6 +121,14 @@ import com.google.common.math.IntMath;
 public class ManagedRepositoryI extends PublicRepositoryI
     implements _ManagedRepositoryOperations {
 
+    /**
+     * Adapts {@link #AdminAction} to allow passing an error to the caller.
+     * @author m.t.b.carroll@dundee.ac.uk
+     */
+    private static abstract class AdminActionWithError implements AdminAction {
+        ServerError error;
+    };
+
     private final static Logger log = LoggerFactory.getLogger(ManagedRepositoryI.class);
 
     private final static int parentDirsToRetain = 3;
@@ -151,6 +163,8 @@ public class ManagedRepositoryI extends PublicRepositoryI
     private final long userGroupId;
 
     private final Set<String> managedRepoUuids;
+
+    private final ThreadLocal<WeakReference<Consumer<CheckedPath>>> fileCreationListeners = new ThreadLocal<>();
 
     /**
      * Creates a {@link ProcessContainer} internally that will not be managed
@@ -204,6 +218,25 @@ public class ManagedRepositoryI extends PublicRepositoryI
     public void initialize(FileMaker fileMaker, Long id, String repoUuid) throws ValidationException {
         super.initialize(fileMaker, id, repoUuid);
         managedRepoUuids.add(repoUuid);
+    }
+
+    /**
+     * Set the file creation listener <em>for this thread</em> that is notified of new files being created.
+     * Maintains only a <em>weak</em> reference to the given listener.
+     * Applies only for uses of {@link #makeCheckedDirs(LinkedList, boolean, Session, ServiceFactory, SqlAction, EventContext)}
+     * by this thread.
+     * @param fileCreationListener a file creation listener
+     */
+    public void setFileCreationListener(Consumer<CheckedPath> fileCreationListener) {
+        fileCreationListeners.set(new WeakReference<>(fileCreationListener));
+    }
+
+    /**
+     * Clear the file creation listener <em>for this thread</em>.
+     * @see #setFileCreationListener(Consumer)
+     */
+    public void clearFileCreationListener() {
+        fileCreationListeners.remove();
     }
 
     //
@@ -614,11 +647,14 @@ public class ManagedRepositoryI extends PublicRepositoryI
      */
     private class TemplateDirectoryCreator {
         private final Calendar now = Calendar.getInstance();
-        private final omero.sys.EventContext ctx;
+        private final EventContext intCtx;
+        private final omero.sys.EventContext extCtx;
         private final Object consistentData;
         private final boolean createDirectories;
         private final Ice.Current current;
         private final ServiceFactory sf;
+        private final Session session;
+        private final SqlAction sql;
         private final Deque<String> remaining;
         private final List<String> done;
 
@@ -634,11 +670,14 @@ public class ManagedRepositoryI extends PublicRepositoryI
          */
         TemplateDirectoryCreator(FsFile base, FsFile todo, final omero.sys.EventContext ctx, final Object consistentData,
                                  boolean createDirectories, Current current) {
-            this.ctx = ctx;
+            this.intCtx = null;
+            this.extCtx = ctx;
             this.consistentData = consistentData;
             this.createDirectories = createDirectories;
             this.current = current;
             this.sf = null;
+            this.session = null;
+            this.sql = null;
             this.remaining = new ArrayDeque<String>(todo.getComponents());
             this.done = new ArrayList<String>(base.getComponents());
         }
@@ -659,11 +698,28 @@ public class ManagedRepositoryI extends PublicRepositoryI
             if (createDirectories) {
                 throw new ApiUsageException("may not create directories with only a service factory");
             }
-            this.ctx = ctx;
+            this.intCtx = null;
+            this.extCtx = ctx;
             this.consistentData = consistentData;
             this.createDirectories = createDirectories;
             this.current = null;
             this.sf = sf;
+            this.session = null;
+            this.sql = null;
+            this.remaining = new ArrayDeque<String>(todo.getComponents());
+            this.done = new ArrayList<String>(base.getComponents());
+        }
+
+        TemplateDirectoryCreator(FsFile base, FsFile todo, final EventContext ctx, final Object consistentData,
+                boolean createDirectories, ServiceFactory sf, Session session, SqlAction sql) {
+            this.intCtx = ctx;
+            this.extCtx = IceMapper.convert(ctx);
+            this.consistentData = consistentData;
+            this.createDirectories = createDirectories;
+            this.current = null;
+            this.sf = sf;
+            this.session = session;
+            this.sql = sql;
             this.remaining = new ArrayDeque<String>(todo.getComponents());
             this.done = new ArrayList<String>(base.getComponents());
         }
@@ -683,6 +739,20 @@ public class ManagedRepositoryI extends PublicRepositoryI
         }
 
         /**
+         * Create a directory in the managed repository.
+         * @param path the path of the directory to create
+         * @param parents if the parents of the directory should also be created if necessary, like {@code mkdir -p}
+         * @throws ServerError if the directory creation failed
+         */
+        private void makeDir(String path, boolean parents) throws ServerError {
+            if (current == null) {
+                ManagedRepositoryI.this.makeDir(path, parents, session, sf, sql, intCtx);
+            } else {
+                ManagedRepositoryI.this.makeDir(path, parents, current);
+            }
+        }
+
+        /**
          * Expand {@code %user%} to the user's name.
          * @param prefix path component text preceding the expansion term, may be empty
          * @param suffix path component text following the expansion term, may be empty
@@ -691,7 +761,7 @@ public class ManagedRepositoryI extends PublicRepositoryI
          */
         @SuppressWarnings("unused")  /* used by create() via Method.invoke */
         public String expandUser(String prefix, String suffix) {
-            return prefix + serverPaths.getPathSanitizer().apply(ctx.userName) + suffix;
+            return prefix + serverPaths.getPathSanitizer().apply(extCtx.userName) + suffix;
         }
 
         /**
@@ -703,7 +773,7 @@ public class ManagedRepositoryI extends PublicRepositoryI
          */
         @SuppressWarnings("unused")  /* used by create() via Method.invoke */
         public String expandUserId(String prefix, String suffix) {
-            return prefix + ctx.userId + suffix;
+            return prefix + extCtx.userId + suffix;
         }
 
         /**
@@ -715,7 +785,7 @@ public class ManagedRepositoryI extends PublicRepositoryI
          */
         @SuppressWarnings("unused")  /* used by create() via Method.invoke */
         public String expandGroup(String prefix, String suffix) {
-            return prefix + serverPaths.getPathSanitizer().apply(ctx.groupName) + suffix;
+            return prefix + serverPaths.getPathSanitizer().apply(extCtx.groupName) + suffix;
         }
 
         /**
@@ -727,7 +797,7 @@ public class ManagedRepositoryI extends PublicRepositoryI
          */
         @SuppressWarnings("unused")  /* used by create() via Method.invoke */
         public String expandGroupId(String prefix, String suffix) {
-            return prefix + ctx.groupId + suffix;
+            return prefix + extCtx.groupId + suffix;
         }
 
         /**
@@ -801,12 +871,12 @@ public class ManagedRepositoryI extends PublicRepositoryI
 
                 @Override
                 public boolean isAcceptable(List<String> path) throws ServerError {
-                    return !checkPath(getFullPathWith(path), null, current).exists();
+                    return !checkPath(getFullPathWith(path), null).exists();
                 }
 
                 @Override
                 public void usePath(List<String> path) throws ServerError {
-                    makeDir(getFullPathWith(path), false, current);
+                    makeDir(getFullPathWith(path), false);
                 }
             };
 
@@ -822,7 +892,7 @@ public class ManagedRepositoryI extends PublicRepositoryI
          */
         @SuppressWarnings("unused")  /* used by create() via Method.invoke */
         public String expandSession(String prefix, String suffix) {
-            return prefix + ctx.sessionUuid + suffix;
+            return prefix + extCtx.sessionUuid + suffix;
         }
 
         /**
@@ -834,7 +904,7 @@ public class ManagedRepositoryI extends PublicRepositoryI
          */
         @SuppressWarnings("unused")  /* used by create() via Method.invoke */
         public String expandSessionId(String prefix, String suffix) {
-            return prefix + ctx.sessionId + suffix;
+            return prefix + extCtx.sessionId + suffix;
         }
 
         /**
@@ -846,7 +916,7 @@ public class ManagedRepositoryI extends PublicRepositoryI
          */
         @SuppressWarnings("unused")  /* used by create() via Method.invoke */
         public String expandPerms(String prefix, String suffix) {
-            return prefix + ctx.groupPermissions + suffix;
+            return prefix + extCtx.groupPermissions + suffix;
         }
 
         /**
@@ -859,10 +929,10 @@ public class ManagedRepositoryI extends PublicRepositoryI
         @SuppressWarnings("unused")  /* used by create() via Method.invoke */
         public String expandInstitution(String prefix, String suffix) {
             final String institution;
-            if (current != null) {
-                institution = repositoryDao.getUserInstitution(ctx.userId, current);
+            if (current == null) {
+                institution = repositoryDao.getUserInstitution(extCtx.userId, sf);
             } else {
-                institution = repositoryDao.getUserInstitution(ctx.userId, sf);
+                institution = repositoryDao.getUserInstitution(extCtx.userId, current);
             }
             if (StringUtils.isBlank(institution)) {
                 return null;
@@ -882,10 +952,10 @@ public class ManagedRepositoryI extends PublicRepositoryI
         @SuppressWarnings("unused")  /* used by create() via Method.invoke */
         public String expandInstitution(String prefix, String suffix, String defaultForNone) {
             String institution;
-            if (current != null) {
-                institution = repositoryDao.getUserInstitution(ctx.userId, current);
+            if (current == null) {
+                institution = repositoryDao.getUserInstitution(extCtx.userId, sf);
             } else {
-                institution = repositoryDao.getUserInstitution(ctx.userId, sf);
+                institution = repositoryDao.getUserInstitution(extCtx.userId, current);
             }
             if (StringUtils.isBlank(institution)) {
                 institution = defaultForNone;
@@ -976,12 +1046,12 @@ public class ManagedRepositoryI extends PublicRepositoryI
 
                 @Override
                 public boolean isAcceptable(List<String> path) throws ServerError {
-                    return !checkPath(getFullPathWith(path), null, current).exists();
+                    return !checkPath(getFullPathWith(path), null).exists();
                 }
 
                 @Override
                 public void usePath(List<String> path) throws ServerError {
-                    makeDir(getFullPathWith(path), false, current);
+                    makeDir(getFullPathWith(path), false);
                 }
             };
 
@@ -1084,7 +1154,7 @@ public class ManagedRepositoryI extends PublicRepositoryI
 
                 @Override
                 public void usePath(List<String> path) throws ServerError {
-                    makeDir(getFullPathWith(path), true, current);
+                    makeDir(getFullPathWith(path), true);
                 }
             };
 
@@ -1216,7 +1286,7 @@ public class ManagedRepositoryI extends PublicRepositoryI
                 }
                 if (pattern != null && createDirectories) {
                     /* expansion occurred but directory was not yet created */
-                    makeDir(new FsFile(done).toString(), !remaining.isEmpty(), current);
+                    makeDir(new FsFile(done).toString(), !remaining.isEmpty());
                 }
             }
             /* all components now processed */
@@ -1227,7 +1297,7 @@ public class ManagedRepositoryI extends PublicRepositoryI
     /**
      * Expand the root-owned segment of the template path.
      * @param ctx the event context to apply in expanding terms
-     * @param current the method invocation context in which to perform queries
+     * @param current the method invocation context
      * @return the expanded template path
      * @throws ServerError if the path could not be expanded
      */
@@ -1238,7 +1308,21 @@ public class ManagedRepositoryI extends PublicRepositoryI
     /**
      * Expand the root-owned segment of the template path.
      * @param ctx the event context to apply in expanding terms
-     * @param sf the service factory which to perform queries
+     * @param sf the service factory
+     * @param session the Hibernate session
+     * @param sql the JDBC convenience wrapper
+     * @return the expanded template path
+     * @throws ServerError if the path could not be expanded
+     */
+    private FsFile expandTemplateRootOwnedPath(EventContext ctx, ServiceFactory sf, Session session, SqlAction sql)
+            throws ServerError {
+        return new TemplateDirectoryCreator(FsFile.emptyPath, templateRoot, ctx, null, false, sf, session, sql).create();
+    }
+
+    /**
+     * Expand the root-owned segment of the template path.
+     * @param ctx the event context to apply in expanding terms
+     * @param sf the service factory
      * @return the expanded template path
      * @throws ServerError if the path could not be expanded
      */
@@ -1251,20 +1335,36 @@ public class ManagedRepositoryI extends PublicRepositoryI
      * Expand and create the user-owned segment of the template path.
      * @param ctx the event context to apply in expanding terms
      * @param rootBase the expanded root-owned segment of the template path
-     * @param Object consistentData the object to hash in expanding {@code %hash%}
+     * @param consistentData the object to hash in expanding {@code %hash%}
      * @param current the method invocation context in which to perform queries and create directories
      * @return the expanded template path
      * @throws ServerError if the path could not be expanded and created
      */
-    private FsFile expandAndCreateTemplateUserOwnedPath(omero.sys.EventContext ctx, FsFile rootBase, Object consistentData, Current current)
-            throws ServerError {
+    private FsFile expandAndCreateTemplateUserOwnedPath(omero.sys.EventContext ctx, FsFile rootBase, Object consistentData,
+            Current current) throws ServerError {
         return new TemplateDirectoryCreator(rootBase, templateUser, ctx, consistentData, true, current).create();
+    }
+
+    /**
+     * Expand the root-owned segment of the template path.
+     * @param ctx the event context to apply in expanding terms
+     * @param rootBase the expanded root-owned segment of the template path
+     * @param consistentData the object to hash in expanding {@code %hash%}
+     * @param sf the service factory
+     * @param session the Hibernate session
+     * @param sql the JDBC convenience wrapper
+     * @return the expanded template path
+     * @throws ServerError if the path could not be expanded
+     */
+    private FsFile expandAndCreateTemplateUserOwnedPath(EventContext ctx, FsFile rootBase, Object consistentData, ServiceFactory sf,
+            Session session, SqlAction sql) throws ServerError {
+        return new TemplateDirectoryCreator(rootBase, templateUser, ctx, consistentData, true, sf, session, sql).create();
     }
 
     /**
      * Expand the template path and create its directories with the correct ownership.
      * @param consistentData the object to hash in expanding {@code %hash%}
-     * @param __current the current ICE method invocation context
+     * @param __current the method invocation context
      * @return the expanded template path
      * @throws ServerError if the new path could not be created
      */
@@ -1284,6 +1384,52 @@ public class ManagedRepositoryI extends PublicRepositoryI
 
         /* now create the user-owned directories */
         final FsFile wholeExpanded = expandAndCreateTemplateUserOwnedPath(ctx, rootOwnedExpanded, consistentData, __current);
+        if (wholeExpanded.equals(rootOwnedExpanded)) {
+            throw new omero.ApiUsageException(null, null,
+                    "no user-owned directories in expanded form of managed repository template path");
+        }
+        return wholeExpanded;
+}
+
+    /**
+     * Expand the template path and create its directories with the correct ownership.
+     * Performs the work of {@link #createTemplatePath(Object, Current)} except from within an existing transaction.
+     * @param consistentData the object to hash in expanding {@code %hash%}
+     * @param ctx the event context to apply in expanding terms
+     * @param sf the service factory
+     * @param session the Hibernate session
+     * @param sql the JDBC convenience wrapper
+     * @return the expanded template path
+     * @throws ServerError if the new path could not be created
+     */
+    public FsFile createTemplatePath(Object consistentData, EventContext ctx, ServiceFactory sf, Session session, SqlAction sql)
+            throws ServerError {
+        final FsFile rootOwnedExpanded;
+        if (FsFile.emptyPath.equals(templateRoot)) {
+            rootOwnedExpanded = FsFile.emptyPath;
+        } else {
+            /* there are some root-owned directories first */
+            rootOwnedExpanded = expandTemplateRootOwnedPath(ctx, sf, session, sql);
+            final CheckedPath checked = checkPath(rootOwnedExpanded.toString(), null);
+            final ExperimenterGroup userGroup = (ExperimenterGroup) session.get(ExperimenterGroup.class, userGroupId);
+            final AdminActionWithError rootDirMaker = new AdminActionWithError() {
+                @Override
+                public void runAsAdmin() {
+                    try {
+                        makeDir(checked, true, session, sf, sql, ctx);
+                    } catch (ServerError se) {
+                        error = se;
+                    }
+                }
+            };
+            securitySystem.runAsAdmin(userGroup, rootDirMaker);
+            if (rootDirMaker.error != null) {
+                throw rootDirMaker.error;
+            }
+        }
+
+        /* now create the user-owned directories */
+        final FsFile wholeExpanded = expandAndCreateTemplateUserOwnedPath(ctx, rootOwnedExpanded, consistentData, sf, session, sql);
         if (wholeExpanded.equals(rootOwnedExpanded)) {
             throw new omero.ApiUsageException(null, null,
                     "no user-owned directories in expanded form of managed repository template path");
@@ -1442,8 +1588,7 @@ public class ManagedRepositoryI extends PublicRepositoryI
     @Override
     protected void makeCheckedDirs(final LinkedList<CheckedPath> paths,
             boolean parents, Session s, ServiceFactory sf, SqlAction sql,
-                                   EventContext effectiveEventContext) throws ServerError {
-
+            EventContext effectiveEventContext) throws ServerError {
         final IAdmin adminService = sf.getAdminService();
         final omero.sys.EventContext ec = IceMapper.convert(effectiveEventContext);
         final FsFile rootOwnedPath = expandTemplateRootOwnedPath(ec, sf);
@@ -1481,7 +1626,14 @@ public class ManagedRepositoryI extends PublicRepositoryI
             pathsToFix.add(checked);
         }
 
-        super.makeCheckedDirs(paths, parents, s, sf, sql, effectiveEventContext);
+        final WeakReference<Consumer<CheckedPath>> maybeFileCreationListener = fileCreationListeners.get();
+        final Consumer<CheckedPath> fileCreationListener;
+        if (maybeFileCreationListener != null) {
+            fileCreationListener = maybeFileCreationListener.get();
+        } else {
+            fileCreationListener = null;
+        }
+        super.makeCheckedDirs(paths, parents, s, sf, sql, null, fileCreationListener);
 
         /* ensure that root segment of the template path is wholly root-owned */
         if (!pathsForRoot.isEmpty()) {
@@ -1500,5 +1652,28 @@ public class ManagedRepositoryI extends PublicRepositoryI
         // the current user, we make sure that the directories are in
         // the user group.
         repositoryDao.createOrFixUserDir(getRepoUuid(), pathsToFix, s, sf, sql);
+    }
+
+    @Override
+    protected final CheckedPath checkPath(String path, ChecksumAlgorithm checksumAlgorithm, final Ice.Current curr)
+            throws ValidationException {
+        /* This a final method so it cannot be subclassed to use Ice.Current. The superclass does not use the invocation context. */
+        return super.checkPath(path, checksumAlgorithm, null);
+    }
+
+    /**
+     * @see PublicRepositoryI#checkPath(String, ChecksumAlgorithm, Current)
+     */
+    protected final CheckedPath checkPath(String path, ChecksumAlgorithm checksumAlgorithm) throws ValidationException {
+        return checkPath(path, checksumAlgorithm, null);
+    }
+
+    /**
+     * @see PublicRepositoryI#makeDir(CheckedPath, boolean, Session, ServiceFactory, SqlAction, EventContext)
+     */
+    public void makeDir(String path, boolean parents, Session session, ServiceFactory sf, SqlAction sql,
+            ome.system.EventContext effectiveEventContext) throws ServerError {
+        final CheckedPath checked = checkPath(path, null);
+        makeDir(checked, parents, session, sf, sql, effectiveEventContext);
     }
 }
