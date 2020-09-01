@@ -37,9 +37,6 @@ import java.util.Set;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 
-import org.apache.commons.io.filefilter.FileFilterUtils;
-import org.apache.commons.io.filefilter.IOFileFilter;
-import org.apache.commons.io.filefilter.NameFileFilter;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -125,11 +122,6 @@ public class PublicRepositoryI implements _RepositoryOperations, ApplicationCont
     static final String SUDO_REAL_GROUP_NAME = "omero.internal.sudo.real:" + omero.constants.GROUP.value;
 
     private final static Logger log = LoggerFactory.getLogger(PublicRepositoryI.class);
-
-    private final static IOFileFilter DEFAULT_SKIP =
-            FileFilterUtils.notFileFilter(
-                    FileFilterUtils.orFileFilter(new NameFileFilter(".omero"),
-                            new NameFileFilter(".git")));
 
     /**
      * Mimetype used to connote a directory {@link OriginalFile} object.
