@@ -312,7 +312,7 @@ public class ManagedRepositoryI extends PublicRepositoryI
         }
 
         for (final ProcessContainer.Process p : ps) {
-            if (filesetIds.contains(p.getFileset().getId())) {
+            if (filesetIds.contains(p.getFileset().getId().getValue())) {
                 proxies.add(p.getProxy());
             }
         }
