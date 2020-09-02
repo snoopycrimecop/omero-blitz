@@ -53,8 +53,8 @@ import ome.formats.importer.ImportContainer;
 import ome.model.core.OriginalFile;
 import ome.model.meta.Experimenter;
 import ome.model.meta.ExperimenterGroup;
-import ome.security.AdminAction;
 import ome.security.SecuritySystem;
+import ome.security.basic.BasicEventContext;
 import ome.services.blitz.repo.path.ClientFilePathTransformer;
 import ome.services.blitz.repo.path.FilePathRestrictionInstance;
 import ome.services.blitz.repo.path.FsFile;
@@ -120,14 +120,6 @@ import com.google.common.math.IntMath;
  */
 public class ManagedRepositoryI extends PublicRepositoryI
     implements _ManagedRepositoryOperations {
-
-    /**
-     * Adapts {@link #AdminAction} to allow passing an error to the caller.
-     * @author m.t.b.carroll@dundee.ac.uk
-     */
-    private static abstract class AdminActionWithError implements AdminAction {
-        ServerError error;
-    };
 
     private final static Logger log = LoggerFactory.getLogger(ManagedRepositoryI.class);
 
@@ -1411,20 +1403,28 @@ public class ManagedRepositoryI extends PublicRepositoryI
             /* there are some root-owned directories first */
             rootOwnedExpanded = expandTemplateRootOwnedPath(ctx, sf, session, sql);
             final CheckedPath checked = checkPath(rootOwnedExpanded.toString(), null);
+            final Roles roles = securitySystem.getSecurityRoles();
+            final Experimenter rootOwner = (Experimenter) session.get(Experimenter.class, roles.getRootId());
             final ExperimenterGroup userGroup = (ExperimenterGroup) session.get(ExperimenterGroup.class, userGroupId);
-            final AdminActionWithError rootDirMaker = new AdminActionWithError() {
-                @Override
-                public void runAsAdmin() {
-                    try {
-                        makeDir(checked, true, session, sf, sql, ctx);
-                    } catch (ServerError se) {
-                        error = se;
-                    }
-                }
-            };
-            securitySystem.runAsAdmin(userGroup, rootDirMaker);
-            if (rootDirMaker.error != null) {
-                throw rootDirMaker.error;
+            final EventContext ec = securitySystem.getEventContext();
+            if (!(ec instanceof BasicEventContext)) {
+                throw new ServerError(null, null, "inappropriate security context for creating repository template path: " + ec);
+            }
+            final BasicEventContext bec = (BasicEventContext) ec;
+            final Experimenter currentUser = bec.getOwner();
+            final Experimenter currentSudoer = bec.getSudoer();
+            final ExperimenterGroup currentGroup = bec.getGroup();
+            try {
+                session.flush();
+                bec.setOwner(rootOwner);
+                bec.setSudoer(currentUser);
+                bec.setGroup(userGroup, userGroup.getDetails().getPermissions());
+                makeDir(checked, true, session, sf, sql, ctx);
+                session.flush();
+            } finally {
+                bec.setOwner(currentUser);
+                bec.setSudoer(currentSudoer);
+                bec.setGroup(currentGroup, currentGroup.getDetails().getPermissions());
             }
         }
 
