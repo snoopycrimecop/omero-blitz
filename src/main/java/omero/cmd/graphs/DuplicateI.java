@@ -55,6 +55,7 @@ import org.springframework.context.ApplicationContext;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.ListMultimap;
@@ -126,8 +127,8 @@ public class DuplicateI extends Duplicate implements IRequest, ReadOnlyStatus.Is
     private final Set<Class<? extends IObject>> targetClasses;
     private GraphPolicy graphPolicy;  /* not final because of adjustGraphPolicy */
     private final SetMultimap<String, String> unnullable;
-    private final Map<Class<? extends IObject>, Function<Long, String>> pathServices = new HashMap<>();
-    private ManagedRepositoryI managedRepository;
+    private final Map<Class<? extends IObject>, Function<Long, String>> pathServices;
+    private final ManagedRepositoryI managedRepository;
     private Function<FsFile, Path> managedRepositoryPathfinder;
     private Predicate<Path> isPathManaged;
 
@@ -182,37 +183,11 @@ public class DuplicateI extends Duplicate implements IRequest, ReadOnlyStatus.Is
                 (prefix, file) -> file.getPathFrom(prefix) != null,
                 (prefix, file) -> FsFile.concatenate(prefix, file),
                 (prefix, file) -> file.getPathFrom(prefix));
-    }
-
-    /**
-     * @param service the original files service to use as a source of file paths for duplicating the underlying storage of
-     * {@link OriginalFile} instances
-     */
-    public void setOriginalFilesService(OriginalFilesService service) {
-        pathServices.put(OriginalFile.class, service::getFilesPath);
-    }
-
-    /**
-     * @param service the pixels service to use as a source of file paths for duplicating the underlying storage of
-     * {@link Pixels} instances
-     */
-    public void setPixelsService(PixelsService service) {
-        pathServices.put(Pixels.class, service::getPixelsPath);
-    }
-
-    /**
-     * @param service the thumbnail service to use as a source of file paths for duplicating the underlying storage of
-     * {@link Thumbnail} instances
-     */
-    public void setThumbnailService(ThumbnailService service) {
-        pathServices.put(Thumbnail.class, service::getThumbnailPath);
-    }
-
-    /**
-     * @param managedRepository the managed repository to be used by this duplication process
-     */
-    public void setManagedRepository(ManagedRepositoryI managedRepository) {
-        this.managedRepository = managedRepository;
+        this.managedRepository = applicationContext.getBean(ManagedRepositoryI.class);
+        this.pathServices = ImmutableMap.of(
+                OriginalFile.class, applicationContext.getBean("/OMERO/Files", OriginalFilesService.class)::getFilesPath,
+                Pixels.class, applicationContext.getBean("/OMERO/Pixels", PixelsService.class)::getPixelsPath,
+                Thumbnail.class, applicationContext.getBean("/OMERO/Thumbs", ThumbnailService.class)::getThumbnailPath);
     }
 
     @Override
