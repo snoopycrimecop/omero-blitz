@@ -324,10 +324,8 @@
       <constructor-arg ref="extendedMetadata"/>
       <constructor-arg ref="aclVoter"/>
       <constructor-arg ref="roles"/>
-      <constructor-arg ref="/OMERO/Files"/>
       <constructor-arg ref="/OMERO/Pixels"/>
       <constructor-arg ref="/OMERO/Thumbs"/>
-      <constructor-arg ref="managedRepositoryServant"/>
       <constructor-arg ref="mailUtil"/>
       <constructor-arg ref="passwordUtil"/>
       <constructor-arg ref="securitySystem"/>

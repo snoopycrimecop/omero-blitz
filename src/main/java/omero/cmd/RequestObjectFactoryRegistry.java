@@ -13,14 +13,12 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-import ome.io.nio.OriginalFilesService;
 import ome.io.nio.PixelsService;
 import ome.io.nio.ThumbnailService;
 import ome.security.ACLVoter;
 import ome.security.SecuritySystem;
 import ome.security.auth.PasswordProvider;
 import ome.security.auth.PasswordUtil;
-import ome.services.blitz.repo.ManagedRepositoryI;
 import ome.services.mail.MailUtil;
 import ome.system.OmeroContext;
 import ome.system.Roles;
@@ -64,13 +62,9 @@ public class RequestObjectFactoryRegistry extends
 
     private final Roles roles;
 
-    private final OriginalFilesService filesService;
-
     private final PixelsService pixelsService;
 
     private final ThumbnailService thumbnailService;
-
-    private final ManagedRepositoryI managedRepository;
 
     private final MailUtil mailUtil;
 
@@ -87,10 +81,8 @@ public class RequestObjectFactoryRegistry extends
     public RequestObjectFactoryRegistry(ExtendedMetadata em,
             ACLVoter voter,
             Roles roles,
-            OriginalFilesService filesService,
             PixelsService pixelsService,
             ThumbnailService thumbnailService,
-            ManagedRepositoryI managedRepository,
             MailUtil mailUtil,
             PasswordUtil passwordUtil,
             SecuritySystem sec,
@@ -100,10 +92,8 @@ public class RequestObjectFactoryRegistry extends
         this.em = em;
         this.voter = voter;
         this.roles = roles;
-        this.filesService = filesService;
         this.pixelsService = pixelsService;
         this.thumbnailService = thumbnailService;
-        this.managedRepository = managedRepository;
         this.mailUtil = mailUtil;
         this.passwordUtil = passwordUtil;
         this.sec = sec;
@@ -238,12 +228,7 @@ public class RequestObjectFactoryRegistry extends
                 new ObjectFactory(DuplicateI.ice_staticId()) {
                     @Override
                     public Ice.Object create(String name) {
-                        final DuplicateI request = graphRequestFactory.getRequest(DuplicateI.class);
-                        request.setOriginalFilesService(filesService);
-                        request.setPixelsService(pixelsService);
-                        request.setThumbnailService(thumbnailService);
-                        request.setManagedRepository(managedRepository);
-                        return request;
+                        return graphRequestFactory.getRequest(DuplicateI.class);
                     }
                 });
         factories.put(SendEmailRequestI.ice_staticId(),

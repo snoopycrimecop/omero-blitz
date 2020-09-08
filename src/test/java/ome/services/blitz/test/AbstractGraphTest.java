@@ -13,14 +13,12 @@ import java.util.Map;
 import org.jmock.Mock;
 import org.testng.annotations.BeforeClass;
 
-import ome.io.nio.OriginalFilesService;
 import ome.io.nio.PixelsService;
 import ome.io.nio.ThumbnailService;
 import ome.security.ACLVoter;
 import ome.security.SecuritySystem;
 import ome.security.auth.PasswordProvider;
 import ome.security.auth.PasswordUtil;
-import ome.services.blitz.repo.ManagedRepositoryI;
 import ome.services.mail.MailUtil;
 import ome.services.util.ReadOnlyStatus;
 import ome.system.Roles;
@@ -57,10 +55,8 @@ public class AbstractGraphTest extends AbstractServantTest {
                 user.ctx.getBean(ExtendedMetadata.class),
                 user.ctx.getBean(ACLVoter.class),
                 user.ctx.getBean(Roles.class),
-                user.ctx.getBean("/OMERO/Files", OriginalFilesService.class),
                 user.ctx.getBean("/OMERO/Pixels", PixelsService.class),
                 user.ctx.getBean("/OMERO/Thumbs", ThumbnailService.class),
-                user.ctx.getBean(ManagedRepositoryI.class),
                 user.ctx.getBean(MailUtil.class),
                 user.ctx.getBean(PasswordUtil.class),
                 user.ctx.getBean(SecuritySystem.class),
