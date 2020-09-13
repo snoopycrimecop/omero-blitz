@@ -1124,7 +1124,7 @@ public class DuplicateI extends Duplicate implements IRequest, ReadOnlyStatus.Is
     public void finish() {
         managedRepository.clearFileCreationListener();
         if (diskUsage.isEmpty()) {
-            LOGGER.info("no file bytes copied");
+            LOGGER.debug("no file bytes copied");
         } else {
             LOGGER.info("file bytes copied: {}", Joiner.on(", ").join(diskUsage.entrySet().stream()
                     .map(entry -> String.format("%,d into %s", entry.getValue(), entry.getKey())).iterator()));
