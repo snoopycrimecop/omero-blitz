@@ -258,6 +258,7 @@ public class DuplicateI extends Duplicate implements IRequest, ReadOnlyStatus.Is
             }
         } else {
             /* copy rather than link as may violate integrity if different users can write to same file */
+            Files.createDirectories(to.getParent());
             copyFile(location, from, to);
             LOGGER.debug("copied {} to {}", from, to);
         }
