@@ -33,6 +33,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
@@ -50,6 +51,7 @@ import Ice.Current;
 
 import ome.api.IQuery;
 import ome.api.RawFileStore;
+import ome.parameters.Parameters;
 import ome.services.blitz.impl.AbstractAmdServant;
 import ome.services.blitz.impl.ServiceFactoryI;
 import ome.services.blitz.repo.path.FilePathRestrictionInstance;
@@ -250,6 +252,19 @@ public class PublicRepositoryI implements _RepositoryOperations, ApplicationCont
         return repositoryDao.treeList(repoUuid, checked, __current);
     }
 
+    /**
+     * @param session the Hibernate session
+     * @param serviceFactory the service factory
+     * @return the filesystem path set for this repository's root directory
+     * @throws ServerError if the root path could not be retrieved
+     */
+    public String rootPath(Session session, ServiceFactory serviceFactory) throws ServerError {
+        final IQuery iQuery = serviceFactory.getQueryService();
+        final String hql = "SELECT path || name FROM OriginalFile WHERE id = :id";
+        final Parameters params = new Parameters().addId(id);
+        final List<Object[]> results = iQuery.projection(hql, params);
+        return (String) results.get(0)[0];
+    }
 
     /**
      * Register an OriginalFile using its path
@@ -672,15 +687,34 @@ public class PublicRepositoryI implements _RepositoryOperations, ApplicationCont
      *
      * @param paths Not null, not empty. (Will be emptied by this method.)
      * @param parents "mkdir -p" like flag.
-     * @param s The session
-     * @param sf
-     * @param sql
-     * @param effectiveEventContext
+     * @param s the Hibernate session
+     * @param sf the service factory
+     * @param sql the JDBC convenience wrapper
+     * @param effectiveEventContext the event context to apply
      */
     protected void makeCheckedDirs(final LinkedList<CheckedPath> paths,
             boolean parents, Session s, ServiceFactory sf, SqlAction sql,
             ome.system.EventContext effectiveEventContext) throws ServerError {
+        makeCheckedDirs(paths, parents, s, sf, sql, effectiveEventContext, null);
+    }
 
+    /**
+     * Internal method to be used by subclasses to perform any extra checks on
+     * the listed of {@link CheckedPath} instances before allowing the creation
+     * of directories.
+     *
+     * @param paths Not null, not empty. (Will be emptied by this method.)
+     * @param parents "mkdir -p" like flag.
+     * @param s the Hibernate session
+     * @param sf the service factory
+     * @param sql the JDBC convenience wrapper
+     * @param effectiveEventContext the event context to apply
+     * @param fileCreationListener the file creation listener to notify of new directories being created
+     */
+    protected void makeCheckedDirs(final LinkedList<CheckedPath> paths,
+            boolean parents, Session s, ServiceFactory sf, SqlAction sql,
+            ome.system.EventContext effectiveEventContext,
+            Consumer<CheckedPath> fileCreationListener) throws ServerError {
         CheckedPath checked;
 
         // Since we now have some number of elements, we start at the most
@@ -705,6 +739,9 @@ public class PublicRepositoryI implements _RepositoryOperations, ApplicationCont
                 try {
                     repositoryDao.register(repoUuid, checked,
                             DIRECTORY_MIMETYPE, sf, sql, s);
+                    if (fileCreationListener != null) {
+                        fileCreationListener.accept(checked);
+                    }
                 } catch (ValidationException ve) {
                     if (ve.getCause() instanceof SQLException) {
                         // Could have collided with another thread also creating the directory.
@@ -738,6 +775,8 @@ public class PublicRepositoryI implements _RepositoryOperations, ApplicationCont
                 throw new omero.ResourceError(null, null,
                     "Path exists on disk: " + checked.fsFile);
             }
+        } else if (fileCreationListener != null) {
+            fileCreationListener.accept(checked);
         }
         repositoryDao.register(repoUuid, checked,
                 DIRECTORY_MIMETYPE, sf, sql, s);

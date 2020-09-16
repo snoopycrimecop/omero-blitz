@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2019 University of Dundee & Open Microscopy Environment.
+ * Copyright (C) 2014-2020 University of Dundee & Open Microscopy Environment.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -19,10 +19,17 @@
 
 package omero.cmd.graphs;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
+import java.nio.file.FileSystemException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -30,8 +37,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.apache.commons.beanutils.NestedNullException;
 import org.apache.commons.beanutils.PropertyUtils;
@@ -43,25 +54,44 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.SetMultimap;
 
+import ome.io.nio.OriginalFilesService;
+import ome.io.nio.PixelsService;
+import ome.io.nio.ThumbnailService;
 import ome.model.IObject;
+import ome.model.core.OriginalFile;
+import ome.model.core.Pixels;
+import ome.model.display.Thumbnail;
+import ome.model.fs.Fileset;
+import ome.model.fs.FilesetEntry;
 import ome.security.ACLVoter;
 import ome.security.basic.LightAdminPrivileges;
+import ome.services.blitz.repo.CheckedPath;
+import ome.services.blitz.repo.ManagedRepositoryI;
+import ome.services.blitz.repo.PublicRepositoryI;
+import ome.services.blitz.repo.path.FsFile;
 import ome.services.delete.Deletion;
 import ome.services.graphs.GraphException;
 import ome.services.graphs.GraphPathBean;
 import ome.services.graphs.GraphPolicy;
 import ome.services.graphs.GraphTraversal;
 import ome.services.graphs.PermissionsPredicate;
+import ome.services.scripts.ScriptRepoHelper;
 import ome.services.util.ReadOnlyStatus;
+import ome.system.EventContext;
 import ome.system.Roles;
+import ome.system.ServiceFactory;
+import ome.util.SqlAction;
+import omero.ServerError;
 import omero.cmd.Duplicate;
 import omero.cmd.DuplicateResponse;
 import omero.cmd.HandleI.Cancel;
@@ -69,6 +99,7 @@ import omero.cmd.ERR;
 import omero.cmd.Helper;
 import omero.cmd.IRequest;
 import omero.cmd.Response;
+import omero.util.PrefixSubstituter;
 
 /**
  * Request to duplicate model objects.
@@ -93,11 +124,29 @@ public class DuplicateI extends Duplicate implements IRequest, ReadOnlyStatus.Is
         IGNORE
     };
 
+    private static enum Location {
+        /* Files/ */
+        FILES,
+        /* Pixels/ */
+        PIXELS,
+        /* Thumbnails/ */
+        THUMBS,
+        /* ManagedRepository/ */
+        MANAGED;
+    }
+
     private final ACLVoter aclVoter;
     private final GraphPathBean graphPathBean;
     private final Set<Class<? extends IObject>> targetClasses;
     private GraphPolicy graphPolicy;  /* not final because of adjustGraphPolicy */
     private final SetMultimap<String, String> unnullable;
+    private final Map<Class<? extends IObject>, Location> locationsForClasses;
+    private final EnumMap<Location, Function<IObject, Path>> pathServices = new EnumMap<>(Location.class);
+    private final EnumMap<Location, Long> diskUsage = new EnumMap<>(Location.class);
+    private final ManagedRepositoryI managedRepository;
+
+    /* retain a reference here because ManagedRepositoryI.setFileCreationListener uses a weak reference */
+    private Consumer<CheckedPath> fileCreationListener;
 
     /* a taxonomy based on the class hierarchy of model objects in Java */
     private SpecificityClassifier<Class<? extends IObject>, Inclusion> classifier;
@@ -116,6 +165,12 @@ public class DuplicateI extends Duplicate implements IRequest, ReadOnlyStatus.Is
     private final Map<Entry<String, Long>, IObject> originalClassIdToDuplicates = new HashMap<Entry<String, Long>, IObject>();
     private final Multimap<IObject, PropertyUpdate> propertiesToUpdate = ArrayListMultimap.create();
     private final SetMultimap<IObject, IObject> blockedBy = HashMultimap.create();
+    private final Map<Long, String> originalFileRepos = new HashMap<>();
+    private final List<Path> filesCreated = new ArrayList<>();
+    private final PrefixSubstituter<FsFile> managedRepositoryRewrites;
+    private final List<OriginalFile> wrongPathDuplicateFiles = new ArrayList<>();
+    private final Set<Long> wrongPathDuplicatePixels = new HashSet<>();
+    private final Map<Long, List<String>> unmappedPropertiesPixels = new HashMap<>();
 
     /**
      * Construct a new <q>duplicate</q> request; called from {@link GraphRequestFactory#getRequest(Class)}.
@@ -137,10 +192,124 @@ public class DuplicateI extends Duplicate implements IRequest, ReadOnlyStatus.Is
         this.targetClasses = targetClasses;
         this.graphPolicy = graphPolicy;
         this.unnullable = unnullable;
+        this.managedRepositoryRewrites = new PrefixSubstituter<FsFile>(
+                (prefix, file) -> file.getPathFrom(prefix) != null,
+                (prefix, file) -> FsFile.concatenate(prefix, file),
+                (prefix, file) -> file.getPathFrom(prefix));
+        this.managedRepository = applicationContext.getBean(ManagedRepositoryI.class);
+        this.locationsForClasses = ImmutableMap.of(
+                OriginalFile.class, Location.FILES,
+                Pixels.class, Location.PIXELS,
+                Thumbnail.class, Location.THUMBS);
+        final Function<Function<Long, String>, Function<IObject, Path>> pathFactory =
+                new Function<Function<Long, String>, Function<IObject, Path>>() {
+            @Override
+            public Function<IObject, Path> apply(Function<Long, String> pathService) {
+                return obj -> Paths.get(pathService.apply(obj.getId()));
+            }
+        };
+        final Function<Long, String> pathInFiles, pathInPixels, pathInThumbs;
+        pathInFiles = applicationContext.getBean("/OMERO/Files", OriginalFilesService.class)::getFilesPath;
+        pathInPixels = applicationContext.getBean("/OMERO/Pixels", PixelsService.class)::getPixelsPath;
+        pathInThumbs = applicationContext.getBean("/OMERO/Thumbs", ThumbnailService.class)::getThumbnailPath;
+        this.pathServices.put(Location.FILES, pathFactory.apply(pathInFiles));
+        this.pathServices.put(Location.PIXELS, pathFactory.apply(pathInPixels));
+        this.pathServices.put(Location.THUMBS, pathFactory.apply(pathInThumbs));
     }
 
     @Override
     public Map<String, String> getCallContext() {
+        return null;
+    }
+
+    /**
+     * Run {@link Files#copy(Path, Path, java.nio.file.CopyOption...)} and note the disk space used.
+     * @param location the location of the file in the binary repository
+     * @param from the file to copy
+     * @param to where to create the copy
+     * @throws IOException from {@link Files#copy(Path, Path, java.nio.file.CopyOption...)}
+     */
+    private void copyFile(Location location, Path from, Path to) throws IOException {
+        Files.copy(from, to);
+        final long size = Files.size(to);
+        if (size > 0) {
+            diskUsage.merge(location, size, (x, y) -> x + y);
+        }
+    }
+
+    /**
+     * Create a duplicate of a file on the filesystem.
+     * @param location the location of the file in the binary repository
+     * @param from the file to duplicate
+     * @param to where to create the duplicate
+     * @throws IOException if the file duplication failed
+     */
+    private void duplicateFile(Location location, Path from, Path to) throws IOException {
+        if (location == Location.MANAGED) {
+            try {
+                /* safe to create a hard link in managed repository */
+                Files.createLink(to, from);
+                LOGGER.debug("linked {} to {}", from, to);
+            } catch (FileSystemException fse) {
+                LOGGER.debug("failed to link {} to {}", from, to, fse);
+                /* cannot link so fall back to a copy */
+                copyFile(location, from, to);
+                LOGGER.debug("copied {} to {}", from, to);
+            }
+        } else {
+            /* copy rather than link as may violate integrity if different users can write to same file */
+            Files.createDirectories(to.getParent());
+            copyFile(location, from, to);
+            LOGGER.debug("copied {} to {}", from, to);
+        }
+    }
+
+    /**
+     * Get the underlying filesystem path for the given object.
+     * @param modelObject a model object
+     * @return the location of the object in the binary repository, or {@code null} if none exists
+     * @throws GraphException if the object should not be included in duplication
+     */
+    private Location getPath(IObject modelObject) throws GraphException {
+        if (modelObject instanceof OriginalFile) {
+            /* Files may require special handling. */
+            final OriginalFile file = (OriginalFile) modelObject;
+            String fileRepo = file.getRepo();
+            if (fileRepo == null) {
+                fileRepo = originalFileRepos.get(file.getId());
+            }
+            if (PublicRepositoryI.DIRECTORY_MIMETYPE.equals(file.getMimetype())) {
+                /* Do not attempt to duplicate directories. */
+                LOGGER.debug("not directly duplicating OriginalFile:{} on filesystem because it is a directory", file.getId());
+                return null;
+            }
+            if (fileRepo != null) {
+                if (ScriptRepoHelper.SCRIPT_REPO.equals(fileRepo)) {
+                    /* Do not attempt to duplicate scripts. */
+                    throw new GraphException(
+                            "will not duplicate OriginalFile:" + file.getId() + " because it is in the scripts repository");
+                } else if (managedRepository.getRepoUuid().equals(fileRepo)) {
+                    return Location.MANAGED;
+                } else {
+                    throw new GraphException(
+                            "cannot duplicate OriginalFile:" + file.getId() + " because it is in repository " + fileRepo);
+                }
+            }
+            /* If we reach here then the file is in /Files/ */
+        }
+        final Class<? extends IObject> modelObjectClass;
+        if (modelObject instanceof HibernateProxy) {
+            modelObjectClass = Hibernate.getClass(modelObject);
+        } else {
+            modelObjectClass = modelObject.getClass();
+        }
+        for (final Map.Entry<Class<? extends IObject>, Location> locationForClass : locationsForClasses.entrySet()) {
+            final Class<? extends IObject> locationClass = locationForClass.getKey();
+            final Location location = locationForClass.getValue();
+            if (locationClass.isAssignableFrom(modelObjectClass)) {
+                return location;
+            }
+        }
         return null;
     }
 
@@ -158,7 +327,7 @@ public class DuplicateI extends Duplicate implements IRequest, ReadOnlyStatus.Is
         }
 
         this.helper = helper;
-        helper.setSteps(dryRun ? 3 : 8);
+        helper.setSteps(dryRun ? 3 : 14);
         this.graphHelper = new GraphHelper(helper, graphPathBean);
 
         classifier = new SpecificityClassifier<Class<? extends IObject>, Inclusion>(
@@ -194,6 +363,25 @@ public class DuplicateI extends Duplicate implements IRequest, ReadOnlyStatus.Is
                 aclVoter, graphPathBean, unnullable, new InternalProcessor(), dryRun);
 
         graphPolicyAdjusters = null;
+
+        final Path managedRepositoryRoot;
+        try {
+            final String rootPath = managedRepository.rootPath(helper.getSession(), helper.getServiceFactory());
+            managedRepositoryRoot = Paths.get(rootPath);
+        } catch (ServerError se) {
+            final String message = "cannot determine root of managed repository";
+            LOGGER.error(message, se);
+            throw new IllegalStateException(message + ": " + se);
+        }
+        fileCreationListener = checked -> filesCreated.add(checked.fsFile.toPath(managedRepositoryRoot));
+        managedRepository.setFileCreationListener(fileCreationListener);
+        this.pathServices.put(Location.MANAGED, new Function<IObject, Path>() {
+            @Override
+            public Path apply(IObject object) {
+                final OriginalFile file = (OriginalFile) object;
+                return new FsFile(file.getPath() + file.getName()).toPath(managedRepositoryRoot);
+            }
+        });
     }
 
     /**
@@ -568,12 +756,23 @@ public class DuplicateI extends Duplicate implements IRequest, ReadOnlyStatus.Is
                     propertyUpdateTriggers.removeAll(duplicate);
                     final Collection<PropertyUpdate> propertiesToUpdateForDuplicate =
                             new ArrayList<PropertyUpdate>(propertiesToUpdate.get(duplicate));
+                    Consumer<? super Long> idProcessor = id -> {};
+                    if (duplicate instanceof OriginalFile) {
+                        final OriginalFile duplicateFile = (OriginalFile) duplicate;
+                        final String duplicateFileRepo = duplicateFile.getRepo();
+                        if (duplicateFileRepo != null) {
+                            /* Cannot naively set repo property via ORM so note for later. */
+                            idProcessor = id -> originalFileRepos.put(id, duplicateFileRepo);
+                            duplicateFile.setRepo(null);
+                        }
+                    }
                     /* when an object is persisted its hash changes, so move key in persisted and in propertiesToUpdate */
                     propertiesToUpdate.removeAll(duplicate);
                     persisted.remove(duplicate);
                     session.persist(duplicate);
                     propertiesToUpdate.putAll(duplicate, propertiesToUpdateForDuplicate);
                     persisted.add(duplicate);
+                    idProcessor.accept(duplicate.getId());
                     if (LOGGER.isDebugEnabled()) {
                         LOGGER.debug("persisted " + duplicate.getClass().getName() + ":" + duplicate.getId());
                     }
@@ -660,6 +859,177 @@ public class DuplicateI extends Duplicate implements IRequest, ReadOnlyStatus.Is
         }
     }
 
+    /**
+     * Handles duplication of a fileset, including creating filesystem directories for the new template path and
+     * adjusting the paths of the duplicate to match.
+     * @param originalFileset the fileset being duplicated
+     * @param duplicateFileset the persisted duplicate of the fileset
+     * @throws GraphException if the fileset could not be duplicated
+     */
+    private void duplicateFileset(Fileset originalFileset, Fileset duplicateFileset) throws GraphException {
+        final Map<OriginalFile, OriginalFile> originalsToDuplicatesUsedFiles = new HashMap<>();
+        for (final FilesetEntry entry : (Iterable<FilesetEntry>) () -> originalFileset.iterateUsedFiles()) {
+            final OriginalFile originalUsedFile = entry.getOriginalFile();
+            final OriginalFile duplicateUsedFile = (OriginalFile) originalsToDuplicates.get(originalUsedFile);
+            if (duplicateUsedFile != null) {
+                originalsToDuplicatesUsedFiles.put(originalUsedFile, duplicateUsedFile);
+            }
+        }
+        if (originalsToDuplicatesUsedFiles.isEmpty()) {
+            /* There are no files to be duplicated. */
+            return;
+        }
+        /* Construct a consistent basis for any hash in the template prefix. */
+        final SortedMap<Long, Long> idMap = originalsToDuplicatesUsedFiles.entrySet().stream()
+                .collect(Collectors.toMap(entry -> entry.getKey().getId(), entry -> entry.getValue().getId(),
+                        (v1, v2) -> { throw new IllegalStateException(); }, TreeMap::new));
+        /* Create a new template path for the duplicate files. */
+        final EventContext ec = helper.getEventContext();
+        final ServiceFactory sf = helper.getServiceFactory();
+        final Session session = helper.getSession();
+        final SqlAction sql = helper.getSql();
+        final FsFile originalTemplatePrefix, duplicateTemplatePrefix;
+        try {
+            originalTemplatePrefix = new FsFile(originalFileset.getTemplatePrefix());
+            duplicateTemplatePrefix = managedRepository.createTemplatePath(idMap, ec, sf, session, sql);
+        } catch (ServerError se) {
+            final String message = "failed to create managed repository directory for duplicate fileset";
+            LOGGER.warn(message, se);
+            throw new GraphException(message + ": " + se);
+        }
+        duplicateFileset.setTemplatePrefix(duplicateTemplatePrefix.toString() + FsFile.separatorChar);
+        managedRepositoryRewrites.put(originalTemplatePrefix, duplicateTemplatePrefix);
+        LOGGER.debug("will duplicate Fileset:{} as Fileset:{} into {}",
+                originalFileset.getId(), duplicateFileset.getId(), duplicateTemplatePrefix);
+    }
+
+    /**
+     * Note the references to underlying files that need fixing in duplicates.
+     */
+    private void noteWrongPaths() throws GraphException {
+        final SqlAction sql = helper.getSql();
+        final String repoUuid = managedRepository.getRepoUuid();
+        for (final Map.Entry<IObject, IObject> originalDuplicate : originalsToDuplicates.entrySet()) {
+            final IObject original = originalDuplicate.getKey();
+            final IObject duplicate = originalDuplicate.getValue();
+            if (original instanceof Fileset) {
+                duplicateFileset((Fileset) original, (Fileset) duplicate);
+            } else if (original instanceof OriginalFile) {
+                if (getPath(original) == Location.MANAGED) {
+                    wrongPathDuplicateFiles.add((OriginalFile) duplicate);
+                }
+            } else if (original instanceof Pixels) {
+                final List<String> pixelInfo = sql.getPixelsNamePathRepo(original.getId());
+                if (pixelInfo != null) {
+                    unmappedPropertiesPixels.put(duplicate.getId(), pixelInfo);
+                    if (repoUuid.equals(pixelInfo.get(2))) {
+                        wrongPathDuplicatePixels.add(duplicate.getId());
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Fix the path set for duplicated files in the managed repository such that they reference their new fileset.
+     * @throws GraphException if the paths for the files could not be created
+     */
+    private void fixPathDuplicateFiles() throws GraphException {
+        final EventContext ec = helper.getEventContext();
+        final ServiceFactory sf = helper.getServiceFactory();
+        final Session session = helper.getSession();
+        final SqlAction sql = helper.getSql();
+        for (final OriginalFile wrongPathDuplicateFile : wrongPathDuplicateFiles) {
+            String fromPathName = wrongPathDuplicateFile.getPath() + wrongPathDuplicateFile.getName();
+            final boolean isLog = fromPathName.endsWith(".log");
+            if (isLog) {
+                /* An awkward hack for import logs which are not contained within the template prefix directory. */
+                fromPathName = fromPathName.substring(0, fromPathName.length() - 4) + FsFile.separatorChar + "log";
+            }
+            String toPathName = managedRepositoryRewrites.apply(new FsFile(fromPathName)).toString();
+            if (fromPathName.equals(toPathName)) {
+                continue;
+            }
+            if (isLog) {
+                toPathName = toPathName.substring(0, toPathName.length() - 4) + ".log";
+            }
+            final int namePosition = toPathName.lastIndexOf(FsFile.separatorChar) + 1;
+            wrongPathDuplicateFile.setPath(toPathName.substring(0, namePosition));
+            wrongPathDuplicateFile.setName(toPathName.substring(namePosition));
+            try {
+                managedRepository.makeDir(wrongPathDuplicateFile.getPath(), true, session, sf, sql, ec);
+            } catch (ServerError se) {
+                final String message = "failed to create managed repository directory " + wrongPathDuplicateFile.getPath();
+                LOGGER.warn(message, se);
+                throw new GraphException(message + ": " + se);
+            }
+        }
+    }
+
+    /**
+     * Duplicate files on the filesystem.
+     * @throws GraphException if the files cannot be duplicated
+     */
+    private void duplicateUnderlyingFiles() throws GraphException {
+        for (final Map.Entry<IObject, IObject> originalDuplicate : originalsToDuplicates.entrySet()) {
+            final IObject original = originalDuplicate.getKey();
+            final IObject duplicate = originalDuplicate.getValue();
+            final Location originalLocation = getPath(original);
+            if (originalLocation == null) {
+                continue;
+            }
+            final Path originalPath = pathServices.get(originalLocation).apply(original);
+            if (!Files.exists(originalPath)) {
+                continue;
+            }
+            final Location duplicateLocation = getPath(duplicate);
+            if (duplicateLocation != null && originalLocation != duplicateLocation) {
+                throw new GraphException("file duplicating " + originalPath + " is in a different repository");
+            }
+            final Path duplicatePath = pathServices.get(originalLocation).apply(duplicate);
+            if (originalPath.equals(duplicatePath)) {
+                throw new GraphException("failed to generate different path for file duplicating " + originalPath);
+            }
+            try {
+                duplicateFile(originalLocation, originalPath, duplicatePath);
+                filesCreated.add(duplicatePath);
+            } catch (IOException ioe) {
+                final String message = "failed to duplicate file from " + originalPath + " to " + duplicatePath;
+                LOGGER.warn(message, ioe);
+                throw new GraphException(message + ": " + ioe);
+            }
+        }
+    }
+
+    /**
+     * Use SQL to effect the required {@link OriginalFile#setRepo(String)} operations
+     * since the property was nulled for persisting the duplicate instances.
+     */
+    public void setOriginalFileRepos() {
+        final SqlAction sql = helper.getSql();
+        for (final Map.Entry<Long, String> originalFileRepo : originalFileRepos.entrySet()) {
+            sql.setFileRepo(Collections.singleton(originalFileRepo.getKey()), originalFileRepo.getValue());
+        }
+    }
+
+    /**
+     * Use SQL to set the unmapped {@code repo}, {@code path}, {@code name} property for pixels,
+     * referencing the path to their new fileset where necessary.
+     */
+    private void setPixelsInfo() {
+        final SqlAction sql = helper.getSql();
+        for (final Map.Entry<Long, List<String>> unmappedPropertiesPixel : unmappedPropertiesPixels.entrySet()) {
+            final Long pixelsId = unmappedPropertiesPixel.getKey();
+            final String name = unmappedPropertiesPixel.getValue().get(0);
+            String path = unmappedPropertiesPixel.getValue().get(1);
+            final String repo = unmappedPropertiesPixel.getValue().get(2);
+            if (wrongPathDuplicatePixels.contains(pixelsId)) {
+                path = managedRepositoryRewrites.apply(new FsFile(path)).toString();
+            }
+            sql.setPixelsNamePathRepo(pixelsId, name, path, repo);
+        }
+    }
+
     @Override
     public Object step(int step) throws Cancel {
         helper.assertStep(step);
@@ -698,23 +1068,68 @@ public class DuplicateI extends Duplicate implements IRequest, ReadOnlyStatus.Is
             case 7:
                 linkToNewDuplicates();
                 return null;
+            case 8:
+                noteWrongPaths();
+                return null;
+            case 9:
+                fixPathDuplicateFiles();
+                return null;
+            case 10:
+                duplicateUnderlyingFiles();
+                return null;
+            case 11:
+                /* Subsequent steps write via SQL instead of via Hibernate. */
+                helper.getSession().flush();
+                return null;
+            case 12:
+                setOriginalFileRepos();
+                return null;
+            case 13:
+                setPixelsInfo();
+                return null;
             default:
                 final Exception e = new IllegalArgumentException("model object graph operation has no step " + step);
                 throw helper.cancel(new ERR(), e, "bad-step");
             }
         } catch (Cancel c) {
+            abort();
             throw c;
         } catch (GraphException ge) {
+            abort();
             final omero.cmd.GraphException graphERR = new omero.cmd.GraphException();
             graphERR.message = ge.message;
             throw helper.cancel(graphERR, ge, "graph-fail");
         } catch (Throwable t) {
+            abort();
             throw helper.cancel(new ERR(), t, "graph-fail");
+        }
+    }
+
+    /**
+     * Clean up after duplication is found to have failed.
+     */
+    private void abort() {
+        LOGGER.debug("aborting duplication process");
+        managedRepository.clearFileCreationListener();
+        Collections.reverse(filesCreated);
+        for (final Path fileCreated : filesCreated) {
+            try {
+                Files.deleteIfExists(fileCreated);
+            } catch (IOException ioe) {
+                LOGGER.warn("failed to delete {}", fileCreated, ioe);
+            }
         }
     }
 
     @Override
     public void finish() {
+        managedRepository.clearFileCreationListener();
+        if (diskUsage.isEmpty()) {
+            LOGGER.debug("no file bytes copied");
+        } else {
+            LOGGER.info("file bytes copied: {}", Joiner.on(", ").join(diskUsage.entrySet().stream()
+                    .map(entry -> String.format("%,d into %s", entry.getValue(), entry.getKey())).iterator()));
+        }
     }
 
     @Override
