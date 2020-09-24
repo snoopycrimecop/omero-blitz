@@ -1,3 +1,14 @@
+5.5.8 (September 2020)
+----------------------
+
+- Allow clients to connect with newer TLS ([#108](https://github.com/ome/omero-blitz/pull/108))
+- Remove unused repository code ([#102](https://github.com/ome/omero-blitz/pull/102))
+- Correct bug in listing import processes ([#101](https://github.com/ome/omero-blitz/pull/101))
+- Allow duplication of file-based objects ([#100](https://github.com/ome/omero-blitz/pull/100))
+- How to report "omero import" bugs now ([#96](https://github.com/ome/omero-blitz/pull/96))
+- Bump omero-server version to 5.6.1
+- Bump omero-common-test version to 5.5.7
+
 5.5.7 (July 2020)
 -----------------
 
