@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/ome/omero-blitz.png)](https://travis-ci.org/ome/omero-blitz)
+[![Actions Status](https://github.com/ome/omero-blitz/workflows/Gradle/badge.svg)](https://github.com/ome/omero-blitz/actions)
 
 # omero-blitz
 
