@@ -45,18 +45,12 @@ jobs:
           restore-keys: ${{ runner.os }}-gradle
       - name: Wrap with specified version
         run: |
-          DIR=$PWD 
-          cd /tmp 
           gradle wrapper --gradle-version=${{ env.gradle_version }}
-          mv .gradle gradle gradlew $DIR
         if: ${{ env.gradle_version != '' }}
         shell: bash
       - name: Wrap without version
         run: |
-          DIR=$PWD 
-          cd /tmp 
           gradle wrapper
-          mv .gradle gradle gradlew $DIR
         if: ${{ env.gradle_version == '' }}
         shell: bash
       - name: Run commands
