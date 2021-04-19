@@ -1,8 +1,8 @@
 plugins {
     id "java-library"
     id "org.openmicroscopy.api" version "5.5.0"
-    id "org.openmicroscopy.dsl" version "5.5.1-SNAPSHOT"
-    id "org.openmicroscopy.blitz" version "5.5.1-SNAPSHOT"
+    id "org.openmicroscopy.dsl" version "5.5.1"
+    id "org.openmicroscopy.blitz" version "5.5.1"
     id "org.openmicroscopy.project" version "5.5.1"
     id "org.openmicroscopy.gradle.ice-builder.slice" version "1.5.0"
 }
