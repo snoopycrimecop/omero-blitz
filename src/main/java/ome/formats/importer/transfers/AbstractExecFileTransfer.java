@@ -159,6 +159,9 @@ public abstract class AbstractExecFileTransfer extends AbstractFileTransfer {
      */
     protected void exec(File file, File location) throws IOException {
         ProcessBuilder pb = createProcessBuilder(file, location);
+        if (pb == null) {
+            return;
+        }
         pb.redirectErrorStream(true);
         Process process = pb.start();
         Integer rcode = null;
