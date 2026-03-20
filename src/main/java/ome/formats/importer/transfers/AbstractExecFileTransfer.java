@@ -205,7 +205,9 @@ public abstract class AbstractExecFileTransfer extends AbstractFileTransfer {
      * @deprecated override {@link #exec(File, File)} instead
      */
     @Deprecated
-    protected abstract ProcessBuilder createProcessBuilder(File file, File location);
+    protected ProcessBuilder createProcessBuilder(File file, File location) {
+        return null;
+    }
 
     protected void printLine() {
         log.error("*******************************************");
