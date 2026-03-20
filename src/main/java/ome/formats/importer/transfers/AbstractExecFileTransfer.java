@@ -209,8 +209,4 @@ public abstract class AbstractExecFileTransfer extends AbstractFileTransfer {
         return null;
     }
 
-    protected void printLine() {
-        log.error("*******************************************");
-    }
-
 }
