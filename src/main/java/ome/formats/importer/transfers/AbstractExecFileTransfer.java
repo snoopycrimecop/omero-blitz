@@ -157,48 +157,7 @@ public abstract class AbstractExecFileTransfer extends AbstractFileTransfer {
      * @param location the target on the server
      * @throws IOException for problems with the source file
      */
-    protected void exec(File file, File location) throws IOException {
-        ProcessBuilder pb = createProcessBuilder(file, location);
-        if (pb == null) {
-            return;
-        }
-        pb.redirectErrorStream(true);
-        Process process = pb.start();
-        Integer rcode = null;
-        while (rcode == null) {
-            try {
-                rcode = process.waitFor();
-                break;
-            } catch (InterruptedException e) {
-                continue;
-            }
-        }
-        if (rcode == null || rcode.intValue() != 0) {
-            StringWriter sw = new StringWriter();
-            sw.append("transfer process returned: ");
-            sw.append(Integer.toString(rcode));
-            sw.append("\n");
-            sw.append("command:");
-            for (String arg : pb.command()) {
-                sw.append(" ");
-                sw.append(arg);
-            }
-            sw.append("\n");
-            sw.append("output:");
-            sw.append(LINE);
-            String line = "";
-            BufferedReader br = new BufferedReader(
-                   new InputStreamReader(process.getInputStream()));
-            while ( (line = br.readLine()) != null) {
-               sw.append(line);
-               sw.append(SEPARATOR);
-            }
-            sw.append(LINE);
-            String msg = sw.toString();
-            log.error(msg);
-            throw new RuntimeException(msg);
-        }
-    }
+    protected abstract void exec(File file, File location) throws IOException;
 
     /**
      * Check that the server can properly read the copied file.
@@ -243,7 +202,9 @@ public abstract class AbstractExecFileTransfer extends AbstractFileTransfer {
      * @param file File to be copied.
      * @param location Location to copy to.
      * @return an instance ready for performing the transfer
+     * @deprecated override {@link #exec(File, File)} instead
      */
+    @Deprecated
     protected abstract ProcessBuilder createProcessBuilder(File file, File location);
 
     protected void printLine() {

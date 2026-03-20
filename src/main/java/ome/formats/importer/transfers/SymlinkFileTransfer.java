@@ -34,19 +34,14 @@ import java.util.List;
 public class SymlinkFileTransfer extends AbstractExecFileTransfer {
 
     /**
-     * Creates a symlink, returns null.
+     * Creates a symlink.
      *
      * @param file File to be copied.
      * @param location Location to copy to.
-     * @return null
+     * @param throws IOException
      */
-    protected ProcessBuilder createProcessBuilder(File file, File location) {
-        try {
-            Files.createSymbolicLink(Paths.get(location.getAbsolutePath()), Paths.get(file.getAbsolutePath()));
-        }
-        catch (IOException e) {
-        }
-        return null;
+    protected void exec(File file, File location) throws IOException {
+        Files.createSymbolicLink(Paths.get(location.getAbsolutePath()), Paths.get(file.getAbsolutePath()));
     }
 
     /**
