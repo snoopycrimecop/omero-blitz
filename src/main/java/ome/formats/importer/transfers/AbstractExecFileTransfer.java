@@ -152,12 +152,55 @@ public abstract class AbstractExecFileTransfer extends AbstractFileTransfer {
 
     /**
      * Executes a local command and fails on non-0 return codes.
+     * This method should be overridden by subclasses, see for example
+     * {@link CopyFileTransfer}.
      *
      * @param file the source file
      * @param location the target on the server
      * @throws IOException for problems with the source file
      */
-    protected abstract void exec(File file, File location) throws IOException;
+    protected void exec(File file, File location) throws IOException {
+        ProcessBuilder pb = createProcessBuilder(file, location);
+        if (pb == null) {
+            return;
+        }
+        pb.redirectErrorStream(true);
+        Process process = pb.start();
+        Integer rcode = null;
+        while (rcode == null) {
+            try {
+                rcode = process.waitFor();
+                break;
+            } catch (InterruptedException e) {
+                continue;
+            }
+        }
+        if (rcode == null || rcode.intValue() != 0) {
+            StringWriter sw = new StringWriter();
+            sw.append("transfer process returned: ");
+            sw.append(Integer.toString(rcode));
+            sw.append("\n");
+            sw.append("command:");
+            for (String arg : pb.command()) {
+                sw.append(" ");
+                sw.append(arg);
+            }
+            sw.append("\n");
+            sw.append("output:");
+            sw.append(LINE);
+            String line = "";
+            BufferedReader br = new BufferedReader(
+                   new InputStreamReader(process.getInputStream()));
+            while ( (line = br.readLine()) != null) {
+               sw.append(line);
+               sw.append(SEPARATOR);
+            }
+            sw.append(LINE);
+            String msg = sw.toString();
+            log.error(msg);
+            throw new RuntimeException(msg);
+        }
+    }
 
     /**
      * Check that the server can properly read the copied file.
