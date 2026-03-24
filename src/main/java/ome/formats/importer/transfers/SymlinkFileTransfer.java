@@ -37,7 +37,7 @@ public class SymlinkFileTransfer extends AbstractExecFileTransfer {
      *
      * @param file File to be copied.
      * @param location Location to copy to.
-     * @param throws IOException
+     * @throws IOException
      */
     protected void exec(File file, File location) throws IOException {
         Files.createSymbolicLink(Paths.get(location.getAbsolutePath()), Paths.get(file.getAbsolutePath()));
