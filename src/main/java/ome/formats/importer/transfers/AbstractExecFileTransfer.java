@@ -34,8 +34,7 @@ import omero.api.RawFileStorePrx;
 import omero.model.OriginalFile;
 
 /**
- * Local-only file transfer mechanism which makes use of soft-linking.
- * This is only useful where the command "ln -s source target" will work.
+ * Abstract base class for file transfer implementations that link or copy files.
  *
  * @since 5.0
  */
@@ -46,9 +45,7 @@ public abstract class AbstractExecFileTransfer extends AbstractFileTransfer {
     private static final String SEPARATOR = System.getProperty("line.separator");
 
     /**
-     * "Transfer" files by soft-linking them into place. This method is likely
-     * re-usable for other general "linking" strategies by overriding
-     * {@link #createProcessBuilder(File, File)} and the other protected methods here.
+     * Transfer files as specified by the {@link #exec(File, File)} implementation.
      */
     public String transfer(TransferState state) throws IOException, ServerError {
         RawFileStorePrx rawFileStore = start(state);
@@ -151,7 +148,12 @@ public abstract class AbstractExecFileTransfer extends AbstractFileTransfer {
     }
 
     /**
-     * Executes a local command and fails on non-0 return codes.
+     * If {@link createProcessBuilder(File, File)} returns non-null,
+     * executes a local command corresponding to the ProcessBuilder
+     * and fails on non-0 return codes.
+     *
+     * If the ProcessBuilder is null, this method does nothing by default.
+     *
      * This method should be overridden by subclasses, see for example
      * {@link CopyFileTransfer}.
      *
