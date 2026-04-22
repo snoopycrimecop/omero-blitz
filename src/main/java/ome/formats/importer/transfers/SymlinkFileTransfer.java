@@ -21,45 +21,26 @@ package ome.formats.importer.transfers;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 
 /**
  * Local-only file transfer mechanism which makes use of soft-linking.
- *
- *  This is only useful where the commands "ln -s source target" (Unix) or
- * "mklink target source" (Windows) will work.
  *
  * @since 5.0
  */
 public class SymlinkFileTransfer extends AbstractExecFileTransfer {
 
     /**
-     * Executes "ln -s file location" (Unix) or "mklink location file" (Windows)
-     * and fails on non-0 return codes.
+     * Creates a symlink.
      *
      * @param file File to be copied.
      * @param location Location to copy to.
      * @throws IOException
      */
-    // TODO Java7: replace ln once Java6 is dropped
-    protected ProcessBuilder createProcessBuilder(File file, File location) {
-        ProcessBuilder pb = new ProcessBuilder();
-        List<String> args = new ArrayList<String>();
-        if (isWindows()) {
-            args.add("cmd");
-            args.add("/c");
-            args.add("mklink");
-            args.add(location.getAbsolutePath());
-            args.add(file.getAbsolutePath());
-        } else {
-            args.add("ln");
-            args.add("-s");
-            args.add(file.getAbsolutePath());
-            args.add(location.getAbsolutePath());
-        }
-        pb.command(args);
-        return pb;
+    protected void exec(File file, File location) throws IOException {
+        Files.createSymbolicLink(Paths.get(location.getAbsolutePath()), Paths.get(file.getAbsolutePath()));
     }
 
     /**

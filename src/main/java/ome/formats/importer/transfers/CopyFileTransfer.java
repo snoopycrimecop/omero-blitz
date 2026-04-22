@@ -21,44 +21,26 @@ package ome.formats.importer.transfers;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 
 /**
- * Local-only file transfer mechanism which makes use of the plaform
- * copy command.
- *
- * This is only useful where the commands "cp source target" (Unix) or
- * "copy source target" (Windows) will work.
+ * Local-only file transfer mechanism.
  *
  * @since 5.0.7
  */
 public class CopyFileTransfer extends AbstractExecFileTransfer {
 
     /**
-     * Executes "cp file location" (Unix) or "cp file location" (Windows)
-     * and fails on non-0 return codes.
+     * Copies a file from one location to another.
      *
      * @param file File to be copied
      * @param location Location to copy to.
      * @throws IOException
      */
-    protected ProcessBuilder createProcessBuilder(File file, File location) {
-        ProcessBuilder pb = new ProcessBuilder();
-        List<String> args = new ArrayList<String>();
-        if (isWindows()) {
-            args.add("cmd");
-            args.add("/c");
-            args.add("cp");
-            args.add(file.getAbsolutePath());
-            args.add(location.getAbsolutePath());
-        } else {
-            args.add("cp");
-            args.add(file.getAbsolutePath());
-            args.add(location.getAbsolutePath());
-        }
-        pb.command(args);
-        return pb;
+    protected void exec(File file, File location) throws IOException {
+        Files.copy(Paths.get(file.getAbsolutePath()), Paths.get(location.getAbsolutePath()));
     }
 
     /**
